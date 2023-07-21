@@ -31,7 +31,7 @@ import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option,window_handle_number,visiblity_status,tagfilter,xpathfilter):
+    def fullscrape(self,scrape_option,window_handle_number,visiblity_status,tagfilter,xpathfilter,scenarioFlag):
         global currenthandle
         start_time = time.clock()
         data = {}
@@ -140,8 +140,10 @@ class Fullscrape():
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[0]+';'+right_part
-                if (tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None:
+                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                if not scenarioFlag and ((tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None):
+                    new_obj.append(a)
+                elif scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):
                     new_obj.append(a)
             tempne=new_obj
             log.info('json operations dumps and loads are performed on the return data')

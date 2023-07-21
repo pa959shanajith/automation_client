@@ -320,7 +320,7 @@ class ScrapeWindow(wx.Frame):
                 event.GetEventObject().SetLabel("Comparing...")
             if event!=None:
                 self.comparebutton.Disable()
-            if ('scenarioLevel' in self.data):
+            if (self.data['scenarioLevel']):
                 currentScrapedData = self.data['view']
 
             else:
@@ -328,19 +328,23 @@ class ScrapeWindow(wx.Frame):
             
             d = obj.perform_compare(currentScrapedData)  #self.data is the current scraped objects
 
-            if ('scenarioLevel' in self.data):
+            if (self.data['scenarioLevel']):
                 d['orderlist']=currentScrapedData['orderlist']
                 
             tagfilter = {}
             for elem in d['view'][2]['notfoundobject']:
                 tagfilter[elem['tag']]=True
-                
+            
+            core_obj=core_utils.CoreUtils()
             xpathfilter = {}
-            if not 'scenarioLevel' in self.data:
-                for elem in currentScrapedData['view']:
+            for elem in currentScrapedData['view']:
+                if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
+                    decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
+                    xpathfilter[decry_abs_xpath] = True
+                else:
                     xpathfilter[elem['xpath'].split(';')[0]] = True
                 
-            fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter)
+            fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter,self.data['scenarioLevel'])
             
             d['view'].append({'newElements':fullScrapeData['view']})
             logger.print_on_console('Full scrape completed for compare object.')
@@ -451,7 +455,7 @@ class ScrapeWindow(wx.Frame):
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
-        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{})
+        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{},False)
 
         '''Check the limit of data size as per Avo Assure standards'''
         if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:

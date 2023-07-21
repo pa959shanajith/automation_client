@@ -152,7 +152,7 @@ def get_ocr(image):
     try:
         texxt_sentence='False'
         import client
-        text=client.api_request().extracttext(image,texxt_sentence)
+        text=client.api_request().getting_text(image)
         #text = pytesseract.image_to_string(cropped)
         #text = pytesseract.image_to_string(cropped)
     except Exception as e:
@@ -1395,7 +1395,7 @@ class IRISKeywords():
                     if(os.path.isfile('demo_cropped.png')):
                         os.remove('demo_cropped.png')
                 else:
-                    text = get_ocr(imb_64)
+                    text = get_ocr(img_crop)
                 if not( err_msg ):
                     status= TEST_RESULT_PASS
                     result = TEST_RESULT_TRUE
@@ -2611,24 +2611,27 @@ class IRISKeywords():
             #         res, width, height = gotoobject(element)
             #         if(res): img = get_byte_mirror(element['cord'])
             # img = get_byte_mirror(element['cord'])
-            # elem_coordinates = element['coordinates']
+            
+            elem_coordinates = element['coordinates']
 
-            # res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
-            # #logger.print_on_console(res)
-            # x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
-            # y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
-            # x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
-            # y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
-            # width=abs(x_new-x_new1)
-            # height=abs(y_new-y_new1)
-            # img_crop=image_gettext.crop((x_new, y_new, x_new1, y_new1))
-            # pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
+            res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+            #logger.print_on_console(res)
+            x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))*widthscale
+            y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))*heightscale
+            x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))*widthscale
+            y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))*heightscale
+            width=abs(x_new-x_new1)
+            height=abs(y_new-y_new1)
+
+            img_crop=image_gettext.crop((x_new, y_new, x_new1, y_new1))
+
+            pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
 
             #text = get_ocr(img_crop)
             text_sentence='False'
 
             import client
-            text =client.api_request().extracttext(im_b64,text_sentence)
+            text =client.api_request().getting_text(img_crop)
             if(verifytext.lower() == text[0][5].lower()):
                 status= TEST_RESULT_PASS
                 result = TEST_RESULT_TRUE
