@@ -58,6 +58,21 @@ class api_request():
         table_data=json.loads(response.text)['reference']
         logger.print_on_console(table_data)
         return table_data
+    
+    def getting_text(self,imgPath):
+
+        test_url = self.addr + '/get/text'
+
+        im_file = BytesIO()
+        imgPath.save(im_file, format="png")
+        im_bytes = im_file.getvalue()
+        im_b64 = base64.b64encode(im_bytes)
+        response = requests.post(test_url, data=im_b64,verify = False , timeout = None)
+        gettext=json.loads(response.text)['reference']
+        logger.print_on_console(gettext)
+
+        return gettext
+
 
 
     def image_save(self,imgPath) :
