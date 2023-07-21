@@ -549,9 +549,6 @@ class ClientWindow(wx.Frame):
         if self.enabledStatus[5]: self.clearbutton.Enable()
         # if self.enabledStatus[6]: self.menubar.EnableTop(0,True)
         # if self.enabledStatus[7]: self.menubar.EnableTop(1,True)
-    def Enable_configItem(self, isEnable):
-        if isEnable: self.configItem.Enable(False) 
-        else: self.configItem.Enable(True) 
 
 
 """Checks if config file is present, if not prompts the user to enter config file details"""

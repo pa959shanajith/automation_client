@@ -17,7 +17,6 @@ from webscrape_utils import WebScrape_Utils
 from selenium.common.exceptions import NoSuchWindowException
 from os.path import normpath
 from constants import SYSTEM_OS
-from constants import CONFIG_PATH
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -28,10 +27,7 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-# If a user's license is adjusted after reading isTrail from the readconfig file,
-# the code below will update the isTrial value 
-isTrial = readconfig.readConfig().readJson().get('isTrial')
-
+isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
