@@ -90,6 +90,18 @@ class AzureWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
+            
+    def modify_data(self,input_data, parent_name=""):
+        modified_data = []
+        for item in input_data:
+            current_name = f"{parent_name}/{item['name']}" if parent_name else item['name']
+            print(item["id"],current_name)
+            modified_data.append({"id": item["id"], "name": current_name})
+
+            if item["hasChildren"] and "children" in item and len(item["children"])>0 :
+                modified_data.extend(self.modify_data(item["children"], current_name))
+
+        return modified_data        
 
     def get_configure_fields(self,azure_input_dict,socket):
         """
@@ -119,20 +131,29 @@ class AzureWindow():
             project_name = azure_input_dict['project']
 
             # API endpoint URL for classification nodes
-            area_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/areas?$depth=2&api-version=6.1'
-            iteration_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/iterations?$depth=2&api-version=6.1'
+            area_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/areas?$depth=100&api-version=6.1'
+            iteration_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/iterations?$depth=100&api-version=6.1'
 
             response_area = requests.get(area_url, headers=headers)
             if response_area.status_code == 200:
                 data_area = response_area.json()
-                if 'children' in data_area:
-                    area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
+                if 'children' in data_area and len(data_area['children']) > 0:
+                  for node in data_area['children']:
+                    area_paths.append({'id':node['id'],'name':node['name']})    
+                    if node['hasChildren'] and "children" in node and len(node["children"])>0 :
+                        child_data = self.modify_data(node["children"], node["name"])
+                        area_paths.extend(child_data)
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
-                if 'children' in data_iteration:
-                    iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
+                if 'children' in data_iteration and len(data_iteration['children']) > 0:
+                  for node in data_iteration['children']:
+                    iteration_paths.append({'id':node['id'],'name':node['name']})    
+                    if node['hasChildren'] and "children" in node and len(node["children"])>0 :
+                        child_data = self.modify_data(node["children"], node["name"])
+                        iteration_paths.extend(child_data)     
+
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
 
@@ -525,7 +546,8 @@ class AzureWindow():
                 if isinstance(value['data'], dict):
                     data = value['data']['text']
                 elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
-                    data = f'{project_name}\\' + value['data']
+                    convert_str = value['data'].replace("/","\\")
+                    data = f'{project_name}\\' + convert_str
                 else:
                     data = value['data']
 
