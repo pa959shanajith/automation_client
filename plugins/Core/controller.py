@@ -425,6 +425,10 @@ class Controller():
             self.status=index
         ellapsed_time=''
         statusflag = self.step_execution_status(tsp)
+        if tsp.name.lower() == "getparam" and tsp.step_description.lower() == DATA_PARAMETERIZATION_FAILED:
+            self.reporting_obj.overallstatus = TEST_RESULT_FAIL
+            status_percentage["total"] += 2
+            status_percentage["Fail"] += 2
         if ignore_stat:
             statusflag=True
         if keyword_flag:
