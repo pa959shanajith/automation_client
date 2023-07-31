@@ -1495,9 +1495,7 @@ class Main():
                     if response == "fail":
                         err_res = "Avo Assure Client registration failed."
                     else:
-                        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                        response = json.loads(core_utils_obj.unwrap(response, ice_das_key))
+                        response = json.loads(response)
                     if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
                         if not err_res: err_res = "Invalid response received"
                         logger.print_on_console(err_res)
