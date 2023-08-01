@@ -334,11 +334,12 @@ class ScrapeWindow(wx.Frame):
             core_obj=core_utils.CoreUtils()
             xpathfilter = {}
             for elem in currentScrapedData['view']:
-                if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
-                    decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
-                    xpathfilter[decry_abs_xpath] = True
-                else:
-                    xpathfilter[elem['xpath'].split(';')[0]] = True
+                # if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
+                #     decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
+                #     xpathfilter[decry_abs_xpath] = True
+                # else:
+                #     xpathfilter[elem['xpath'].split(';')[0]] = True
+                xpathfilter[elem['xpath'].split(';')[0]] = True
                 
             fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter,self.data['scenarioLevel'])
             

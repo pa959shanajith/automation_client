@@ -1969,11 +1969,12 @@ def check_browser():
                     a = p.stdout.readline()
                     a = a.decode('utf-8')[13:17]
                     a=a.split('.')[0]
-                    if str(a) == CHROME_VERSION.split('.')[0]:
+                    CHROME_VERSION = CHROME_VERSION.split('.')[0]
+                    if str(a) == CHROME_VERSION:
                         chromeFlag = True
                 if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
                     try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION.split('.')[0]+".exe"
+                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION+".exe"
                         if proxies:
                             fileObj = requests.get(URL,verify=False,proxies=proxies)
                             if(fileObj.status_code == 200):
@@ -1982,10 +1983,12 @@ def check_browser():
                             request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
-                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
+                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')    
+                    # using lower version of driver present
+                    chromeFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")    
 
         elif SYSTEM_OS == 'Darwin':
             if CHROME_VERSION != -1:
@@ -2002,10 +2005,12 @@ def check_browser():
                         request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
-                        logger.print_on_console("Unable to download compatible chrome driver from AvoAssure server")
+                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+                    # using lower version of driver present
+                    chromeFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")
         elif SYSTEM_OS == 'Linux':
             if CHROME_VERSION != -1:
                 chromeFlag = False
@@ -2022,11 +2027,14 @@ def check_browser():
                         chromeFlag = True
                         os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
                     except Exception as e:
+                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
                         log.debug("Error in chrome driver download")
                         log.error(e)
                         chromeFlag = False 
                 if chromeFlag == False:
-                    logger.print_on_console('Unable to download compatible chrome driver from AvoAssure server')
+                    # using lower version of driver present
+                    chromeFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")
         
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
@@ -2151,10 +2159,13 @@ def check_browser():
                             request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
-                        chromiumFlag = False 
+                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION.split('.')[0]} from AvoAssure server")
+                        chromiumFlag = False
 
-                if chromiumFlag == False :
-                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')        
+                if chromiumFlag == False:
+                    # using lower version of driver present
+                    chromiumFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION.split('.')[0]}")      
         elif SYSTEM_OS == 'Darwin':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
@@ -2170,10 +2181,13 @@ def check_browser():
                         request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
                         chromiumFlag = True
                     except:
-                        chromiumFlag = False 
+                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION} from AvoAssure server")
+                        chromiumFlag = False
 
-                if chromiumFlag == False :
-                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
+                if chromiumFlag == False:
+                    # using lower version of driver present
+                    chromiumFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION}")
         elif SYSTEM_OS == 'Linux':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
@@ -2190,11 +2204,14 @@ def check_browser():
                         chromiumFlag = True
                         os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
                     except Exception as e:
+                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION} from AvoAssure server")
                         log.debug("Error in edge-chromium driver download")
                         log.error(e)
-                        chromiumFlag = False 
-                if chromiumFlag == False :
-                    logger.print_on_console('Unable to download compatible Edge Chromium driver from AvoAssure server')
+                        chromiumFlag = False
+                if chromiumFlag == False:
+                    # using lower version of driver present
+                    chromiumFlag = True
+                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION}")
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
