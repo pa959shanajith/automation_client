@@ -140,7 +140,7 @@ class Fullscrape():
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
                 right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[0]+';'+right_part
+                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
                 if not scenarioFlag and ((tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None):
                     new_obj.append(a)
                 elif scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):

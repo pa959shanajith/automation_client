@@ -125,12 +125,14 @@ class AzureWindow():
             response_area = requests.get(area_url, headers=headers)
             if response_area.status_code == 200:
                 data_area = response_area.json()
-                area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
+                if 'children' in data_area:
+                    area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
-                iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
+                if 'children' in data_iteration:
+                    iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
 
@@ -225,7 +227,7 @@ class AzureWindow():
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
-            wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.CreatedDate] DESC"
+            wiql_query = f"SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' AND [System.TeamProject] = '{project_name}' ORDER BY [System.CreatedDate] DESC"
 
             # Request body with WIQL query
             body = {
@@ -294,13 +296,13 @@ class AzureWindow():
                             logger.print_on_console("Connection error occurred with:"+ endpoint_url)
                             time.sleep(2)
                         else:
-                            # break
                             if respon.status_code == 200:
                                 JsonObject = respon.json()
                                 if len(JsonObject)>0:
                                     res = {}
                                     res['userStories'] = JsonObject['value']
                                     res['total_count'] = total_count
+                            break
                     
                     except Exception as e:
                         log.error(e)
@@ -512,7 +514,7 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['url']
             project_name = azure_input_dict['info']['project']['text']
-            userstory_id = azure_input_dict['mappedId']
+            userstory_id = azure_input_dict['mappedId'] if 'mappedId' in azure_input_dict else ''
             type='Bug'
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems/${type}?api-version=6.0'
 
@@ -537,19 +539,20 @@ class AzureWindow():
                         "value": data
                     }
                 )
-            patch_document.append(
-                     {
-                        'op': 'add',
-                        'path': '/relations/-',
-                        'value': {
-                            'rel': 'System.LinkTypes.Hierarchy-Reverse',
-                            'url': f'{org_url}/{project_name}/_apis/wit/workitems/{userstory_id}',
-                            'attributes': {
-                                'comment': 'Relates to'
+            if 'mappedId' in azure_input_dict:
+                patch_document.append(
+                        {
+                            'op': 'add',
+                            'path': '/relations/-',
+                            'value': {
+                                'rel': 'System.LinkTypes.Hierarchy-Reverse',
+                                'url': f'{org_url}/{project_name}/_apis/wit/workitems/{userstory_id}',
+                                'attributes': {
+                                    'comment': 'Relates to'
+                                }
                             }
                         }
-                    }
-                )    
+                    )
             respon = requests.patch(endpoint_url, headers=headers, data=json.dumps(patch_document))
 
             if respon.status_code == 200:

@@ -793,7 +793,8 @@ class Controller():
                 self.pause_execution()
             # logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
-            log.info(result)
+            if keyword != 'secureGetData':
+                log.info(result)
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)

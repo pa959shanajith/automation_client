@@ -331,11 +331,11 @@ return isVisible(s);"""
                     info_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(info_msg)
                     local_uo.log.info(info_msg)
+                    methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-                    methodoutput=TEST_RESULT_FALSE
                 status=TEST_RESULT_PASS
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
