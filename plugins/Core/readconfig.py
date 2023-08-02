@@ -26,77 +26,27 @@ class readConfig():
 
     def readJson(self):
         global configvalues
-        configvalues={"server_ip":"", "server_port":"", "ignore_certificate":"",
-        "chrome_path":"", "chrome_profile":"","bit_64":"", "logFile_Path":"", "screenShot_Flag":"",
-        "queryTimeOut":"", "timeOut":"", "stepExecutionWait":"", "displayVariableTimeOut":"",
-        "httpStatusCode":"", "delay":"", "ignoreVisibilityCheck":"", "exception_flag":"",
-        "server_cert":"", "enableSecurityCheck":"","browser_check":"","tls_security":"","highlight_check":"",
-        "firefox_path":"", "prediction_for_iris_objects":"","hide_soft_key":"","connection_timeout":"","extn_enabled":"",
-        "headless_mode":"","update_check":"", "delay_stringinput":"","clear_cache":"","screen_rec":"","full_screenshot":"",
-        "close_browser_popup":"","incognito_private_mode":"", "use_custom_debugport":"","disable_screen_timeout":"",
-        "globalWaitTimeOut":"","kill_stale":"","chrome_extnpath":"","browser_screenshots":"","max_retries_app_launch":"","file_server_ip":"",
-        "ice_Token":"","isTrial":"","sample_application_urls":"","element_load_timeout":"", "verify_wait_time":"","ai_server":"", "sap_object_indentification_order": ""}
-        if os.path.isfile(self.config_path)==True:
+        configvalues = {}
+        if os.path.isfile(self.config_path) == True:
             try:
-                conf = open(self.config_path, 'r')
-                params = json.load(conf)
-                conf.close()
-                configvalues['server_ip']=params['server_ip']
-                configvalues['server_port']=params['server_port']
-                configvalues['ignore_certificate']=params['ignore_certificate']
-                configvalues['chrome_path']=params['chrome_path']
-                configvalues['chrome_profile']=params['chrome_profile']
-                configvalues['firefox_path']=params['firefox_path']
-                configvalues['bit_64']=params['bit_64']
-                configvalues['logFile_Path']=params['logFile_Path']
-                configvalues['screenShot_Flag']=params['screenShot_Flag']
-                configvalues['queryTimeOut']=params['queryTimeOut']
-                configvalues['timeOut']=params['timeOut']
-                configvalues['globalWaitTimeOut']=params['globalWaitTimeOut']
-                configvalues['stepExecutionWait']=params['stepExecutionWait']
-                configvalues['displayVariableTimeOut'] = params['displayVariableTimeOut']
-                configvalues['httpStatusCode']=params['httpStatusCode']
-                configvalues['delay']=params['delay']
-                configvalues['ignoreVisibilityCheck']=params['ignoreVisibilityCheck']
-                configvalues['exception_flag']=params['exception_flag']
-                configvalues['server_cert']=params['server_cert']
-                configvalues['enableSecurityCheck'] = params['enableSecurityCheck']
-                configvalues['browser_check'] = params['browser_check']
-                configvalues['tls_security'] = params['tls_security']
-                configvalues['highlight_check'] = params['highlight_check']
-                configvalues['prediction_for_iris_objects'] = params['prediction_for_iris_objects']
-                configvalues['hide_soft_key'] = params['hide_soft_key']
-                configvalues['connection_timeout'] = params['connection_timeout']
-                configvalues['extn_enabled'] = params['extn_enabled']
-                configvalues['update_check'] = params['update_check']
-                configvalues['headless_mode'] = params['headless_mode']
-                configvalues['delay_stringinput']=params['delay_stringinput']
-                configvalues['clear_cache']=params['clear_cache']
-                configvalues['screen_rec']=params['screen_rec']
-                configvalues['full_screenshot']=params['full_screenshot']
-                configvalues['close_browser_popup']=params['close_browser_popup']
-                configvalues['incognito_private_mode']=params['incognito_private_mode']
-                configvalues['use_custom_debugport']=params['use_custom_debugport']
-                configvalues['disable_screen_timeout']=params['disable_screen_timeout']
-                configvalues['chrome_extnpath']=params['chrome_extnpath']
-                configvalues['kill_stale']=params['kill_stale']
-                configvalues['browser_screenshots']=params['browser_screenshots']
-                configvalues["max_retries_app_launch"] = params['max_retries_app_launch']
-                configvalues['file_server_ip']=params['file_server_ip']
-                configvalues['ice_Token']=params['ice_Token']
-                configvalues['sample_application_urls']=params['sample_application_urls']
-                configvalues['isTrial']=params['isTrial']
-                configvalues['element_load_timeout'] = params['element_load_timeout']
-                configvalues['verify_wait_time'] = params['verify_wait_time']
-                configvalues['ai_server']=params['ai_server']
-                configvalues["sap_object_indentification_order"] = params["sap_object_indentification_order"]
-
+                with open(self.config_path, 'r') as conf:
+                    configvalues = json.load(conf)
             except Exception as e:
-                configvalues['errorflag']=e
+                configvalues['errorflag'] = e
         else:
-            configvalues['configmissing']=os.path.isfile(self.config_path)
+            configvalues['configmissing'] = os.path.isfile(self.config_path)
         return configvalues
 
+    def updateconfig(self, config_data):
+        #Here, we recieve hole data of configvalues and re-writing the config.json file
+        global configvalues
+        try:
+            with open(self.config_path, 'w') as f:
+                json.dump(config_data, f, indent = 4)
+                configvalues = config_data
+        except Exception as e:
+            log.error(e)
+            log.info("Error occurred while altering config.json")
 
 class readProxyConfig():
 
