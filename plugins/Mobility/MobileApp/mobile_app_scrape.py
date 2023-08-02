@@ -442,7 +442,7 @@ class MobileWindow():
             Returns Mobile CLient is Present or not 
         """
         try:
-            folder_path = os.environ.get("AVO_ASSURE_HOME") + '/avoAssureClient_Mobile'
+            folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'avoAssureClient_Mobile'
             if os.path.exists(folder_path):
                 socket.emit('checking_Mobile_Client', 'true')
             else:
