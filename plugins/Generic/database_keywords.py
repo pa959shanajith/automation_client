@@ -1090,6 +1090,7 @@ class DatabaseOperation():
                     self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
                 return self.cnxn
             except Exception as e:
+                print(e)
                 self.processException(e)
         else:
             err_msg=generic_constants.INVALID_INPUT

@@ -5,7 +5,7 @@
     "browser_screenshots": "Yes",
     "chrome_extnpath": "default",
     "chrome_path": "default",
-    "chrome_profile": "default",
+    "chrome_profile": "C:\\test\\Chrome_Test_Profile",
     "clear_cache": "No",
     "close_browser_popup": "Yes",
     "connection_timeout": "0",
@@ -31,16 +31,17 @@
     "incognito_private_mode": "No",
     "isTrial": 0,
     "kill_stale": "Yes",
-    "logFile_Path": "./logs/Avoclient.log",
+    "logFile_Path": "C:\\Users\\jauharirohan.manish\\Desktop\\ICE\\logs\\Avoclient.log",
     "max_retries_app_launch": "20",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",
     "sample_application_urls": [
         "https://avotestlabnew.avoassure.ai/"
     ],
+    "sap_object_indentification_order": "1",
     "screenShot_Flag": "All",
     "screen_rec": "No",
-    "server_cert": "./assets/CA_BUNDLE/server.crt",
+    "server_cert": "C:\\Users\\jauharirohan.manish\\Desktop\\ICE\\assets\\CA_BUNDLE\\server.crt",
     "server_ip": "localhost",
     "server_port": "443",
     "stepExecutionWait": "1",
@@ -48,6 +49,5 @@
     "tls_security": "Low",
     "update_check": "No",
     "use_custom_debugport": "No",
-    "verify_wait_time": "60",
-    "sap_object_indentification_order": "1"
+    "verify_wait_time": "60"
 }

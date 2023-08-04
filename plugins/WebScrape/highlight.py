@@ -15,6 +15,9 @@ import domconstants
 import clickandadd
 import time
 import browserops
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 import fullscrape
 from selenium import webdriver
 import logger
@@ -35,11 +38,15 @@ class Highlight():
         self.driver = browserops.driver
         self.currenthandle = None
 
-    def perform_highlight(self,elementxpath,elementurl):
+    def perform_highlight(self,elementxpath,elementurl,scenarioFlag):
         try:
             status = domconstants.STATUS_FAIL
             log.info('Inside perform_highlight method')
             apply_status = remove_status = False
+            if scenarioFlag==True:
+                self.driver.get(elementurl)
+                element_present = EC.presence_of_element_located((By.XPATH, elementxpath.split(';')[0]))
+                WebDriverWait(self.driver, 20).until(element_present)
             # Find the current handle
             self.currenthandle = clickandadd.currenthandle
             if self.currenthandle is '' or self.currenthandle is None:

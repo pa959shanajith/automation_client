@@ -276,7 +276,7 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('WebScrape')
                     import highlight
                     light =highlight.Highlight()
-                    res = light.perform_highlight(args[0],args[1])
+                    res = light.perform_highlight(args[0],args[1],args[-1])
                     logger.print_on_console('Highlight result: '+str(res))
                 if appType==APPTYPE_MOBILE.lower():
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
@@ -1990,8 +1990,8 @@ def check_browser():
                             request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
-                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
-                        chromeFlag = False 
+                        chromeFlag = True
+                        logger.print_on_console("Using old chrome driver from AvoAssure server")
                 if chromeFlag == False:
                     # using lower version of driver present
                     chromeFlag = True
