@@ -172,6 +172,7 @@ class Fullscrape():
                 scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
+            #collecting new elements for analyze screen and scenario impact analyzer.
             if scenarioFlag:
                 filtered_data={}
                 filtered_data['new_obj_for_not_found']=tempne

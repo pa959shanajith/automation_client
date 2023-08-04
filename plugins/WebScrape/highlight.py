@@ -43,6 +43,7 @@ class Highlight():
             status = domconstants.STATUS_FAIL
             log.info('Inside perform_highlight method')
             apply_status = remove_status = False
+            #highlight in browser for scenario flag and implicitly waiting for element to appear
             if scenarioFlag==True:
                 self.driver.get(elementurl)
                 element_present = EC.presence_of_element_located((By.XPATH, elementxpath.split(';')[0]))

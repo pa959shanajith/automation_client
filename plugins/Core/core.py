@@ -276,6 +276,7 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('WebScrape')
                     import highlight
                     light =highlight.Highlight()
+                    #last arg will be scenario flag
                     res = light.perform_highlight(args[0],args[1],args[-1])
                     logger.print_on_console('Highlight result: '+str(res))
                 if appType==APPTYPE_MOBILE.lower():
