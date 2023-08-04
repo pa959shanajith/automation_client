@@ -144,6 +144,8 @@ class AzureWindow():
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
+                    if details['name'] == 'State':
+                        details['allowedValues'] = ['New']
                     required_comp[details['name']] = details
                 required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
                 required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
