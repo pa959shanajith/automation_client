@@ -170,10 +170,11 @@ class ScrapeWindow(wx.Frame):
                         self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                         self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
                 if (data.get('scenarioLevel')==None or data.get('scenarioLevel')==False):
-                    self.Centre()
                     style = self.GetWindowStyle()
                     self.SetWindowStyle( style|wx.STAY_ON_TOP )
                     wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                    screen_width, screen_height = wx.GetDisplaySize()
+                    self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
                     self.Show()
             except Exception as e:
                 log.error(e)
