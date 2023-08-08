@@ -124,9 +124,7 @@ class MainNamespace(BaseNamespace):
                 enable_reregister = False
                 try:
                     global plugins_list
-                    ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_das_key))
+                    response = json.loads(args[1])
                     if(response['id'] != root.icesession['ice_id'] or response['connect_time'] != root.icesession['connect_time']):
                         err_res="Invalid response received"
                         logger.print_on_console(err_res)
@@ -1019,10 +1017,8 @@ class MainNamespace(BaseNamespace):
         log.info('Disconnect triggered')
         stop_ping_thread()
         if socketIO is not None:
-            ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             root.icesession['connect_time'] = str(datetime.now())
-            socketIO.eio.http.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
+            socketIO.eio.http.params['icesession'] = json.dumps(root.icesession)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -1117,13 +1113,11 @@ class ConnectionThread(threading.Thread):
             'username': username,
             'iceaction': self.ice_action,
             'icetoken': root.ice_token,
-            'data': random()*100000000000000
+            'data': random()*100000000000000,
+            'host':readconfig.configvalues['server_ip']
         }
-        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
-            'ice_action': self.ice_action, 'icesession': icesession_enc}
+            'ice_action': self.ice_action, 'icesession': json.dumps(root.icesession)}
         args["params"] = params
         return args
 
@@ -1512,9 +1506,7 @@ class Main():
                     if response == "fail":
                         err_res = "Avo Assure Client registration failed."
                     else:
-                        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                        response = json.loads(core_utils_obj.unwrap(response, ice_das_key))
+                        response = json.loads(response)
                     if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
                         if not err_res: err_res = "Invalid response received"
                         logger.print_on_console(err_res)
@@ -2350,7 +2342,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         result['mode'] = cw.schedule.GetValue()
     else:
         result['mode'] = False
-
+    result["host"] = readconfig.configvalues['server_ip']
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 

@@ -136,11 +136,12 @@ class Fullscrape():
             obj = CoreUtils()
             # XPath Encryption logic implemented
             for a in tempne:
-                a['url']= obj.scrape_wrap(a['url'])
+                # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
-                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
-                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                # right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                # a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['xpath'] = ';'.join(map(str,xpath_string))
                 if not scenarioFlag and ((tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None):
                     new_obj.append(a)
                 elif scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):

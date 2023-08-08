@@ -1599,11 +1599,11 @@ class WebScrape_Utils:
                                         }
                                     }
                                 }
-                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '' && !(values.slice(-1).includes('AvoAssure'))) {
+                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '' && !(values.slice(-1)[0].includes('AvoAssure'))) {
                                     childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
                                     parentFlag = true;
                                 }
-                                else if (selector == '' && nodes.length != 0 && (values.slice(-1) == '' || !(values.slice(-1).includes('AvoAssure')))) {
+                                else if (selector == '' && nodes.length != 0 && (values.slice(-1) == '' || !(values.slice(-1)[0].includes('AvoAssure')))) {
                                     if (childSelector == '' && nodes.length > 1 && nodes.slice(-1) == 'class') {
                                         childSelector = `${tag}[${nodes[nodes.length-2]}="${values[values.length-2]}"]`;
                                         parentFlag = true;
