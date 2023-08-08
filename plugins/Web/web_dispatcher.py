@@ -196,6 +196,7 @@ class Dispatcher:
             'closesubwindows':local_Wd.browser_object.closeSubWindows,
             'switchtowindow':local_Wd.browser_object.switch_to_window,
             'sendkeys':local_Wd.util_object.send_keys,
+            'sendsecurekeys':local_Wd.util_object.send_secure_keys,
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
