@@ -85,8 +85,12 @@ class ComboboxKeywords():
                                                 result = TEST_RESULT_TRUE
                                                 local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
                                             except Exception as e:
-                                                local_cbo.log.error(e)
-                                                logger.print_on_console("Element is not clickable")
+                                                browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[input_val])
+                                                clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(CLICK_JAVASCRIPT,optionList[input_val])
+                                                status = TEST_RESULT_PASS
+                                                result = TEST_RESULT_TRUE
+                                                local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                                local_cbo.log.info('Clicked info: '+clickinfo)
                                         else:
                                             value = self.getelement_text(optionList[input_val])
                                             browser_Keywords.local_bk.driver_obj.execute_script(SET_VALUE_ATTRIBUTE, webelement, value)
@@ -276,8 +280,12 @@ class ComboboxKeywords():
                                             result = TEST_RESULT_TRUE
                                             local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
                                         except Exception as e:
-                                                local_cbo.log.error(e)
-                                                logger.print_on_console("Element is not clickable")
+                                            browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[i])
+                                            clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(CLICK_JAVASCRIPT,optionList[i])
+                                            status = TEST_RESULT_PASS
+                                            result = TEST_RESULT_TRUE
+                                            local_cbo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                            local_cbo.log.info('Clicked info: '+clickinfo)
                                     else:
                                         browser_Keywords.local_bk.driver_obj.execute_script(SET_VALUE_ATTRIBUTE, webelement, inp_val)
                                         status = TEST_RESULT_PASS
