@@ -27,7 +27,6 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-# isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
