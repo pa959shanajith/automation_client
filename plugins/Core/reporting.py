@@ -412,6 +412,8 @@ class Reporting:
             name=self.name
             ##            Added this line to remove status for conditional keyword in reports
             status = ''
+            if tsp.name.lower() == "getparam" and step_description.lower() == DATA_PARAMETERIZATION_FAILED:
+                status = TEST_RESULT_FAIL
         if len(args)>0:
             if args[0] != None:
                 result_tuple=args[0]
