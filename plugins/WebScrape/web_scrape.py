@@ -27,11 +27,10 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
-    def __init__(self, parent,id, title,browser,socketIO,action,data):  #called in core #1646
+    def __init__(self, parent, id, title, browser, socketIO, action, data):  #called in core #1646
         global checkWebPackage
         checkWebPackage = self.get_client_manifest()
         if SYSTEM_OS == 'Linux':
@@ -150,7 +149,7 @@ class ScrapeWindow(wx.Frame):
 
                     # Name : A sreenivasulu Date: 02/08/2022
                     # setting the URL from allowed_urls when istrail is true
-                    if isTrial:
+                    if readconfig.configvalues["isTrial"]:
                         self.navigateURL.SetValue(allowed_urls[0])
 
                 elif(self.action == 'compare'):
@@ -206,7 +205,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
@@ -366,7 +365,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
