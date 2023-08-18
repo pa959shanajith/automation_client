@@ -220,18 +220,17 @@ class ElementKeywords:
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-                if webelement.is_enabled():
-                    local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     click_obj=ButtonLinkKeyword()
                     local_eo.log.debug('ButtonLinkKeyword object created to call the click method')
                     status,methodoutput,output,err_msg=click_obj.click(webelement,args[0])
-                else:   #if element is disabled, selenium/JS click will not work. Mouse click will 've to be simulated at position of mouse pointer. 
-                        #So, mouse hover kw should be used before to click a disabled element.
-                    import pyautogui
-                    pyautogui.click()
-                local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
-                status=TEST_RESULT_PASS
-                methodoutput=TEST_RESULT_TRUE   
+                    #local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
+                    #status=TEST_RESULT_PASS
+                    #methodoutput=TEST_RESULT_TRUE
+                else:
+                    local_eo.log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(ERR_DISABLED_OBJECT)   
             except Exception as e:
                 local_eo.log.error(e)
                 logger.print_on_console(e)
