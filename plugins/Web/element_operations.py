@@ -220,7 +220,8 @@ class ElementKeywords:
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
-                local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
+                if webelement.is_enabled():
+                    local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_ENABLED'])
                     click_obj=ButtonLinkKeyword()
                     local_eo.log.debug('ButtonLinkKeyword object created to call the click method')
                     status,methodoutput,output,err_msg=click_obj.click(webelement,args[0])
