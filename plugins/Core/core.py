@@ -1991,8 +1991,8 @@ def check_browser():
                             request.urlretrieve(URL,CHROME_DRIVER_PATH)
                         chromeFlag = True
                     except:
-                        chromeFlag = True
-                        logger.print_on_console("Using old chrome driver from AvoAssure server")
+                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
+                        chromeFlag = False
                 if chromeFlag == False:
                     # using lower version of driver present
                     chromeFlag = True
