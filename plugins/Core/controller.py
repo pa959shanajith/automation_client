@@ -143,6 +143,7 @@ class Controller():
             if self.mobile_web_dispatcher_obj==None:
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
+                    core_utils.get_all_the_imports('Saucelabs')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
