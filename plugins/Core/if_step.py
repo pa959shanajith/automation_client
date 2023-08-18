@@ -166,8 +166,8 @@ class Logical_eval():
                 else:
                     return [False]
             else:
-                    status = eval(expression)
-                    return [status]
+                status = eval(expression)
+                return [status]
         except Exception as e:
             if e.__class__.__name__=='TypeError':
                 return [INVALID,str(e)]
