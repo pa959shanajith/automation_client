@@ -341,6 +341,7 @@ class ScrapeWindow(wx.Frame):
                 #     xpathfilter[elem['xpath'].split(';')[0]] = True
                 xpathfilter[elem['xpath'].split(';')[0]] = True
                 
+            #Full scraping for scenario level impact analysis and analyze screen. Decided by scenario flag
             fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter,self.data['scenarioLevel'])
             
             d['view'].append({'newElements':fullScrapeData['view']})
@@ -452,7 +453,9 @@ class ScrapeWindow(wx.Frame):
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
-        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{},False)
+        
+        #Full scraping for normal. Passing filters as empty and scenario flag as
+        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{}, False)
 
         '''Check the limit of data size as per Avo Assure standards'''
         if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:

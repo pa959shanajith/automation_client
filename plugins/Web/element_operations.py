@@ -205,7 +205,7 @@ class ElementKeywords:
         #return status and methodoutput
         local_eo.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
-
+        
     def click_element(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -225,10 +225,9 @@ class ElementKeywords:
                 else:
                     local_eo.log.error(ERR_DISABLED_OBJECT)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                    logger.print_on_console(ERR_DISABLED_OBJECT)
+                    logger.print_on_console(ERR_DISABLED_OBJECT)   
             except Exception as e:
                 local_eo.log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
