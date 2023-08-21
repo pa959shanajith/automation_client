@@ -18,7 +18,8 @@ from requests.auth import HTTPBasicAuth
 import json
 log = logging.getLogger("saucelabcontroller.py")
 import base64
-
+import time
+import urllib3
 
 class SaucelabWindow():
     # jira = None
@@ -135,10 +136,36 @@ class SaucelabWindow():
             headers = {
                 'Authorization': 'Basic '+authorization
             }
-            response = requests.get('https://app.saucelabs.com/rest/v1/info/platforms/webdriver',headers=headers)
-            
-            if response.status_code == 200:
-                data = json.loads(response.text)
+            http = urllib3.PoolManager()
+            # response = requests.get('https://app.saucelabs.com/rest/v1/info/platforms/webdriver',headers=headers)
+            # response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers)
+            retry_limit = 10
+            retry_counter = 0
+            while retry_counter < retry_limit:
+                try:
+                    # Send request to API endpoint
+                    # respon = requests.post(endpoint_url, headers=headers, json=body)
+                    response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers)
+                    if response.status != 200:
+                        log.info("Unable to connect to server retrying Status code is: %s",
+                            response.status)
+                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        time.sleep(2)
+                    else:
+                        break
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console("Unable to connect to server retrying.")
+                    time.sleep(2)
+                retry_counter += 1
+            if retry_counter == retry_limit:
+                logger.print_on_console("Maximum retry limit reached. Unable to connect to the server.")
+            data = response.data.decode('utf-8')
+
+            # if response.status_code == 200:
+            if True:
+
+                data = json.loads(data)
                 androidVersions = {}
                 iphoneVersions = {}
                 for detail in data:
@@ -157,8 +184,30 @@ class SaucelabWindow():
                         'iphone': iphoneVersions
                     }
 
-            response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
-            if response_real_devices.status_code == 200:
+            # response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers,timeout = 120)
+            retry_limit1 = 10
+            retry_counter1 = 0
+            while retry_counter1 < retry_limit1:
+                try:
+                    # Send request to API endpoint
+                    # respon = requests.post(endpoint_url, headers=headers, json=body)
+                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
+                    if response_real_devices.status_code != 200:
+                        log.info("Unable to connect to server retrying Status code is: %s",
+                            response_real_devices.status_code)
+                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        time.sleep(2)
+                    else:
+                        break
+                except Exception as e:
+                    log.error(e)
+                    logger.print_on_console("Unable to connect to server retrying.")
+                    time.sleep(2)
+                retry_counter1 += 1
+            if retry_counter1 == retry_limit1:
+                logger.print_on_console("Maximum retry limit reached. Unable to connect to the server.")
+                
+            if response_real_devices.status_code== 200:
                 data = json.loads(response_real_devices.text)
                 androidVersions = {}
                 iphoneVersions = {}
@@ -176,7 +225,88 @@ class SaucelabWindow():
                         'android' : androidVersions,
                         'iphone': iphoneVersions
                     }
+
+                if saucleb_input_dict['action'] == 'sauceMobileWebDetails' :
+                    authorization = str(base64.b64encode(bytes(saucleb_input_dict['SauceLabusername'] +':'+saucleb_input_dict['SauceLabAccessKey'], 'ascii')), 'ascii')
+                    headers = {
+                        'Authorization': 'Basic '+authorization
+                    }
+                    # storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
+                    # response = requests.get(storage_url, headers=headers)
+                    
+                    retry_limit2 = 10
+                    retry_counter2 = 0
+                    while retry_counter2 < retry_limit2:
+                        try:
+                            # Send request to API endpoint
+                            # respon = requests.post(endpoint_url, headers=headers, json=body)
+                            storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
+                            response = requests.get(storage_url, headers=headers)
+                            if response.status_code != 200:
+                                log.info("Unable to connect to server retrying Status code is: %s",
+                                    response.status_code)
+                                logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                                time.sleep(2)
+                            else:
+                                break
+                        except Exception as e:
+                            log.error(e)
+                            logger.print_on_console("Unable to connect to server retrying.")
+                            time.sleep(2)
+                        retry_counter2 += 1
+                    if retry_counter2 == retry_limit2:
+                        logger.print_on_console("Maximum retry limit reached. Unable to connect to the server.")
+
+
+                    stored_files = []
+                    if response.status_code == 200:
+                        storage_data = response.json()
+                        for items in storage_data['items']:
+                            if items['kind'] == 'android':
+                                stored_files.append({
+                                    'id':items['id'],
+                                    'name':items['name'],
+                                    'group_id': items['group_id'],
+                                    'kind': items['kind']
+                                })
+                    
+                    res['stored_files'] = stored_files
                 
+            socket.emit('sauceconfresponse',res)
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('sauceconfresponse','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('sauceconfresponse','Invalid Credentials')
+            else:
+                socket.emit('sauceconfresponse','Fail')
+            logger.print_on_console('Exception in fetching the sauce details')
+
+    def update_mobile_details(self,saucleb_input_dict,socket):
+        """
+                Method to upload saucelab mobile configurations
+                returns list of os names and respective browser configurations
+        """
+        res = "invalidcredentials"
+        try:
+            username = saucleb_input_dict['SauceLabusername']
+            access_key = saucleb_input_dict['SauceLabAccessKey']
+            upload_url = "https://api.us-west-1.saucelabs.com/v1/storage/upload"
+            apk_path = saucleb_input_dict['SauceLabUploadApk']['apkPath']
+            with open(apk_path, "rb") as file:
+                apk_data = file.read()
+
+            files = {
+                'payload': apk_data,
+                'name': saucleb_input_dict['SauceLabUploadApk']['apkName']
+            }
+
+            auth = (username, access_key)
+
+            response = requests.post(upload_url, files=files, auth=auth)
+
+
             socket.emit('sauceconfresponse',res)
         except Exception as e:
             log.error(e)
