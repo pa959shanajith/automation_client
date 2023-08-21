@@ -243,7 +243,6 @@ class MobileDispatcher:
                             desired_caps = {}
                             desired_caps['platformName'] = config["platformName"]
                             desired_caps['appium:deviceName'] = config["deviceName"]
-                            desired_caps['udid'] = config["deviceName"]
                             desired_caps['appium:platformVersion'] = config["platformVersion"]                           
                             desired_caps['appium:app'] = 'storage:filename=Codex.apk'  # The filename of the mobile app   
                             desired_caps['appium:appPackage'] = 'com.projects.sharath.materialvision'
