@@ -19,6 +19,7 @@ from appium.webdriver.common.touch_action import TouchAction
 import time
 import action_keywords_app
 import readconfig
+import web_keywords_MA
 log = logging.getLogger('textbox_keywords_mobility.py')
 
 class Textbox_keywords():
@@ -48,16 +49,21 @@ class Textbox_keywords():
                             element.clear()
                         if SYSTEM_OS == 'Darwin': element.set_value(text)
                         else:
-                            action = TouchAction(android_scrapping.driver)
-                            action.tap(element).perform()
-                            text1 = []
-                            text1.append(text)
-                            obj = action_keywords_app.Action_Key_App()
-                            status,methodoutput,output,err_msg = obj.action_key(element,text1)
+                            if args[1] == 'saucelabs':
+                                action = TouchAction(web_keywords_MA.local_mak.driver)
+                                element.set_text(text)
+                            else:    
+                                action = TouchAction(android_scrapping.local_mak.driver)
+                                action.tap(element).perform()
+                                text1 = []
+                                text1.append(text)
+                                obj = action_keywords_app.Action_Key_App()
+                                status,methodoutput,output,err_msg = obj.action_key(element,text1)
                         configvalues = readconfig.configvalues
                         hide_soft_key = configvalues['hide_soft_key']
-                        if android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
-                            android_scrapping.driver.hide_keyboard()
+                        if args[1] != 'saucelabs':
+                            if  android_scrapping.driver.is_keyboard_shown() and (hide_soft_key == "Yes"):
+                                android_scrapping.driver.hide_keyboard()
                         if (text == element.text):
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
