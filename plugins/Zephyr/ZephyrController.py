@@ -419,7 +419,7 @@ class ZephyrWindow():
                 # Make a GET request without SSL certificate verification (not recommended)
                 return False
             else:
-                # Make a GET request with SSL certificate verificatio
+                # Make a GET request with SSL certificate verification
                 return True
         except Exception as e:
             log.error(e)
