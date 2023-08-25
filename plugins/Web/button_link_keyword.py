@@ -417,6 +417,8 @@ class ButtonLinkKeyword():
                         local_blk.log.debug(WEB_ELEMENT_ENABLED)
                         local_blk.log.debug('Going to perform click operation')
                         time.sleep(0.5)
+                        #setting focus before clicking
+                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""",webelement)
                         webelement.click()
                         local_blk.log.info('press operation performed using selenium click')
                         local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
@@ -425,8 +427,35 @@ class ButtonLinkKeyword():
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
-            local_blk.log.error(e)
-            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            try:
+                #emulating mouse click at mouse pointer position
+                webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(webelement).click(webelement).perform()
+                local_blk.log.info('press operation performed using Action chains click')
+                status = webconstants.TEST_RESULT_PASS
+                methodoutput = webconstants.TEST_RESULT_TRUE
+            except Exception as e:
+                try:
+                    #if webElement becomes stale, click is performed in browser passing xpath.
+                    print(e)
+                    browser_Keywords.local_bk.driver_obj.execute_script("""
+                                                                    var xpath = arguments[0]
+                                                                    var xres = document.evaluate(xpath,document);
+                                                                    var webElement;
+                                                                    while(1){
+                                                                        webElement = xres.iterateNext();
+                                                                        if (webElement == null)
+                                                                            break;
+                                                                        if ((webElement.getBoundingClientRect().height)*(webElement.getBoundingClientRect().width)>0){
+                                                                            webElement.focus();
+                                                                            webElement.click();
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    """,args[0])
+                    local_blk.log.info('press operation performed on element in browser using JS click.')
+                except Exception as e:
+                    local_blk.log.error(e)
+                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         if err_msg:
             local_blk.log.error(err_msg)
             logger.print_on_console(err_msg)
