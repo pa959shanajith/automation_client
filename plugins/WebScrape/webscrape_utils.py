@@ -1161,6 +1161,9 @@ class WebScrape_Utils:
                 // }
                 var className = e.className;
                 var rpath = '';
+                var cpath = '';
+                var healedXpath = '';
+                debugger;
                 var firstpass = 0;
                 var role = 'null';
                 var svgTags = ['svg', 'circle', 'rect', 'ellipse', 'line', 'polygon', 'polyline', 'path', 'g', 'text', 'image', 'use'];
@@ -1180,8 +1183,11 @@ class WebScrape_Utils:
                     else
                         var siblings = parentNode.children;
                     var count = 0;
+                    var xpathTag = ''
                     var unique = false;
+                    var isSizeZero = false;
                     for (var i = 0; siblings && (i < siblings.length); i++) {
+                        isSizeZero = isSizeZero||(siblings[i].getBoundingClientRect().height==0 && siblings[i].getBoundingClientRect().width==0);
                         if (siblings[i].tagName == e.tagName) {
                             count++;
                             if (siblings[i] == e) {
@@ -1200,11 +1206,29 @@ class WebScrape_Utils:
                     idx = (useIdx && idx && !unique) ? ('[' + idx + ']') : '';
                     predicate = (predicate.length > 0) ? ('[' + predicate.join(' and ') + ']') : '';
                     if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
+                        xpathTag = '*[local-name()="' + e.tagName.toLowerCase() + '"]';
                         path = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + xidx + path;
                     } else if (e.tagName.toLowerCase() === 'foreignobject') {
+                        xpathTag = '*[local-name()="foreignObject"]';
                         path = '/*[local-name()="foreignObject"]' + xidx + path;
                     } else {
+                        xpathTag = e.tagName.toLowerCase();
                         path = '/' + e.tagName.toLowerCase() + xidx + path;
+                    }
+                    if (healedXpath==''){
+                        if (e.dynamicComponentType!=undefined){
+                            if (cpath[0]!='/' || cpath[1]!='/')
+                                cpath = '/' + cpath;
+                        }
+                        else if (isSizeZero)
+                            cpath = '/' + xpathTag + cpath;
+                        else
+                            cpath = '/' + xpathTag + xidx + cpath;
+
+                        var xres = document.evaluate('/'+cpath,document);
+                        xres.iterateNext();
+                        if (xres.iterateNext()==null)
+                            healedXpath = '/'+cpath
                     }
                     if (firstpass == 0) {
                         if (unique && relative) {
@@ -1225,6 +1249,7 @@ class WebScrape_Utils:
                 }
                 var firstpass1 = 0;
                 var rpath1 = '';
+                var cpath1 = '';
                 if (parentele != 'null') {
                     g = parentele;
                     for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode.host || g.parentNode) {
@@ -1232,7 +1257,9 @@ class WebScrape_Utils:
                         var siblings1 = g.parentNode.children;
                         var count1 = 0;
                         var unique1 = false;
+                        isSizeZero = false;
                         for (var i = 0; siblings1 && (i < siblings1.length); i++) {
+                            isSizeZero = isSizeZero||(siblings[i].getBoundingClientReact().height==0 && siblings[i].getBoundingClientReact().width==0);
                             if (siblings1[i].tagName == g.tagName) {
                                 count1++;
                                 if (siblings1[i] == g) {
@@ -1256,6 +1283,14 @@ class WebScrape_Utils:
                             path1 = '/*[local-name()="foreignObject"]' + xidx1 + path1;
                         } else {
                             path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;
+                            if (g.dynamicComponentType!=undefined)
+                                if (c1path[0]!='/' || c1path[1]!='/'){
+                                    cpath1 = '/' + cpath1;
+                            }
+                            else if (isSizeZero)
+                                cpath1 = '/' + g.tagName.toLowerCase() + cpath1;
+                            else
+                                cpath1 = '/' + g.tagName.toLowerCase() + xidx1 + cpath1;
                         }
                         if (firstpass1 == 0) {
                             if (unique1 && relative) {
@@ -1273,6 +1308,7 @@ class WebScrape_Utils:
                         }
                     }
                     path = path1 + path;
+                    cpath = cpath1 + cpath;
                     rpath = rpath1 + rpath;
                 }
                 ishidden = isVisible(f);
@@ -1717,7 +1753,8 @@ class WebScrape_Utils:
                     href = getHref(f);
 
                     //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
-                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
+                    debugger;
+                    newPath = String(path) + ';' + String(id) + ';' + String(healedXpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
                     for (var i = 0; i < arr.length; i++) {
                         if (arr[i].xpath == newPath) {
                             uniqueFlag = true;
