@@ -28,6 +28,7 @@ from oebs_elementsops import ElementOperations
 from oebs_tableops import TableOperations
 from oebs_scrollbarops import ScrollbarOperations
 from oebs_internalframeops import InternalFrameOperations
+import readconfig
 
 import readconfig
 import iris_operations
@@ -303,15 +304,23 @@ class OebsDispatcher:
                 elif keyword in ['findwindowandattach', 'waitforelementvisible','switchtoframe','getobjectforcustom','selectmenu']:
                     result = self.keyword_dict[keyword](*message)
                 else:
-                    accessContext , visible, active_parent =  self.utilities_obj.object_generator(*message)
-                    if accessContext and str(accessContext) != 'fail':
-                        if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
-                            if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
-                                result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                    configvalues = readconfig.configvalues
+                    delay_constant = int(configvalues['element_load_timeout'])
+                    for _ in range(delay_constant):
+                        accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
+                        if accessContext and str(accessContext) != 'fail':
+                            if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
+                                if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                    result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                                else:
+                                    result = self.keyword_dict[keyword](accessContext)
                             else:
-                                result = self.keyword_dict[keyword](accessContext)
+                                err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                            break
                         else:
-                            err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                            err_msg = oebs_constants.ERROR_CODE_DICT['err_finding_object']
+                            log.info(err_msg)
+                            time.sleep(1)
 
                     log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
                 if not result or len(result) <= 0: result = [constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
