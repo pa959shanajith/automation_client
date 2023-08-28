@@ -602,3 +602,62 @@ class AzureWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
+
+    def update_azure_test_details(self,azure_input_dict):
+        """
+            Method to update executed test details to Azure (Azure Execution)
+        """
+        try:
+            pat = azure_input_dict['azurepat']
+            testplan_id = azure_input_dict['test_plan_id']
+            testsuite_id = azure_input_dict['test_suite_id']
+            testpoint_id = azure_input_dict['test_point_id']
+            test_status = azure_input_dict['status']
+                        
+            authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
+            headers = {
+                            'Accept': 'application/json',
+                            'Authorization': 'Basic '+authorization
+                        }
+            #finding user details before update
+            org_name = azure_input_dict['azureOrgname']
+            users_endpoint = f'https://dev.azure.com/{org_name}/_apis/connectionData?connectOptions=includeServices&api-version=7.1-preview.1'
+                        
+            user_respon = requests.get(users_endpoint, headers=headers)
+            if user_respon.status_code == 200:
+                user_json = user_respon.json()
+
+            # Azure DevOps organization URL
+            org_url = azure_input_dict['azureBaseUrl']
+            project_name = azure_input_dict['projectDetails']['name']
+            endpoint_url = f'{org_url}/{project_name}/_apis/test/Plans/{testplan_id}/Suites/{testsuite_id}/points/{testpoint_id}?api-version=7.0'
+            payload = {
+                    "outcome":test_status,
+                    "tester":{
+                        "id":user_json['authenticatedUser']['id'],
+                        "displayName":user_json['authenticatedUser']['customDisplayName']
+                    }
+                    }
+            # Send request to API endpoint
+            respon = requests.patch(endpoint_url,json=payload, headers=headers)
+            if respon.status_code == 200:
+                logger.print_on_console(' azure devops test details updated successfully')
+            elif respon.status_code == 400:
+                logger.print_on_console('Bad Request')
+            elif respon.status_code == 401:
+                logger.print_on_console('Unauthorized user')
+            elif respon.status_code == 403:
+                logger.print_on_console('user does not have the necessary permissions to access')
+            elif respon.status_code == 404 :
+                logger.print_on_console('Source not found')
+            elif respon.status_code == 500 :
+                logger.print_on_console('Internal Server Error')                    
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                log.error('Invalid URL')
+            elif 'Unauthorized' in str(e):
+                log.error('Invalid Credentials')
+            else:
+                log.error(e,' Fail')
+            logger.print_on_console('Exception in updating test details in azure')
