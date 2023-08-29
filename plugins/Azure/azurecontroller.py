@@ -494,7 +494,11 @@ class AzureWindow():
                    res = {}
                    res['testcases'] = []
                    for details in JsonObject['value']:
-                    res['testcases'].append(details['workItem'])
+                    inputs = {
+                        'workItem':details['workItem'],
+                        'points': [i['id'] for i in details['pointAssignments']]
+                    }
+                    res['testcases'].append(inputs)
 
             # if(';' in org_url):
             #     log.debug('Connecting to JIRA through proxy')
@@ -609,10 +613,14 @@ class AzureWindow():
         """
         try:
             pat = azure_input_dict['azurepat']
-            testplan_id = azure_input_dict['test_plan_id']
-            testsuite_id = azure_input_dict['test_suite_id']
-            testpoint_id = azure_input_dict['test_point_id']
-            test_status = azure_input_dict['status']
+            testplan_id = azure_input_dict['mapping_details']['TestPlanId']
+            testsuite_id = azure_input_dict['mapping_details']['TestSuiteId']
+            testpoint_id = azure_input_dict['mapping_details']['TestPoints']
+            test_status = azure_input_dict['status'] 
+            org_url = azure_input_dict['azureBaseUrl']
+
+            testpoint_id_flat_string = ','.join([str(num) for num in testpoint_id])
+
                         
             authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
             headers = {
@@ -620,38 +628,43 @@ class AzureWindow():
                             'Authorization': 'Basic '+authorization
                         }
             #finding user details before update
-            org_name = azure_input_dict['azureOrgname']
-            users_endpoint = f'https://dev.azure.com/{org_name}/_apis/connectionData?connectOptions=includeServices&api-version=7.1-preview.1'
+            # org_name = azure_input_dict['azureOrgname']
+            users_endpoint = f'{org_url}/_apis/connectionData?connectOptions=includeServices&api-version=7.1-preview.1'
                         
             user_respon = requests.get(users_endpoint, headers=headers)
             if user_respon.status_code == 200:
                 user_json = user_respon.json()
 
             # Azure DevOps organization URL
-            org_url = azure_input_dict['azureBaseUrl']
-            project_name = azure_input_dict['projectDetails']['name']
-            endpoint_url = f'{org_url}/{project_name}/_apis/test/Plans/{testplan_id}/Suites/{testsuite_id}/points/{testpoint_id}?api-version=7.0'
+            project_name = azure_input_dict['mapping_details']['projectName']
+            endpoint_url = f'{org_url}/{project_name}/_apis/test/Plans/{testplan_id}/Suites/{testsuite_id}/points/{testpoint_id_flat_string}?api-version=7.0'
             payload = {
                     "outcome":test_status,
                     "tester":{
                         "id":user_json['authenticatedUser']['id'],
-                        "displayName":user_json['authenticatedUser']['customDisplayName']
+                        "displayName":user_json['authenticatedUser']['providerDisplayName']
                     }
                     }
             # Send request to API endpoint
             respon = requests.patch(endpoint_url,json=payload, headers=headers)
             if respon.status_code == 200:
                 logger.print_on_console(' azure devops test details updated successfully')
+                return 1
             elif respon.status_code == 400:
                 logger.print_on_console('Bad Request')
+                return 0
             elif respon.status_code == 401:
                 logger.print_on_console('Unauthorized user')
+                return 0
             elif respon.status_code == 403:
                 logger.print_on_console('user does not have the necessary permissions to access')
+                return 0
             elif respon.status_code == 404 :
                 logger.print_on_console('Source not found')
+                return 0
             elif respon.status_code == 500 :
-                logger.print_on_console('Internal Server Error')                    
+                logger.print_on_console('Internal Server Error')
+                return 0
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
@@ -661,3 +674,4 @@ class AzureWindow():
             else:
                 log.error(e,' Fail')
             logger.print_on_console('Exception in updating test details in azure')
+            return 0
