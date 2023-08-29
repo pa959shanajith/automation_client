@@ -77,7 +77,7 @@ class ComboboxKeywords():
                             if (input_val < optionListSize):
                                 for i in range(0, optionListSize):
                                     if (input_val == i):
-                                        if (webelement.tag_name in ['input','li','a']):
+                                        if (webelement.tag_name in ['input','li','a','div','span']):
                                             try:
                                                 browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[input_val])
                                                 optionList[input_val].click()
@@ -272,7 +272,7 @@ class ComboboxKeywords():
                                     local_cbo.log.info(ERROR_CODE_DICT['ERR_INVALID_INPUT'])
                                     err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
                                 if (flag):
-                                    if (webelement.tag_name in ['input','li','a']):
+                                    if (webelement.tag_name in ['input','li','a','div','span']):
                                         try:                                          
                                             browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focus()""", optionList[i])
                                             optionList[i].click()
