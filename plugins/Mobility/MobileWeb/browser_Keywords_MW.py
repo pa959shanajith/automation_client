@@ -100,7 +100,7 @@ class BrowserKeywords():
             else:
                 path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = curdir + '/node_modules/node_appium'
-                proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
+                proc = subprocess.Popen([nodePath, path], shell=False, stdin=None, stdout=None, stderr=None, close_fds=True)
                 controller.process_ids.append(proc.pid)
                 time.sleep(25) # psutil.net_connections() doesn't work on Mac, insearch of alternatives
                 logger.print_on_console('Browser session started')
