@@ -29,6 +29,7 @@ from oebs_tableops import TableOperations
 from oebs_scrollbarops import ScrollbarOperations
 from oebs_internalframeops import InternalFrameOperations
 import readconfig
+import time
 
 import readconfig
 import iris_operations
