@@ -364,6 +364,8 @@ class Dispatcher:
         global simple_debug_gwto, status_gwto
         status_gwto =False
         simple_debug_gwto=False
+        global finalIdentifier
+        finalIdentifier = ''
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
@@ -694,7 +696,8 @@ class Dispatcher:
                             if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
-                        result= self.web_dict[keyword](webelement,input,objectname.split(';')[0])
+                        #sending identifier that found webelement in keywords
+                        result= self.web_dict[keyword](webelement,input,finalIdentifier)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
                     if(result[1] == TERMINATE):
                         result = TERMINATE
@@ -860,11 +863,13 @@ class Dispatcher:
         return web_element
 
     def element_locator(self,driver,identifiers_type,identifier,id_num):
+        global finalIdentifier
         if identifier=='null' or identifier == '': return None
         display_identifier_type = identifiers_type
         webElement = None
         try:
             index = 0
+            driver.switch_to.default_content()
             if identifiers_type == 'rxpath' or identifiers_type == 'xpath':
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
@@ -879,6 +884,7 @@ class Dispatcher:
                             break
 
                 if webElement:
+                    finalIdentifier = identifier
                     logger.print_on_console(f'Webelement found by OI '+identifiers_type)
                     local_Wd.log.info(f'Webelement found by OI '+identifiers_type)
                     return webElement
@@ -905,6 +911,7 @@ class Dispatcher:
                 return None
             if len(webElement) == 1:
                 webElement=webElement[0]
+                finalIdentifier = identifier
                 try:
                     identifier_fullname = {'xpath':'Absolute X-Path',
                                             'id':'ID Attribute',
