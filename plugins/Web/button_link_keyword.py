@@ -428,34 +428,30 @@ class ButtonLinkKeyword():
                     err_msg = WEB_ELEMENT_DISABLED
         except Exception as e:
             try:
-                #emulating mouse click at mouse pointer position
-                webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(webelement).click(webelement).perform()
-                local_blk.log.info('press operation performed using Action chains click')
+                local_blk.log.info(e)
+                #if webElement becomes stale, click is performed in browser passing xpath.
+                browser_Keywords.local_bk.driver_obj.execute_script("""
+                                                                debugger;
+                                                                var xpath = arguments[0]
+                                                                var xres = document.evaluate(xpath,document);
+                                                                var webElement;
+                                                                while(1){
+                                                                    webElement = xres.iterateNext();
+                                                                    if (webElement == null)
+                                                                        break;
+                                                                    if ((webElement.getBoundingClientRect().height)*(webElement.getBoundingClientRect().width)>0){
+                                                                        webElement.focus();
+                                                                        webElement.click();
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                """,args[0])
                 status = webconstants.TEST_RESULT_PASS
                 methodoutput = webconstants.TEST_RESULT_TRUE
+                local_blk.log.info('press operation performed on element in browser using JS click.')
             except Exception as e:
-                try:
-                    #if webElement becomes stale, click is performed in browser passing xpath.
-                    print(e)
-                    browser_Keywords.local_bk.driver_obj.execute_script("""
-                                                                    var xpath = arguments[0]
-                                                                    var xres = document.evaluate(xpath,document);
-                                                                    var webElement;
-                                                                    while(1){
-                                                                        webElement = xres.iterateNext();
-                                                                        if (webElement == null)
-                                                                            break;
-                                                                        if ((webElement.getBoundingClientRect().height)*(webElement.getBoundingClientRect().width)>0){
-                                                                            webElement.focus();
-                                                                            webElement.click();
-                                                                            break;
-                                                                        }
-                                                                    }
-                                                                    """,args[0])
-                    local_blk.log.info('press operation performed on element in browser using JS click.')
-                except Exception as e:
-                    local_blk.log.error(e)
-                    err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+                local_blk.log.error(e)
+                err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         if err_msg:
             local_blk.log.error(err_msg)
             logger.print_on_console(err_msg)
@@ -569,20 +565,23 @@ class ButtonLinkKeyword():
                             status = webconstants.TEST_RESULT_PASS
                             methodoutput = webconstants.TEST_RESULT_TRUE
                     else:
-                        #Checking for headless mode
-                        inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,".//input[@type='file']")
-                        if inputElement:
-                            # if (str(readconfig.configvalues['headless_mode'])=='Yes'):
-                            inputElement.send_keys(inputfile)
-                            status = webconstants.TEST_RESULT_PASS
-                            methodoutput = webconstants.TEST_RESULT_TRUE
-                        elif not(multiplefile):
-                            if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
-                                filestatus =self.__upload_operation(inputfile,inputs)
-                                local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
-                                if filestatus:
-                                    status = webconstants.TEST_RESULT_PASS
-                                    methodoutput = webconstants.TEST_RESULT_TRUE
+                        try:                        
+                            inputElement = webelement.find_element(By.XPATH,'..').find_element(By.XPATH,".//input[@type='file']")
+                            if inputElement:
+                                inputElement.send_keys(inputfile)
+                                status = webconstants.TEST_RESULT_PASS
+                                methodoutput = webconstants.TEST_RESULT_TRUE
+                        except:
+                            local_blk.log.info("Finding element using click and entering path.")
+                            logger.print_on_console("Finding element using click and entering path.")
+                            if not(multiplefile):
+                                if self.__click_for_file_upload(browser_Keywords.local_bk.driver_obj,webelement):
+                                    filestatus =self.__upload_operation(inputfile,inputs)
+                                    local_blk.log.info(STATUS_METHODOUTPUT_UPDATE)
+                                    if filestatus:
+                                        status = webconstants.TEST_RESULT_PASS
+                                        methodoutput = webconstants.TEST_RESULT_TRUE
+                                        logger.print_on_console("File uploaded using primitive method.")
                     
                 else:
                     err_msg = WEB_ELEMENT_DISABLED

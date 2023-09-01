@@ -984,11 +984,15 @@ class TableOperationKeywords():
                             #logger.print_on_console('normal cell click inside the cell')
                             row_number=int(input_arr[0])-1
                             col_number=int(input_arr[1])-1
-                            cell=self.javascriptExecutor(webElement,row_number,col_number)
+                            if webElement.tag_name.lower() == 'table':
+                                cell = local_tk.driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,row_number,col_number)
+                            else:
+                                cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
-                            if len(list(element_list))>0:
-                                xpath=self.getElemntXpath(element_list[0])
-                                cell=local_tk.driver.find_element_by_xpath(xpath)
+                            # going inside the cell
+                            # if len(list(element_list))>0:
+                            #     xpath=self.getElemntXpath(element_list[0])
+                            #     cell=local_tk.driver.find_element_by_xpath(xpath)
                             try:
                                 local_tk.log.debug('checking for element not none')
                                 if(cell!=None):
@@ -1019,6 +1023,7 @@ class TableOperationKeywords():
                                                     click=local_tk.driver.execute_script(js,webElement)
                                                 else:
                                                     local_tk.log.debug('performing click')
+                                                    local_tk.driver.execute_script("""arguments[0].focus()""",webElement)
                                                     cell.click()
                                                 status=TEST_RESULT_PASS
                                                 methodoutput=TEST_RESULT_TRUE
