@@ -138,20 +138,24 @@ class AzureWindow():
             if response_area.status_code == 200:
                 data_area = response_area.json()
                 if 'children' in data_area and len(data_area['children']) > 0:
+                  area_paths.append({'id':data_area['id'],'name':data_area['name']})  
                   for node in data_area['children']:
-                    area_paths.append({'id':node['id'],'name':node['name']})    
+                    grandparent_name = f"{data_area['name']}/{node['name']}"  
+                    area_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
-                        child_data = self.modify_data(node["children"], node["name"])
+                        child_data = self.modify_data(node["children"], grandparent_name)
                         area_paths.extend(child_data)
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
                 if 'children' in data_iteration and len(data_iteration['children']) > 0:
+                  iteration_paths.append({'id':data_iteration['id'],'name':data_iteration['name']})  
                   for node in data_iteration['children']:
-                    iteration_paths.append({'id':node['id'],'name':node['name']})    
+                    grandparent_name = f"{data_iteration['name']}/{node['name']}"  
+                    iteration_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
-                        child_data = self.modify_data(node["children"], node["name"])
+                        child_data = self.modify_data(node["children"], grandparent_name)
                         iteration_paths.extend(child_data)     
 
 
@@ -553,7 +557,10 @@ class AzureWindow():
                     data = value['data']['text']
                 elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
                     convert_str = value['data'].replace("/","\\")
-                    data = f'{project_name}\\' + convert_str
+                    # if(project_name != convert_str):
+                    #    data = f'{project_name}\\' + convert_str
+                    # else:
+                    data = convert_str   
                 else:
                     data = value['data']
 
