@@ -138,20 +138,24 @@ class AzureWindow():
             if response_area.status_code == 200:
                 data_area = response_area.json()
                 if 'children' in data_area and len(data_area['children']) > 0:
+                  area_paths.append({'id':data_area['id'],'name':data_area['name']})  
                   for node in data_area['children']:
-                    area_paths.append({'id':node['id'],'name':node['name']})    
+                    grandparent_name = f"{data_area['name']}/{node['name']}"  
+                    area_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
-                        child_data = self.modify_data(node["children"], node["name"])
+                        child_data = self.modify_data(node["children"], grandparent_name)
                         area_paths.extend(child_data)
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
                 if 'children' in data_iteration and len(data_iteration['children']) > 0:
+                  iteration_paths.append({'id':data_iteration['id'],'name':data_iteration['name']})  
                   for node in data_iteration['children']:
-                    iteration_paths.append({'id':node['id'],'name':node['name']})    
+                    grandparent_name = f"{data_iteration['name']}/{node['name']}"  
+                    iteration_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
-                        child_data = self.modify_data(node["children"], node["name"])
+                        child_data = self.modify_data(node["children"], grandparent_name)
                         iteration_paths.extend(child_data)     
 
 
@@ -494,7 +498,11 @@ class AzureWindow():
                    res = {}
                    res['testcases'] = []
                    for details in JsonObject['value']:
-                    res['testcases'].append(details['workItem'])
+                    inputs = {
+                        'workItem':details['workItem'],
+                        'points': [i['id'] for i in details['pointAssignments']]
+                    }
+                    res['testcases'].append(inputs)
 
             # if(';' in org_url):
             #     log.debug('Connecting to JIRA through proxy')
@@ -549,7 +557,10 @@ class AzureWindow():
                     data = value['data']['text']
                 elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
                     convert_str = value['data'].replace("/","\\")
-                    data = f'{project_name}\\' + convert_str
+                    # if(project_name != convert_str):
+                    #    data = f'{project_name}\\' + convert_str
+                    # else:
+                    data = convert_str   
                 else:
                     data = value['data']
 
@@ -602,3 +613,72 @@ class AzureWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
+
+    def update_azure_test_details(self,azure_input_dict):
+        """
+            Method to update executed test details to Azure (Azure Execution)
+        """
+        try:
+            pat = azure_input_dict['azurepat']
+            testplan_id = azure_input_dict['mapping_details']['TestPlanId']
+            testsuite_id = azure_input_dict['mapping_details']['TestSuiteId']
+            testpoint_id = azure_input_dict['mapping_details']['TestPoints']
+            test_status = azure_input_dict['status'] 
+            org_url = azure_input_dict['azureBaseUrl']
+
+            testpoint_id_flat_string = ','.join([str(num) for num in testpoint_id])
+
+                        
+            authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
+            headers = {
+                            'Accept': 'application/json',
+                            'Authorization': 'Basic '+authorization
+                        }
+            #finding user details before update
+            # org_name = azure_input_dict['azureOrgname']
+            users_endpoint = f'{org_url}/_apis/connectionData?connectOptions=includeServices&api-version=7.1-preview.1'
+                        
+            user_respon = requests.get(users_endpoint, headers=headers)
+            if user_respon.status_code == 200:
+                user_json = user_respon.json()
+
+            # Azure DevOps organization URL
+            project_name = azure_input_dict['mapping_details']['projectName']
+            endpoint_url = f'{org_url}/{project_name}/_apis/test/Plans/{testplan_id}/Suites/{testsuite_id}/points/{testpoint_id_flat_string}?api-version=7.0'
+            payload = {
+                    "outcome":test_status,
+                    "tester":{
+                        "id":user_json['authenticatedUser']['id'],
+                        "displayName":user_json['authenticatedUser']['providerDisplayName']
+                    }
+                    }
+            # Send request to API endpoint
+            respon = requests.patch(endpoint_url,json=payload, headers=headers)
+            if respon.status_code == 200:
+                logger.print_on_console(' azure devops test details updated successfully')
+                return 1
+            elif respon.status_code == 400:
+                logger.print_on_console('Bad Request')
+                return 0
+            elif respon.status_code == 401:
+                logger.print_on_console('Unauthorized user')
+                return 0
+            elif respon.status_code == 403:
+                logger.print_on_console('user does not have the necessary permissions to access')
+                return 0
+            elif respon.status_code == 404 :
+                logger.print_on_console('Source not found')
+                return 0
+            elif respon.status_code == 500 :
+                logger.print_on_console('Internal Server Error')
+                return 0
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                log.error('Invalid URL')
+            elif 'Unauthorized' in str(e):
+                log.error('Invalid Credentials')
+            else:
+                log.error(e,' Fail')
+            logger.print_on_console('Exception in updating test details in azure')
+            return 0

@@ -133,7 +133,8 @@ ERROR_CODE_DICT = {
     'err_value': 'Value does not exist',
     'err_operation_detect': 'Element clicked but operation not detected, Please use alternative keyword double click',
     'err_shell': 'Unable to use shell to bring window on top',
-    'err_select_navigator': 'Error occurred in select from navigator'
+    'err_select_navigator': 'Error occurred in select from navigator',
+    'err_finding_object': 'Element not found with primary identifer'
 }
 
 

@@ -333,6 +333,7 @@ return isVisible(s);"""
                     local_uo.log.info(info_msg)
                     status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     logger.print_on_console(err_msg)
