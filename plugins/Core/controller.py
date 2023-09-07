@@ -1244,14 +1244,14 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
+                        if("alm" in qc_creds and qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
                             qc_url=qc_creds['alm']['url']
                             qc_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
+                        if("qtest" in qc_creds and qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
                             qtest_username=qc_creds["qtest"]["username"]
                             qtest_password=qc_creds["qtest"]["password"]
                             qtest_url=qc_creds["qtest"]["url"]
@@ -1263,7 +1263,7 @@ class Controller():
                             qtest_suite=qtest_sceanrio_data['qtestsuite']
                             qtest_suiteid=qtest_sceanrio_data['qtestsuiteid']
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
+                        if("zephyr" in qc_creds and qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
@@ -1279,7 +1279,7 @@ class Controller():
                             else: zephyr_parentid=''
 
                         # Updating the azure variables to update the test case status
-                        if(qc_creds["azure"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Azure"):
+                        if("azure" in qc_creds and qc_creds["azure"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Azure"):
                             azure_url=qc_creds["azure"]["url"]
                             azure_username=qc_creds["azure"]["username"]
                             azure_password=qc_creds["azure"]["password"]

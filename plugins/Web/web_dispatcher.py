@@ -680,6 +680,7 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
                         local_Wd.browser_object.validate_current_window_handle()
+                    window_handles_count_begin = 0
                     if driver is not None and self.action == EXECUTE and configvalues['browser_screenshots'].lower() == 'yes':
                         window_handles_count_begin=len(driver.window_handles)
                     if objectname=="@Object":
