@@ -1276,7 +1276,7 @@ class BrowserKeywords():
         handle = hwnds[0] if (len(hwnds) > 0) else None
         return handle
 
-    def save_file(self,element,args):
+    def save_file(self,element,*args):
         """
         def : save_file
         purpose : Saving a file in windows
@@ -1291,8 +1291,9 @@ class BrowserKeywords():
             output=OUTPUT_CONSTANT
             local_bk.log.debug('Reading the inputs')
             brute_logic = False
-            folder_path=str(args[0]) if len(args) > 0 else None
-            file_path=str(args[1]) if len(args) > 1 else None
+            input_val = args[0]
+            folder_path=str(input_val[0]) if len(input_val) > 0 else None
+            file_path=str(input_val[1]) if len(input_val) > 1 else None
             local_bk.log.debug('Folder path is '+str(folder_path)+' and File is '+str(file_path))
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 local_bk.log.debug('Saving the file')
@@ -1313,8 +1314,8 @@ class BrowserKeywords():
 
                         maxTries = 10
                         time_sleep = 0.5
-                        if len(args) > 2:
-                            maxTries = int(int(args[2]) / time_sleep)
+                        if len(input_val) > 2:
+                            maxTries = int(int(input_val[2]) / time_sleep)
                         handle = __save_time_func(maxTries, time_sleep)
                         if handle is None: brute_logic = True
                         else:
