@@ -1279,7 +1279,7 @@ class Controller():
                             else: zephyr_parentid=''
 
                         # Updating the azure variables to update the test case status
-                        if("azure" in qc_creds and qc_creds["azure"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Azure" and 'userStoryId' not in scenario['qcdetails'][integ]):
+                        if("azure" in qc_creds and qc_creds["azure"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Azure" and 'TestCaseId' in scenario['qcdetails'][integ]):
                             azure_url=qc_creds["azure"]["url"]
                             azure_username=qc_creds["azure"]["username"]
                             azure_password=qc_creds["azure"]["password"]
@@ -1682,7 +1682,7 @@ class Controller():
                                 logger.print_on_console('Error in Updating Zephyr details')
                         
                         # Azure - Updating the scenario status to the azure test case
-                        if len(scenario["qcdetails"]) > integ and 'azure' in qc_creds and qc_creds['azure']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Azure" and 'userStoryId' not in scenario['qcdetails'][integ]:
+                        if len(scenario["qcdetails"]) > integ and 'azure' in qc_creds and qc_creds['azure']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Azure" and 'TestCaseId' in scenario['qcdetails'][integ]:
                             azure_status_over=report_json
                             integ += 1
                             try:
