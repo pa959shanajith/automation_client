@@ -331,12 +331,13 @@ return isVisible(s);"""
                     info_msg=ERROR_CODE_DICT['ERR_HIDDEN_OBJECT']
                     logger.print_on_console(info_msg)
                     local_uo.log.info(info_msg)
+                    status=TEST_RESULT_PASS
                     methodoutput=TEST_RESULT_TRUE
+                    status=TEST_RESULT_PASS
                 else:
                     err_msg=ERROR_CODE_DICT['ERR_OBJECT_VISIBLE']
                     logger.print_on_console(err_msg)
                     local_uo.log.error(err_msg)
-                status=TEST_RESULT_PASS
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
@@ -1727,3 +1728,22 @@ return isVisible(s);"""
                     if finalValue:
                         value = finalValue.rstrip()
         return value, childSearchFlag
+    
+    def send_secure_keys(self, webelement, input_value, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        text = False
+        try:
+            if len(input_value)==1:
+                encryption_obj = AESCipher()
+                decrypted_input_value = encryption_obj.decrypt(input_value[0])
+                actions = ActionChains(browser_Keywords.local_bk.driver_obj)
+                actions.send_keys(decrypted_input_value)
+                actions.perform()
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg

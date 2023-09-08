@@ -22,22 +22,27 @@ class UserObject:
         data={}
         if d['operation']=='encrypt':
             obj=core_utils.CoreUtils()
-            data['url']= obj.scrape_wrap(d['url'])
-            left_part=obj.scrape_wrap(d['apath']+";"+d["id"])
-            right_part=obj.scrape_wrap(d["name"]+";"+d["tagname"]+";"+d["classname"]+"; ; ; ; ; ;"+d['selector'])
-            data['xpath'] = left_part+';'+d["rpath"]+';'+right_part
+            # data['url']= obj.scrape_wrap(d['url'])
+            # left_part=obj.scrape_wrap(d['apath']+";"+d["id"])
+            # right_part=obj.scrape_wrap(d["name"]+";"+d["tagname"]+";"+d["classname"]+"; ; ; ; ; ;"+d['selector'])
+            # data['xpath'] = left_part+';'+d["rpath"]+';'+right_part
+            data['url'] = d['url']
+            data['xpath'] = d['apath']+";"+d["id"]+";"+d["rpath"]+";"+d["name"]+";"+d["tagname"]+";"+d["classname"]+"; ; ; ; ; ;"+d['selector']
             log.debug('data encrypt',data)
             socketIO.emit('scrape',data)
         elif d['operation']=='decrypt':
             obj=core_utils.CoreUtils()
             xpath_string=d['xpath'].split(';')
-            if len(xpath_string) == 3:
-                left_part=obj.scrape_unwrap(xpath_string[0])
-                right_part=obj.scrape_unwrap(xpath_string[2])
-            else:
-                left_part = ';'.join(map(str,xpath_string[:2]))
-                right_part = ';'.join(map(str,xpath_string[2:]))
-            data['url']=obj.scrape_unwrap(d['url'])
+            # if len(xpath_string) == 3:
+            #     left_part=obj.scrape_unwrap(xpath_string[0])
+            #     right_part=obj.scrape_unwrap(xpath_string[2])
+            # else:
+            #     left_part = ';'.join(map(str,xpath_string[:2]))
+            #     right_part = ';'.join(map(str,xpath_string[2:]))
+            left_part = ';'.join(map(str,xpath_string[:2]))
+            right_part = ';'.join(map(str,xpath_string[2:]))
+            # data['url']=obj.scrape_unwrap(d['url'])
+            data['url']=d['url']
             data['apath']=left_part.split(';')[0]
             data['rpath']=xpath_string[1]
             data['id']=left_part.split(';')[1]
@@ -53,10 +58,12 @@ class UserObject:
         data={}
         identifier=objectname.split(';')
         obj=core_utils.CoreUtils()
-        left_part=obj.scrape_wrap(obj_flag+";"+identifier[1])
-        right_part=obj.scrape_wrap(';'.join(identifier[3:]))
-        data['url']= obj.scrape_wrap(url)
-        data['xpath'] = left_part+';'+identifier[2]+';'+right_part
+        # left_part=obj.scrape_wrap(obj_flag+";"+identifier[1])
+        # right_part=obj.scrape_wrap(';'.join(identifier[3:]))
+        # data['url']= obj.scrape_wrap(url)
+        # data['xpath'] = left_part+';'+identifier[2]+';'+right_part
+        data['url'] = url
+        data['xpath'] = obj_flag+';'+';'.join(map(str,identifier))
         for i in range(1,len(identifier)):
             obj_flag=obj_flag+';'+identifier[i]
         data[custname]=obj_flag

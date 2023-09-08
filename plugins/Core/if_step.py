@@ -157,13 +157,17 @@ class Logical_eval():
     #Block to evaluate conditional expression
     def eval_expression(self,expression):
         try:
-            result=satisfiable(expression)
-            if type(result)==dict:
-                for res in result.keys():
-                    status=result[res]
-                    return [status]
+            if SYSTEM_OS == "Windows":
+                result=satisfiable(expression)
+                if type(result)==dict:
+                    for res in result.keys():
+                        status=result[res]
+                        return [status]
+                else:
+                    return [False]
             else:
-                return [False]
+                status = eval(expression)
+                return [status]
         except Exception as e:
             if e.__class__.__name__=='TypeError':
                 return [INVALID,str(e)]

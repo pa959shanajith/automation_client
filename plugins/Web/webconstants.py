@@ -9,6 +9,20 @@ EXTENSIONS_PATH = os.environ["AVO_ASSURE_HOME"] + os.sep + "extension"
 
 GET_XPATH_JS="""function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();"""
 
+GET_ELEMENT_BY_XPATH_JS = """
+debugger;
+var xpath = arguments[0]
+var xres = document.evaluate(xpath,document);
+var webElement;
+while(1){
+    webElement = xres.iterateNext();
+    if (webElement == null)
+        break;
+    if ((webElement.getBoundingClientRect().height)*(webElement.getBoundingClientRect().width)>0)
+        return webElement;
+}
+"""
+
 CLICK_JAVASCRIPT = """var evType;
 element = arguments[0];
 if (document.createEvent && element.hasAttribute('getRootNode') && element.getRootNode().toString()!='[object ShadowRoot]') {

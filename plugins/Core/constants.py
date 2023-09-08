@@ -123,6 +123,8 @@ PARALLEL = 'parallel'
 
 SERIAL = 'serial'
 
+DATA_PARAMETERIZATION_FAILED = "data parameterization failed"
+
 ERROR_CODE_DICT = {
                     'NULL_DATA' : 'Cannot verify text with the null data',
                     'MSG_STATUS' : 'Executed and the status is:',

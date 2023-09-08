@@ -133,18 +133,21 @@ class Fullscrape():
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
             new_obj=[]
+            new_obj_in_screen = []
             obj = CoreUtils()
             # XPath Encryption logic implemented
             for a in tempne:
-                a['url']= obj.scrape_wrap(a['url'])
+                # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
-                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
-                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
-                if not scenarioFlag and ((tagfilter=={} and xpathfilter=={}) or tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None):
+                # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                # right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                # a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['xpath'] = ';'.join(map(str,xpath_string))
+                
+                if ((tagfilter=={} and xpathfilter=={}) or (tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a))):
                     new_obj.append(a)
-                elif scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):
-                    new_obj.append(a)
+                if scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):
+                    new_obj_in_screen.append(a)
             tempne=new_obj
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time
@@ -171,7 +174,14 @@ class Fullscrape():
                 scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
-            data['view'] = tempne
+            #collecting new elements for analyze screen and scenario impact analyzer.
+            if scenarioFlag:
+                filtered_data={}
+                filtered_data['new_obj_for_not_found']=tempne
+                filtered_data['new_obj_in_screen']=new_obj_in_screen
+                data['view']=filtered_data
+            else:    
+                data['view'] = tempne
             data['mirror'] = screen
             log.info('Creating a json object with key view with value as return data')
             with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:

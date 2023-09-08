@@ -434,3 +434,21 @@ class MobileWindow():
         except Exception as e:
             socket.emit('get_serial_number', 'Error occurred in getting the serial number of connected device')
             logger.print_on_console("ADB command not found. Make sure ADB is installed and added to your system's PATH.")
+
+    def checking_mobile_client(self, socket):
+        """
+            Method to check Mobile Client Present in ICE or Not
+            related to android native scraping
+            Returns Mobile CLient is Present or not 
+        """
+        try:
+            folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'avoAssureClient_Mobile'
+            if os.path.exists(folder_path):
+                socket.emit('checking_Mobile_Client', 'true')
+            else:
+                logger.print_on_console('avoAssureClient_Mobile Folder is not Available in ICE package')
+                socket.emit('checking_Mobile_Client','false')
+                
+        except Exception as e:
+            socket.emit('checking_Mobile_Client', 'Error occurred in Finding Mobile Client')
+            logger.print_on_console("Please Check Mobile Client Folder in the ICE Package")

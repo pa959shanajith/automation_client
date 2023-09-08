@@ -27,11 +27,10 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
-    def __init__(self, parent,id, title,browser,socketIO,action,data):  #called in core #1646
+    def __init__(self, parent, id, title, browser, socketIO, action, data):  #called in core #1646
         global checkWebPackage
         checkWebPackage = self.get_client_manifest()
         if SYSTEM_OS == 'Linux':
@@ -150,7 +149,7 @@ class ScrapeWindow(wx.Frame):
 
                     # Name : A sreenivasulu Date: 02/08/2022
                     # setting the URL from allowed_urls when istrail is true
-                    if isTrial:
+                    if readconfig.configvalues["isTrial"]:
                         self.navigateURL.SetValue(allowed_urls[0])
 
                 elif(self.action == 'compare'):
@@ -170,10 +169,11 @@ class ScrapeWindow(wx.Frame):
                         self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
                         self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
                 if (data.get('scenarioLevel')==None or data.get('scenarioLevel')==False):
-                    self.Centre()
                     style = self.GetWindowStyle()
                     self.SetWindowStyle( style|wx.STAY_ON_TOP )
                     wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                    screen_width, screen_height = wx.GetDisplaySize()
+                    self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
                     self.Show()
             except Exception as e:
                 log.error(e)
@@ -205,7 +205,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
@@ -334,12 +334,14 @@ class ScrapeWindow(wx.Frame):
             core_obj=core_utils.CoreUtils()
             xpathfilter = {}
             for elem in currentScrapedData['view']:
-                if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
-                    decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
-                    xpathfilter[decry_abs_xpath] = True
-                else:
-                    xpathfilter[elem['xpath'].split(';')[0]] = True
+                # if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
+                #     decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
+                #     xpathfilter[decry_abs_xpath] = True
+                # else:
+                #     xpathfilter[elem['xpath'].split(';')[0]] = True
+                xpathfilter[elem['xpath'].split(';')[0]] = True
                 
+            #Full scraping for scenario level impact analysis and analyze screen. Decided by scenario flag
             fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter,self.data['scenarioLevel'])
             
             d['view'].append({'newElements':fullScrapeData['view']})
@@ -364,7 +366,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
@@ -451,7 +453,9 @@ class ScrapeWindow(wx.Frame):
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
-        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{},False)
+        
+        #Full scraping for normal. Passing filters as empty and scenario flag as
+        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{}, False)
 
         '''Check the limit of data size as per Avo Assure standards'''
         if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:

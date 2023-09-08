@@ -15,6 +15,9 @@ import domconstants
 import clickandadd
 import time
 import browserops
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 import fullscrape
 from selenium import webdriver
 import logger
@@ -35,11 +38,16 @@ class Highlight():
         self.driver = browserops.driver
         self.currenthandle = None
 
-    def perform_highlight(self,elementxpath,elementurl):
+    def perform_highlight(self,elementxpath,elementurl,scenarioFlag):
         try:
             status = domconstants.STATUS_FAIL
             log.info('Inside perform_highlight method')
             apply_status = remove_status = False
+            #highlight in browser for scenario flag and implicitly waiting for element to appear
+            if scenarioFlag==True:
+                self.driver.get(elementurl)
+                element_present = EC.presence_of_element_located((By.XPATH, elementxpath.split(';')[0]))
+                WebDriverWait(self.driver, 20).until(element_present)
             # Find the current handle
             self.currenthandle = clickandadd.currenthandle
             if self.currenthandle is '' or self.currenthandle is None:
@@ -64,15 +72,17 @@ class Highlight():
             self.driver.switch_to.default_content()
 
             # XPath and URL decryption logic implemented
-            xpath_string = elementxpath.split(';')
-            if len(xpath_string) == 3:
-                left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
-                right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
-            else:
-                left_part = str(xpath_string[0])
-                right_part = ';'.join(map(str,xpath_string[2:]))
-            decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
-            decryptedelementurl = self.coreutilsobj.scrape_unwrap(elementurl)
+            # xpath_string = elementxpath.split(';')
+            # if len(xpath_string) == 3:
+            #     left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
+            #     right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+            # else:
+            #     left_part = str(xpath_string[0])
+            #     right_part = ';'.join(map(str,xpath_string[2:]))
+            # decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
+            decryptedxpath = elementxpath
+            # decryptedelementurl = self.coreutilsobj.scrape_unwrap(elementurl)
+            decryptedelementurl = elementurl
             identifiers = decryptedxpath.split(';')
 
             # If the element URL is of frame/iframe, switch to that

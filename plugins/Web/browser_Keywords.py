@@ -1599,6 +1599,8 @@ class Singleton_DriverUtil():
                         prefs["credentials_enable_service"] = False
                         prefs["profile.password_manager_enabled"] = False
                         choptions.add_experimental_option("prefs", prefs)
+                        choptions.add_argument("--disable-notifications")
+
                     if str(incognito_private_mode).lower() == 'yes':
                         choptions.add_argument('--incognito')
                     if use_custom_debugport:

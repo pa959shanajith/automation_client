@@ -186,11 +186,12 @@ class Clickandadd():
             new_obj=[]
             obj=CoreUtils()
             for a in tempne_stopclicknadd:
-                a['url']= obj.scrape_wrap(a['url'])
+                # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';')+ ["null",a['tag']]
-                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
-                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                # right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                # a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['xpath'] = ';'.join(map(str,xpath_string))
                 new_obj.append(a)
             tempne_stopclicknadd=new_obj
             data['view'] = tempne_stopclicknadd

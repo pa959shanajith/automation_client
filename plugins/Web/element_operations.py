@@ -80,20 +80,14 @@ class ElementKeywords:
                         observer.observe(document.body, {attributes: false, childList: true, characterData: false, subtree:true});
                         """)
 
-                        #Emulating mousehover by JS injection in browser through selenium to trigger tooltip.
-                        browser_Keywords.local_bk.driver_obj.execute_script("""         
-                        var mousehoverEvent = new MouseEvent('mouseover', {
-                        'view': window,
-                        'bubbles': true,
-                        'cancelable': true
-                        });                                                    
-                        arguments[0].dispatchEvent(mousehoverEvent);
-                        """,webelement)
-                        # time.sleep(2)
+                        #Performing mousehover through action chains class of selenium
+
+                        hover = webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(webelement)
+                        hover.perform()
 
                         #Retreiving the tooltip
                         t=0
-                        while(text=='' and t<10):
+                        while((text==None or text=='') and t<10):
                             text = browser_Keywords.local_bk.driver_obj.execute_script("""
                             console.log(j);
                             return j;""")
@@ -122,37 +116,38 @@ class ElementKeywords:
         text=None
         err_msg=None
         configvalues = readconfig.configvalues
+        delayconst = int(configvalues['element_load_timeout'])
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 util = UtilWebKeywords()
-                if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    local_eo.log.debug('element is invisible, performing js code')
-                    text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
-                    logger.print_on_console('Element text: ',text)
-                    local_eo.log.info('Element text: ')
-                    local_eo.log.info(text)
-                    status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
-                    local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
-                else:
-                    if(util.is_visible(webelement)):
-                        text = webelement.get_attribute('innerText')
-                        if text.find('\xa0')!=-1:text=text.replace('\xa0'," ")
-                        # text=self.__getelement_text(webelement)
-                        if text.find('\n')!=-1:
-                            local_eo.log.debug("\\n detected. Fetching text using element.text method")
-                            text = webelement.text
+                for i in range(delayconst):
+                    if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
+                        local_eo.log.debug('element is invisible, performing js code')
+                        text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                    else:
+                        if(util.is_visible(webelement)):
+                            text = webelement.get_attribute('innerText')
+                            if text.find('\xa0')!=-1:text=text.replace('\xa0'," ")
+                            # text=self.__getelement_text(webelement)
+                            if text.find('\n')!=-1:
+                                local_eo.log.debug("\\n detected. Fetching text using element.text method")
+                                text = webelement.text
+                        elif i+1 == delayconst:
+                            err_msg = 'Element is not displayed'
+                            logger.print_on_console('Element is not displayed')
+                            local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                    if text:
                         logger.print_on_console('Element text: ',text)
                         local_eo.log.info('Element text: ')
                         local_eo.log.info(text)
                         local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                         status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
                         methodoutput=TEST_RESULT_TRUE
+                        break
                     else:
-                        err_msg = 'Element is not displayed'
-                        logger.print_on_console('Element is not displayed')
-                        local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        time.sleep(1)
             except Exception as e:
                 local_eo.log.error(e)
                 logger.print_on_console(e)
@@ -166,6 +161,7 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         configvalues = readconfig.configvalues
+        delayconst = int(configvalues['element_load_timeout'])
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -174,17 +170,22 @@ class ElementKeywords:
                     input = input.replace("\xa0"," ")
                 if input is not None:
                     util = UtilWebKeywords()
-                    if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
-                        text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
-                    else:
-                        text = webelement.get_attribute('innerText')
-                        if text is None or text is '': 
-                            local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
-                            text=self.__getelement_text(webelement)
-                    if text.find('\xa0') != -1: text = text.replace("\xa0", " ")
-                    if text.find('\n') != -1:
-                        local_eo.log.debug("\\n detected. Fetching text using element.text method")
-                        text = webelement.text
+                    for i in range(delayconst):
+                        if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                        else:
+                            text = webelement.get_attribute('innerText')
+                            if text is None or text is '': 
+                                local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
+                                text=self.__getelement_text(webelement)
+                        if text is not None and text.find('\xa0') != -1: text = text.replace("\xa0", " ")
+                        if text is not None and text.find('\n') != -1:
+                            local_eo.log.debug("\\n detected. Fetching text using element.text method")
+                            text = webelement.text
+                        if text:
+                            break
+                        else:
+                            time.sleep(1)
                     if text==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')
@@ -211,7 +212,7 @@ class ElementKeywords:
         #return status and methodoutput
         local_eo.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
-
+        
     def click_element(self,webelement,*args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
@@ -231,10 +232,9 @@ class ElementKeywords:
                 else:
                     local_eo.log.error(ERR_DISABLED_OBJECT)
                     err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                    logger.print_on_console(ERR_DISABLED_OBJECT)
+                    logger.print_on_console(ERR_DISABLED_OBJECT)   
             except Exception as e:
                 local_eo.log.error(e)
-
                 logger.print_on_console(e)
                 err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
         #return status and methodoutput
@@ -464,18 +464,6 @@ class ElementKeywords:
                local_eo.log.info(tool_tip)
 ##               logger.print_on_console('Tool tip text: '+str(tool_tip))
                logger.print_on_console('Tool tip text: ',tool_tip)
-               
-               #removing mutation observer and Emulating mouseout event to make tooltip disappear.
-               browser_Keywords.local_bk.driver_obj.execute_script("""
-                observer.disconnect();
-                j='';
-                var mouseoutEvent = new MouseEvent('mouseout', {
-                'view': window,
-                'bubbles': true,
-                'cancelable': true
-                });
-                arguments[0].dispatchEvent(mouseoutEvent);
-                """,webelement)
                
             except Exception as e:
                 local_eo.log.error(e)

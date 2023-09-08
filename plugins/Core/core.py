@@ -58,6 +58,7 @@ zephyrdata = None
 qcObject = None
 qtestObject = None
 zephyrObject = None
+azureObject = None
 soc=None
 browsercheckFlag=False
 updatecheckFlag=False
@@ -124,9 +125,7 @@ class MainNamespace(BaseNamespace):
                 enable_reregister = False
                 try:
                     global plugins_list
-                    ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                        'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                    response = json.loads(core_utils_obj.unwrap(str(args[1]), ice_das_key))
+                    response = json.loads(args[1])
                     if(response['id'] != root.icesession['ice_id'] or response['connect_time'] != root.icesession['connect_time']):
                         err_res="Invalid response received"
                         logger.print_on_console(err_res)
@@ -139,23 +138,22 @@ class MainNamespace(BaseNamespace):
                             allow_connect = True
                             plugins_list = response['plugins']
                             try:
-                                isTrial_val = configvalues.get("isTrial")
+                                isTrial_val = configvalues["isTrial"]
                                 LicenseType = response["license_data"]["LicenseTypes"].lower()
-                                config_path = os.environ["AVO_ASSURE_HOME"]+os.sep+"assets"+os.sep+"config.json"
                                 isTrial_update = ''
                                 if LicenseType == "trial" and isTrial_val != 1:
                                     isTrial_update = 1
                                 if LicenseType != "trial" and isTrial_val != 0:
                                     isTrial_update = 0
+                                    wx.CallAfter(cw.configItem.Enable)
                                 if isTrial_update != '':
-                                    with open(config_path,'r+') as f:
-                                        data = json.load(f)
-                                        data['isTrial'] = int(isTrial_update)
-                                        f.seek(0)
-                                        json.dump(data, f, indent=4)
-                                        f.truncate()
-                                        logger.print_on_console("Your license is upgraded, Please restart Avo Assure client to continue.")
-                                        wx.MessageBox("Your license is upgraded, Please restart Avo Assure client to continue.")
+                                    configvalues["isTrial"] = isTrial_update
+                                    obj_readConfig_class = readconfig.readConfig()
+                                    obj_readConfig_class.updateconfig(configvalues)
+                                    # By default configItem is disabled for trial users.
+                                    # while connect, Here we enabling(LicenseType != "trial") or disabling(LicenseType == "trial") it by user license without restarting the application ice
+                                    log.info("The licence you have has changed.")
+                                    logger.print_on_console("Your license is modified")
                             except Exception as e:
                                 log.error(e)
                                 log.info("Error occurred while changing isTrail value in config.json")
@@ -277,7 +275,8 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('WebScrape')
                     import highlight
                     light =highlight.Highlight()
-                    res = light.perform_highlight(args[0],args[1])
+                    #last arg will be scenario flag
+                    res = light.perform_highlight(args[0],args[1],args[-1])
                     logger.print_on_console('Highlight result: '+str(res))
                 if appType==APPTYPE_MOBILE.lower():
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
@@ -314,27 +313,32 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject
         wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
             if("integration" in exec_data):
-                if(exec_data["integration"]["alm"]["url"] != ""):
+                if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
                         core_utils.get_all_the_imports('Qc')
                         import QcController
                         qcObject = QcController.QcWindow()
-                if(exec_data["integration"]["qtest"]["url"] != ""):
+                if("qtest" in exec_data["integration"] and exec_data["integration"]["qtest"]["url"] != ""):
                     if(qtestObject == None):
                         core_utils.get_all_the_imports('QTest')
                         import QTestController
                         qtestObject = QTestController.QTestWindow()
-                if(exec_data["integration"]["zephyr"]["url"] != ""):
+                if("zephyr" in exec_data["integration"] and exec_data["integration"]["zephyr"]["url"] != ""):
                     if(zephyrObject == None):
                         core_utils.get_all_the_imports('Zephyr')
                         import ZephyrController
                         zephyrObject = ZephyrController.ZephyrWindow()
+                if("azure" in exec_data["integration"] and exec_data["integration"]["azure"]["url"] != ""):
+                    if(azureObject == None):
+                        core_utils.get_all_the_imports('Azure')
+                        import azurecontroller
+                        azureObject = azurecontroller.AzureWindow()
             aws_mode=False
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
@@ -1020,10 +1024,8 @@ class MainNamespace(BaseNamespace):
         log.info('Disconnect triggered')
         stop_ping_thread()
         if socketIO is not None:
-            ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
             root.icesession['connect_time'] = str(datetime.now())
-            socketIO.eio.http.params['icesession'] = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
+            socketIO.eio.http.params['icesession'] = json.dumps(root.icesession)
             if root.gui:
                 if not bool(cw): return
                 cw.schedule.Disable()
@@ -1069,6 +1071,18 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)       
 
+    def on_checkingMobileClient(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('Mobility')
+            import mobile_app_scrape
+            obj = mobile_app_scrape.MobileWindow()
+            obj.checking_mobile_client(socketIO)
+        except Exception as e:
+            err_msg='Error occured in Checking Mobile Client'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)   
 
 class ConnectionThread(threading.Thread):
     """Socket Connection Thread Class."""
@@ -1106,13 +1120,11 @@ class ConnectionThread(threading.Thread):
             'username': username,
             'iceaction': self.ice_action,
             'icetoken': root.ice_token,
-            'data': random()*100000000000000
+            'data': random()*100000000000000,
+            'host':readconfig.configvalues['server_ip']
         }
-        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-        icesession_enc = core_utils_obj.wrap(json.dumps(root.icesession), ice_das_key)
         params={'username': username, 'icename': root.ice_token["icename"],
-            'ice_action': self.ice_action, 'icesession': icesession_enc}
+            'ice_action': self.ice_action, 'icesession': json.dumps(root.icesession)}
         args["params"] = params
         return args
 
@@ -1245,13 +1257,13 @@ class TestThread(threading.Thread):
             #     logger.print_on_console('This app type is not part of the license.')
             #     status=TERMINATE
             # else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
             else:
                 if apptype.lower() not in plugins_list:
                     logger.print_on_console('This app type is not part of the license.')
                     status=TERMINATE
                 else:
-                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
+                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
             if status==TERMINATE:
@@ -1501,9 +1513,7 @@ class Main():
                     if response == "fail":
                         err_res = "Avo Assure Client registration failed."
                     else:
-                        ice_das_key = "".join(['a','j','k','d','f','i','H','F','E','o','w','#','D','j',
-                            'g','L','I','q','o','c','n','^','8','s','j','p','2','h','f','Y','&','d'])
-                        response = json.loads(core_utils_obj.unwrap(response, ice_das_key))
+                        response = json.loads(response)
                     if err_res or response['id'] != self.icesession['ice_id'] or response['connect_time'] != self.icesession['connect_time']:
                         if not err_res: err_res = "Invalid response received"
                         logger.print_on_console(err_res)
@@ -1992,7 +2002,7 @@ def check_browser():
                         chromeFlag = True
                     except:
                         logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
-                        chromeFlag = False 
+                        chromeFlag = False
                 if chromeFlag == False:
                     # using lower version of driver present
                     chromeFlag = True
@@ -2339,7 +2349,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         result['mode'] = cw.schedule.GetValue()
     else:
         result['mode'] = False
-
+    result["host"] = readconfig.configvalues['server_ip']
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 
