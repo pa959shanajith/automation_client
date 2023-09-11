@@ -87,7 +87,10 @@ class JiraWindow():
                                             Labels.append(data[i]['userInput']['text'])
                                             temp_dict[data[i]['field_name']] = Labels
                                         else:
-                                            temp_dict[data[i]['field_name']] = data[i]['userInput']['text']
+                                            if data[i]['type']=='array':
+                                                temp_dict['fixVersions']=[{'name':data[i]['userInput']['text']}]
+                                            else:
+                                                temp_dict[data[i]['field_name']] = data[i]['userInput']['text']
                             else:
                                 # use below logic is for label text box without suggestion
                                 # if i.lower() == 'labels':
@@ -275,7 +278,7 @@ class JiraWindow():
                                 temp['value']=[]
                                 count=1
                                 for index,item in enumerate(all_fields[i]['allowedValues']):
-                                    temp['value'].append({'key': count , 'text':item['value']})
+                                    temp['value'].append({'key': count , 'text':item['value'] if 'value' in item else item['name']})
                                     count=count+1
                             elif 'allowedValues' in all_fields[i] and all_fields[i]['allowedValues']!=[] and all_fields[i]['name'].lower()=='priority':
                                 temp['value']=[]

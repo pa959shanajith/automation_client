@@ -57,13 +57,13 @@ class ZephyrWindow():
                 encSt = base64.b64encode(userpass)
                 headersVal = {'Authorization':'Basic %s'% encSt.decode('ascii')}
                 self.headers =  headersVal
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
             else:
                 self.headers = {'Authorization':'Bearer %s'% zephyrPayload["zephyrApiToken"]}
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -80,7 +80,7 @@ class ZephyrWindow():
             self.zephyrURL = self.baseURL + "/flex/services/rest/latest"
 
             relative_path = "/project/lite"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -97,7 +97,7 @@ class ZephyrWindow():
             # get all releases
             projectId = filePath["projectId"]
             relative_path = "/release/project/"+str(projectId)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 res = [{'id':i['id'],'name':i['name']} for i in JsonObject]
@@ -115,7 +115,7 @@ class ZephyrWindow():
             releaseid = filePath["releaseId"]
             self.release_id = releaseid
             relative_path = "/cycle/release/"+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers,proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for cycle in JsonObject:
@@ -143,7 +143,7 @@ class ZephyrWindow():
             self.release_id = releaseid
             mappedPhases = filePath["mappedPhases"]
             relative_path = "/cycle/release/"+str(releaseid)
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers,proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers,proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Loop through and get cycle, phase and testcases(fetch using API)
@@ -168,7 +168,7 @@ class ZephyrWindow():
         try:
             for parid in parentFetchList:
                 relative_path = "/testcasetree/"+str(parid)
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     if "categories" in JsonObject and len(JsonObject["categories"]) != 0:
@@ -195,7 +195,7 @@ class ZephyrWindow():
             treeid = filePath["treeId"]
             if "updateflag" in filePath: updateflag = filePath["updateflag"]
             relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if len(JsonObject) != 0:
@@ -206,7 +206,7 @@ class ZephyrWindow():
                             res["testcases"] = self.get_testcases_treeid(JsonObject[i]["id"], res["testcases"])
                 if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -243,14 +243,14 @@ class ZephyrWindow():
     def get_testcases_treeid(self, treeid, tests):
         try:
             relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if len(JsonObject) != 0:
                     for i in range(len(JsonObject)):
                         self.get_testcases_treeid(JsonObject[i]["id"], tests)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -291,7 +291,7 @@ class ZephyrWindow():
             treeid = filePath["treeId"]
             mappedTests = filePath["mappedTests"]
             relative_path = "/testcasetree?type=Module&releaseid="+str(self.release_id)+"&revisionid=&parentid="+str(treeid)+"&isShared="
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 if len(JsonObject) != 0:
@@ -299,7 +299,7 @@ class ZephyrWindow():
                         phaseObj = {JsonObject[i]["id"]:JsonObject[i]["name"]}
                         res["modules"].append(phaseObj)
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
-            respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -358,14 +358,14 @@ class ZephyrWindow():
                 else:
                     relative_path = "/execution?parentid="+str(parentid[index])+"&cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid[index])+"&pagesize=0&isascorder=true"
                 # relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid)+"&releaseid="+str(releaseid)
-                respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
                 if respon.status_code == 200:
                     JsonObject = respon.json()
                     if JsonObject["resultSize"] != 0:
                         # default userid of Anyone
                         testerid = -10 
                         user_url = self.baseURL + "/flex/services/rest/v3/user"
-                        list_user = requests.get(user_url, headers=self.headers)
+                        list_user = requests.get(user_url, headers = self.headers, verify = self.send_tls_security())
                         if list_user.status_code == 200:
                             users_json = list_user.json()
                             for obj in users_json:
@@ -379,7 +379,7 @@ class ZephyrWindow():
                         ids = []
                         ids.append(scheduleid)
                         data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
-                        response = requests.put(self.zephyrURL+relative_path_update , headers=self.headers, json=data1 ,proxies=readconfig.proxies)
+                        response = requests.put(self.zephyrURL+relative_path_update , headers = self.headers, json = data1 ,proxies = readconfig.proxies, verify = self.send_tls_security())
                         if response.status_code == 200:
                             status = True
         except Exception as e:
@@ -396,7 +396,7 @@ class ZephyrWindow():
             if len(requirementid) >=1:
                 for i in requirementid:
                     relative_path = "/requirement/"+str(i)
-                    respon = requests.get(self.zephyrURL+relative_path, headers=self.headers, proxies=readconfig.proxies)
+                    respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
                     if respon.status_code == 200:
                         JsonObject = respon.json()
                         # Fetch requirement details
@@ -411,3 +411,18 @@ class ZephyrWindow():
             logger.print_on_console(err_msg)
             log.error(eproject, exc_info=True)
         return res
+
+    def send_tls_security(self):
+        try:
+            tls_security = readconfig.configvalues.get("tls_security")
+            if tls_security != None and tls_security.lower() == "low":
+                # Make a GET request without SSL certificate verification (not recommended)
+                return False
+            else:
+                # Make a GET request with SSL certificate verification
+                return True
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("ERROR:SSLverify flag as False. Disabled TLS Certificate and Hostname Verification.")
+            #by default sending false(if this fuction met exception).you can modify this default return and above logger message.
+            return False 

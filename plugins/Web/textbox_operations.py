@@ -1188,16 +1188,16 @@ class TextboxKeywords:
                         if not(readonly_value is not None and readonly_value.lower() =='true' or readonly_value is ''):
                             obj=UtilWebKeywords()
                             if obj.is_visible(webelement):
-                                webelement.clear()
                                 from selenium.webdriver.common.keys import Keys
                                 try:
-                                    #Fixes for: Clear text clears only last character
-                                    if len(webelement.get_attribute('value')) > 0:
-                                        self.__clear_text(webelement)
-                                        browser_Keywords.local_bk.driver_obj.execute_script("""arguments[0].focusout()""", webelement)
+                                    #Selecting all and pressing backspace for the webelement. Only webelement will receive operation.
+                                    webelement.click()
+                                    webelement.send_keys(Keys.CONTROL, 'a')
                                     webelement.send_keys(Keys.BACK_SPACE)
                                 except Exception as e:
-                                    local_to.log.debug('Warning!: Could not perform backspace function due to error : '+str(e))
+                                    local_to.log.debug('Warning!: Could not perform select all and backspace function due to error : '+str(e))
+                                if len(webelement.get_attribute('value')) > 0:
+                                        webelement.clear()
                             else:
                                 self.__clear_text(webelement)
                             status=TEST_RESULT_PASS

@@ -116,37 +116,38 @@ class ElementKeywords:
         text=None
         err_msg=None
         configvalues = readconfig.configvalues
+        delayconst = int(configvalues['element_load_timeout'])
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
                 util = UtilWebKeywords()
-                if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
-                    local_eo.log.debug('element is invisible, performing js code')
-                    text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
-                    logger.print_on_console('Element text: ',text)
-                    local_eo.log.info('Element text: ')
-                    local_eo.log.info(text)
-                    status=TEST_RESULT_PASS
-                    result=TEST_RESULT_TRUE
-                    local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
-                else:
-                    if(util.is_visible(webelement)):
-                        text = webelement.get_attribute('innerText')
-                        if text.find('\xa0')!=-1:text=text.replace('\xa0'," ")
-                        # text=self.__getelement_text(webelement)
-                        if text.find('\n')!=-1:
-                            local_eo.log.debug("\\n detected. Fetching text using element.text method")
-                            text = webelement.text
+                for i in range(delayconst):
+                    if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
+                        local_eo.log.debug('element is invisible, performing js code')
+                        text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                    else:
+                        if(util.is_visible(webelement)):
+                            text = webelement.get_attribute('innerText')
+                            if text.find('\xa0')!=-1:text=text.replace('\xa0'," ")
+                            # text=self.__getelement_text(webelement)
+                            if text.find('\n')!=-1:
+                                local_eo.log.debug("\\n detected. Fetching text using element.text method")
+                                text = webelement.text
+                        elif i+1 == delayconst:
+                            err_msg = 'Element is not displayed'
+                            logger.print_on_console('Element is not displayed')
+                            local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                    if text:
                         logger.print_on_console('Element text: ',text)
                         local_eo.log.info('Element text: ')
                         local_eo.log.info(text)
                         local_eo.log.info(STATUS_METHODOUTPUT_UPDATE)
                         status=TEST_RESULT_PASS
+                        result=TEST_RESULT_TRUE
                         methodoutput=TEST_RESULT_TRUE
+                        break
                     else:
-                        err_msg = 'Element is not displayed'
-                        logger.print_on_console('Element is not displayed')
-                        local_eo.log.info(ERROR_CODE_DICT['MSG_OBJECT_NOT_DISPLAYED'])
+                        time.sleep(1)
             except Exception as e:
                 local_eo.log.error(e)
                 logger.print_on_console(e)
@@ -160,6 +161,7 @@ class ElementKeywords:
         err_msg=None
         output=OUTPUT_CONSTANT
         configvalues = readconfig.configvalues
+        delayconst = int(configvalues['element_load_timeout'])
         local_eo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         if webelement is not None:
             try:
@@ -168,17 +170,22 @@ class ElementKeywords:
                     input = input.replace("\xa0"," ")
                 if input is not None:
                     util = UtilWebKeywords()
-                    if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
-                        text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
-                    else:
-                        text = webelement.get_attribute('innerText')
-                        if text is None or text is '': 
-                            local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
-                            text=self.__getelement_text(webelement)
-                    if text.find('\xa0') != -1: text = text.replace("\xa0", " ")
-                    if text.find('\n') != -1:
-                        local_eo.log.debug("\\n detected. Fetching text using element.text method")
-                        text = webelement.text
+                    for i in range(delayconst):
+                        if not(util.is_visible(webelement)) and configvalues['ignoreVisibilityCheck'].strip().lower() == "yes":
+                            text = browser_Keywords.local_bk.driver_obj.execute_script("""return arguments[0].innerText""",webelement)
+                        else:
+                            text = webelement.get_attribute('innerText')
+                            if text is None or text is '': 
+                                local_eo.log.debug('Element Attribute not found,fetching with __getelement_text function')
+                                text=self.__getelement_text(webelement)
+                        if text is not None and text.find('\xa0') != -1: text = text.replace("\xa0", " ")
+                        if text is not None and text.find('\n') != -1:
+                            local_eo.log.debug("\\n detected. Fetching text using element.text method")
+                            text = webelement.text
+                        if text:
+                            break
+                        else:
+                            time.sleep(1)
                     if text==input:
                        logger.print_on_console('Element Text matched')
                        local_eo.log.info('Element Text matched')

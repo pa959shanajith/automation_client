@@ -58,6 +58,7 @@ zephyrdata = None
 qcObject = None
 qtestObject = None
 zephyrObject = None
+azureObject = None
 soc=None
 browsercheckFlag=False
 updatecheckFlag=False
@@ -312,27 +313,32 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject
         wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
             if("integration" in exec_data):
-                if(exec_data["integration"]["alm"]["url"] != ""):
+                if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
                         core_utils.get_all_the_imports('Qc')
                         import QcController
                         qcObject = QcController.QcWindow()
-                if(exec_data["integration"]["qtest"]["url"] != ""):
+                if("qtest" in exec_data["integration"] and exec_data["integration"]["qtest"]["url"] != ""):
                     if(qtestObject == None):
                         core_utils.get_all_the_imports('QTest')
                         import QTestController
                         qtestObject = QTestController.QTestWindow()
-                if(exec_data["integration"]["zephyr"]["url"] != ""):
+                if("zephyr" in exec_data["integration"] and exec_data["integration"]["zephyr"]["url"] != ""):
                     if(zephyrObject == None):
                         core_utils.get_all_the_imports('Zephyr')
                         import ZephyrController
                         zephyrObject = ZephyrController.ZephyrWindow()
+                if("azure" in exec_data["integration"] and exec_data["integration"]["azure"]["url"] != ""):
+                    if(azureObject == None):
+                        core_utils.get_all_the_imports('Azure')
+                        import azurecontroller
+                        azureObject = azurecontroller.AzureWindow()
             aws_mode=False
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
@@ -1291,13 +1297,13 @@ class TestThread(threading.Thread):
             #     logger.print_on_console('This app type is not part of the license.')
             #     status=TERMINATE
             # else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
             else:
                 if apptype.lower() not in plugins_list:
                     logger.print_on_console('This app type is not part of the license.')
                     status=TERMINATE
                 else:
-                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,self.aws_mode,self.cicd_mode)
+                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
             if status==TERMINATE:
