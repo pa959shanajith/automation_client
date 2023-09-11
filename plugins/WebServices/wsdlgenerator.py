@@ -43,22 +43,65 @@ class WebservicesWSDL():
     1. WSDL url
     returns the operations present in WSDL
     """
-    def listOfOperation(self,wsdlURL):
+    def listOfOperation(self,wsdlURL,import_def):
         try:
             self.wsdlURL = wsdlURL
             #list_method = Client(wsdlURL)
             list_method = Client(wsdlURL, doctor=ImportDoctor(imp))
             allmethodslist=[]
+            import_wsdl_definition={}
+            import_wsdl_definition['CollectionName']=''
+            import_wsdl_definition['APIS']=[]
             for portindex in range(0,len(list_method.wsdl.services[0].ports)):
                 portname=list_method.wsdl.services[0].ports[portindex].name
+                import_wsdl_definition['CollectionName']=list_method.wsdl.services[0].name
                 obt_list_method = [method for method in list_method.wsdl.services[0].ports[portindex].methods]
                 for methodindex in range(0,len(obt_list_method)):
+                    # temp = {}
+                    # temp['requestHeader']=''
+                    # temp['requestBody']=''
                     if 'Soap12' in portname:
                         allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'1','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            # working
+                            # import_wsdl_definition[str('SOAP1.2-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str('SOAP1.2-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            import_wsdl_definition['APIS'].append(temp)
+                            # temp['requestHeader']=requestHeader
+                            # temp['requestBody']=requestBody
                     elif 'Soap' in portname:
                         allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'0','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            # working
+                            # import_wsdl_definition[str('SOAP1.1-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str('SOAP1.1-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            import_wsdl_definition['APIS'].append(temp)
+                            # temp['requestHeader']=requestHeader
+                            # temp['requestBody']=requestBody
                     else:
                         allmethodslist.append(str(obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'2','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            # working
+                            # import_wsdl_definition[str(obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str(obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            import_wsdl_definition['APIS'].append(temp)
+                            # temp['requestHeader']=requestHeader
+                            # temp['requestBody']=requestBody
             ##print list_method.wsdl.services[0].ports[0].name
             ##    obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
             ##    obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]
@@ -70,14 +113,33 @@ class WebservicesWSDL():
             ##    for methodindex in range(0,len(obt_list_method1)):
             ##       allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
             ##    log.info(allmethodslist)
-            log.info("List Of Operations:")
-            log.info(allmethodslist)
-            logger.print_on_console('List Of Operations:::::',allmethodslist)
-            return allmethodslist
+            if import_def:
+                log.info("List Of Operations:")
+                log.info(import_wsdl_definition)
+                # logger.print_on_console('List Of Operations:::::',import_wsdl_definition)
+                return import_wsdl_definition
+            else:
+                log.info("List Of Operations:")
+                log.info(allmethodslist)
+                logger.print_on_console('List Of Operations:::::',allmethodslist)
+                return allmethodslist
         except Exception as e:
             logger.print_on_console('Invalid end point URl')
             log.error(e)
             return "fail"
+        
+    def beautify_req_header(self,requestHeader,requestBody):
+        from bs4 import BeautifulSoup
+        requestBody = BeautifulSoup(requestBody, "xml").prettify()
+        stringHeader=''
+        if(requestHeader != None):
+            for key in requestHeader:
+                # logger.print_on_console(key,'==========',requestHeader[key])
+                log.info(key)
+                log.info(requestHeader[key])
+                stringHeader = stringHeader + str(key) + ": " + str (requestHeader[key]) + "##"
+        requestHeader = stringHeader
+        return requestBody, requestHeader
 
 
 class BodyGenarator():

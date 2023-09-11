@@ -40,7 +40,8 @@ class Dispatcher:
                   'setbasicauth': self.webservice.setBasicAuth,
                   'setoauth2.0': self.webservice.setOAuth2,
                   'setparam':self.webservice.setParam,
-                  'setparamvalue':self.webservice.setParamValue
+                  'setparamvalue':self.webservice.setParamValue,
+                  'simpleexecute' : self.webservice.SimpleExecute
                 }
             if keyword in ws_dict.keys():
                 if keyword in ['settagvalue','settagattribute','setparamvalue']:

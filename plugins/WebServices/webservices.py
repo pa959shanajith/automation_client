@@ -110,10 +110,10 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            url=str(url)
-            if url != None and url.strip() != '':
+            url=str(url).strip()
+            if url != None and url != '':
                 self.clearValues()
-                url=url.strip()
+                # url=url.strip()
                 self.baseEndPointURL = url
                 log.debug('End point URL is set')
                 logger.print_on_console('End point URL: ',url , ' has been set.')
@@ -181,13 +181,13 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            method=str(method)
-            if method != None and method.strip() != '':
-                log.debug('Removing leading and trailing spaces from method name and converting it to uppercase')
-                method=method.strip().upper()
-                log.debug('Removed leading and trailing spaces from method name and converting it to uppercase')
+            method=str(method).strip().upper()
+            if method != None and method != '':
+                # log.debug('Removing leading and trailing spaces from method name and converting it to uppercase')
+                # method=method.strip().upper()
+                # log.debug('Removed leading and trailing spaces from method name and converting it to uppercase')
                 if method in ws_constants.METHOD_ARRAY:
-                    log.debug('Setting input method name to base method name ')
+                    # log.debug('Setting input method name to base method name ')
                     self.baseMethod = method
                     log.info('Base method name has been set to input method name')
                     logger.print_on_console('Method name has been set to: ',method)
@@ -401,9 +401,9 @@ class WSkeywords:
         output=OUTPUT_CONSTANT
         log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            body=str(body)
-            if body != None and body.strip() != '':
-                 body=body.strip()
+            body=str(body).strip()
+            if body != None and body != '':
+                #  body=body.strip()
                  self.baseReqBody = body
                  log.info('Input body has been set to base Request body ')
                  log.debug(STATUS_METHODOUTPUT_UPDATE)
@@ -1319,3 +1319,86 @@ class WSkeywords:
             log.error(e)
             logger.print_on_console("Error while setting the tag value")
         return json_obj
+    
+    def SimpleExecute(self,*args):
+        testcasename = handler.local_handler.testcasename
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=None
+        result=status,methodoutput,output,err_msg
+        #set end point url
+        self.baseEndPointURL=str(args[0]).strip()
+        #set method
+        method=str(args[1]).strip().upper()
+        #set whole body
+        # if args[3]!='':
+        self.baseReqBody=str(args[3]).strip()
+        #set header
+        # if args[2]!='':
+        self.baseReqHeader=args[2]
+        header=args[2]
+        if header != None and str(header).strip() != '':
+            err_msg=self.buildRequest(str(header).strip(),True)
+            if len(self.baseReqHeader)==0:
+                self.baseReqHeader=header[0]
+            log.info('Header is set')
+            log.debug(STATUS_METHODOUTPUT_UPDATE)
+            output=self.baseReqHeader
+            self.baseReqHeader = dict(self.defHeaders, **self.baseReqHeader)
+            status = ws_constants.TEST_RESULT_PASS
+            methodoutput = ws_constants.TEST_RESULT_TRUE
+            logger.print_on_console('Request Header has been set to :',self.baseReqHeader)
+
+
+        dict1={'GET':WSkeywords.get,
+        'POST':WSkeywords.post,
+        'PUT':WSkeywords.put,
+        'HEAD':WSkeywords.head,
+        'DELETE':WSkeywords.delete}
+        log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        if method in ws_constants.METHOD_ARRAY:
+            log.info(STATUS_METHODOUTPUT_UPDATE)
+            status = ws_constants.TEST_RESULT_PASS
+            methodoutput = ws_constants.TEST_RESULT_TRUE
+            result= dict1[method](self)
+        else:
+            log.error(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+            err_msg = ERROR_CODE_DICT['ERR_INVALID_METHOD']
+            logger.print_on_console(ERROR_CODE_DICT['ERR_INVALID_METHOD'])
+        response=''
+        socketIO = args[1]
+
+        #data size check
+        import sys
+        try:
+            if(result[2] != None and result[2] != OUTPUT_CONSTANT):
+                headerresp = ''
+                res = result[2]
+                if type(res) == tuple:
+                    for key in res[0]:
+                        headerresp = headerresp +str(key) + ":" + str(res[0][key]) + "##"
+                    datasize = sys.getsizeof(res[1])
+                    kilobytes = datasize/1024
+                    megabytes = kilobytes/1024
+                    if megabytes > 10:
+                        response = headerresp+'rEsPONseBOdY: Response Body exceeds max. Limit., please use writeToFile keyword.'
+##                        res[1]='Data length is '+str(megabytes)+', please use writeToFile'
+##                        result[2]=headerresp+res[1]
+                    else:
+                        response=headerresp+'rEsPONseBOdY:'+res[1]
+                else:
+                    for key in res:
+                        headerresp = headerresp +str(key) + ":" + str (res[key]) + "##"
+                    response=headerresp+'rEsPONseBOdY: '
+            #response = response.decode('utf-8') if (type(response)==bytes) else str(response)
+            response= str(response)
+            if response == '':
+                response = 'fail'
+            if testcasename == '':
+                response = response.replace("##", ' ')
+                socketIO.emit('result_debugTestCaseWS',response)
+        except Exception as e:
+            logger.print_on_console(e)
+            log.error(e,exc_info=True)
+        return result
