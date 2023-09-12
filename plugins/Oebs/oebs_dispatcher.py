@@ -307,21 +307,67 @@ class OebsDispatcher:
                 else:
                     configvalues = readconfig.configvalues
                     delay_constant = int(configvalues['element_load_timeout'])
-                    for _ in range(delay_constant):
-                        accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
-                        if accessContext and str(accessContext) != 'fail':
-                            if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
-                                if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
-                                    result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                    oebs_object_indentification_order = "1"
+                    if "oebs_object_indentification_order" in configvalues:
+                        oebs_object_indentification_order = configvalues["oebs_object_indentification_order"]
+                    if oebs_object_indentification_order == "1":
+                        for _ in range(delay_constant):
+                            logger.print_on_console('Finding the OEBS element by XPATH')
+                            accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
+                            if accessContext and str(accessContext) != 'fail':
+                                if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
+                                    if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                        result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                                    else:
+                                        result = self.keyword_dict[keyword](accessContext)
                                 else:
-                                    result = self.keyword_dict[keyword](accessContext)
+                                    err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                                break
                             else:
-                                err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
-                            break
-                        else:
-                            err_msg = oebs_constants.ERROR_CODE_DICT['err_finding_object']
-                            log.info(err_msg)
-                            time.sleep(1)
+                                logger.print_on_console('Finding the OEBS element by XPATH failed so finding the element by POSITION')
+                                accessContext, visible, active_parent =  self.utilities_obj.object_generator_using_coordinates(*message)
+                                if accessContext and str(accessContext) != 'fail':
+                                    if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
+                                        if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                            result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                                        else:
+                                            result = self.keyword_dict[keyword](accessContext)
+                                    else:
+                                        err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                                    break
+                                else:
+                                    err_msg = oebs_constants.ERROR_CODE_DICT['err_finding_object']
+                                    log.info(err_msg)
+                                    time.sleep(1)
+                    else:
+                        for _ in range(delay_constant):
+                            logger.print_on_console('Finding the OEBS element by POSITION')
+                            accessContext, visible, active_parent =  self.utilities_obj.object_generator_using_coordinates(*message)
+                            if accessContext and str(accessContext) != 'fail':
+                                if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
+                                    if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                        result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                                    else:
+                                        result = self.keyword_dict[keyword](accessContext)
+                                else:
+                                    err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                                break
+                            else:
+                                logger.print_on_console('Finding the OEBS element by POSITION failed so finding the element by XPATH')
+                                accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
+                                if accessContext and str(accessContext) != 'fail':
+                                    if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
+                                        if keyword in ['selectvaluebytext', 'selectvaluebyindex', 'setfocus']:
+                                            result = self.keyword_dict[keyword](accessContext, {'top': message[6], 'left': message[7], 'width': message[8], 'height': message[9]})
+                                        else:
+                                            result = self.keyword_dict[keyword](accessContext)
+                                    else:
+                                        err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
+                                    break
+                                else:
+                                    err_msg = oebs_constants.ERROR_CODE_DICT['err_finding_object']
+                                    log.info(err_msg)
+                                    time.sleep(1)
 
                     log.debug('MSG:Keyword response : %s',oebs_key_objects.keyword_output)
                 if not result or len(result) <= 0: result = [constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]

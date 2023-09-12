@@ -98,7 +98,7 @@ class Utilities:
                             path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'  + '[' + str(elementObj.description.strip()) + ']'
                         else:
                             path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
-            if path == currentxpathtemp or (str(top) == str(elementObj.y) and str(left) == str(elementObj.x) and str(width) == str(elementObj.width) and str(height) == str(elementObj.height)):
+            if path == currentxpathtemp:
                 if currentxpathtemp.split("/").pop() == 'internal frame' and elementObj.name != identifiers[1]:
                     continue
                 if page_tab_list:
@@ -554,5 +554,313 @@ class Utilities:
                             counter+=1
 
         return eleproperties
+    
+    def iterate_over_other_panes_using_coordinates(self, a, objecttofind, currentxpathtemp, i, p, windowname, location, object_type, top, left, width, height):
+        queue = []
+        active_parent = False
+        queue.append((p,a,i,0))
+        identifiers = objecttofind.split(';')
+        uniquepath = identifiers[0]
+        alt_paths = {}
+        alt_paths_list = []
+        internal_frame_list = []
+        visited = {}
+        for each_internal_frame in uniquepath.split('/'):
+            if each_internal_frame.find('internal frame')!=-1:
+                internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
+        
+        while len(queue) > 0:
+            xpath, acc, index, paneindex = queue.pop(0)
+            elementObj = acc.getAccessibleContextInfo()
+
+            if xpath == '':
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1 >= location):
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = elementObj.role + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1 >= location):
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        if object_type == "@Custom":
+                            path = elementObj.role  + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
+            else:
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role or ('scroll pane' in elementObj.role and len(path) + 1>= location):
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
+                else:
+                    if 'internal frame' in elementObj.role:
+                        if elementObj.description.strip() not in internal_frame_list:
+                            continue
+                        path = xpath + '/' + elementObj.role
+                    elif 'scroll pane' in elementObj.role and len(path) + 1 >= location :
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        if object_type == "@Custom":
+                            path = xpath + '/' + elementObj.role  + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
+            if path in visited:
+                continue
+            else:
+                visited[path + str(index)] = True
+            if path.split('/').pop() == 'text[0]':
+                new_path = self.get_alt_paths(path, currentxpathtemp)
+                log.info("Hidden Push button detected, creating new xpath: " + new_path)
+                if new_path != '':
+                    logger.print_on_console("Hidden Push button detected, creating new xpaths")
+                    alt_paths_list.append(new_path)
+                    alt_paths[new_path] = len(alt_paths_list) - 1
+
+            if (str(top) == str(elementObj.y) and str(left) == str(elementObj.x) and str(width) == str(elementObj.width) and str(height) == str(elementObj.height)):
+                return active_parent, acc, paneindex == 0
+
+            curr = currentxpathtemp.split('/')
+            p = path.split('/')
+            index = len(p) - 1
+            if (len(curr) > index and curr[index] == p[index]) or (len(alt_paths_list) > 0 and self.in_alt_paths(alt_paths_list, p[index], index)):
+                if 'active' in elementObj.states and windowname != elementObj.name:
+                    active_parent = True
+                for index in range(elementObj.childrenCount):
+                    element = acc.getAccessibleChildFromContext(index)
+
+                    elementcontext=element.getAccessibleContextInfo()
+                    if elementcontext.role == 'internal frame':
+                        if 'active' in elementcontext.states:
+                            queue.append((path, element, index, paneindex))
+                        else:
+                            hasinternal=0
+                            children=elementcontext.childrenCount
+                            for childrencount in range(int(children)):
+                                childobj=element.getAccessibleChildFromContext(childrencount)
+                                childrencontext=childobj.getAccessibleContextInfo()
+                                if 'internal frame' in childrencontext.role:
+                                    hasinternal=1
+                                    break
+                            if hasinternal ==1:
+                                queue.append((path, element, index , paneindex))
+                            else:
+                                index = index + 1
+                    else:
+                        if elementcontext.role == 'scroll pane':
+                            queue.append((path, element, index, index))
+                        else:
+                            queue.append((path, element, index, paneindex))
+            elif len(queue) == 0:
+                return active_parent, '', False 
+        return active_parent, '', False 
+    
+    def swooptoelement_using_coordinates(self , a, objecttofind, currentxpathtemp, i, p, windowname, object_type, top, left, width, height, errors = False, allow_showing = False):
+        queue = []
+        active_parent = False
+        page_tab_list = False
+        queue.append((p,a,i,0))
+        identifiers = objecttofind.split(';')
+        uniquepath = identifiers[0]
+        #getting the internal frame name :
+        
+        internal_frame_list = []
+        for each_internal_frame in uniquepath.split('/'):
+            if each_internal_frame.find('internal frame')!=-1:
+                internal_frame_list.append(each_internal_frame.lstrip('internal frame[')[:-1])
+        
+        while len(queue) > 0:
+            xpath, acc, index, paneindex = queue.pop(0)
+            elementObj = acc.getAccessibleContextInfo()
+
+            if xpath == '':
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = elementObj.role + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
+                        path = elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = elementObj.role + '[' + str(index) + ']'
+                    else:
+                        if object_type == "@Custom":
+                            path = elementObj.role + '[' + str(index) + ']' + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = elementObj.role + '[' + str(elementObj.description.strip()) + ']'
+
+            else:
+                if len(elementObj.description.strip()) == 0:
+                    if 'internal frame' in elementObj.role or 'frame' in elementObj.role:
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'
+
+                else:
+                    if 'internal frame' in elementObj.role:
+                        if elementObj.description.strip() not in internal_frame_list:
+                            continue
+                        path = xpath + '/' + elementObj.role
+                    elif 'panel' in elementObj.role:
+                        path = xpath + '/' + elementObj.role + '[' + str(index) + ']'
+                    else:
+                        if object_type == "@Custom":
+                            path = xpath + '/' + elementObj.role  + '[' + str(index) + ']'  + '[' + str(elementObj.description.strip()) + ']'
+                        else:
+                            path = xpath + '/' + elementObj.role  + '[' + str(elementObj.description.strip()) + ']'
+            if (str(top) == str(elementObj.y) and str(left) == str(elementObj.x) and str(width) == str(elementObj.width) and str(height) == str(elementObj.height)):
+                if currentxpathtemp.split("/").pop() == 'internal frame' and elementObj.name != identifiers[1]:
+                    continue
+                if page_tab_list:
+                    return active_parent, acc, paneindex == 0
+                return active_parent, acc, True
+
+            curr = currentxpathtemp.split('/')
+            p = path.split('/')
+            index = len(p) - 1
+            if len(curr) > index and (curr[index] == p[index] or (''.join([i for i in str(curr[index]) if not i.isdigit()]).strip("[]") == ''.join([i for i in str(p[index]) if not i.isdigit()]).strip("[]"))):
+                if 'active' in elementObj.states and windowname != elementObj.name:
+                    active_parent = True
+                for index in range(elementObj.childrenCount):
+                    element = acc.getAccessibleChildFromContext(index)
+                    elementcontext=element.getAccessibleContextInfo()
+                    if elementcontext.role == "page tab list" and "page tab list" not in currentxpathtemp:
+                        page_tab_list = True
+                    if elementcontext.role == 'internal frame':
+                        if 'active' in elementcontext.states or (allow_showing and 'showing' in elementcontext.states):
+                            queue.append((path, element, index, paneindex))
+                        else:
+                            hasinternal=0
+                            children=elementcontext.childrenCount
+                            for childrencount in range(int(children)):
+                                childobj=element.getAccessibleChildFromContext(childrencount)
+                                childrencontext=childobj.getAccessibleContextInfo()
+                                if 'internal frame' in childrencontext.role:
+                                    hasinternal=1
+                                    break
+                            if hasinternal ==1:
+                                queue.append((path, element, index, paneindex))
+                            else:
+                                index = index + 1
+                    else:
+                        if elementcontext.role == 'scroll pane':
+                            queue.append((path, element, index, index))
+                        else:
+                            queue.append((path, element, index, paneindex))   
+            if len(queue) == 0:
+                if errors: logger.print_on_console("Object not found in provided path, searching in alternate scroll panes for the object")
+                pane_occurances = [m.start() for m in re.finditer('scroll pane', currentxpathtemp)]
+                variable_path = currentxpathtemp
+                for i in range(len(pane_occurances) - 1, -1, -1):
+                    fixed_path = variable_path[0:pane_occurances[i]]
+                    skip_over = variable_path[pane_occurances[i]:len(variable_path)].find('/') + pane_occurances[i]
+                    variable_path = fixed_path + 'scroll pane' + variable_path[skip_over:len(variable_path)]
+                    if errors: log.info('Searching for object in alternate xpath: ' + variable_path)
+                    active_parent, acc, visible = self.iterate_over_other_panes_using_coordinates(a,objecttofind,variable_path,0,'',windowname, pane_occurances[i], object_type, top, left, width, height)
+                    if acc and str(acc) != '':
+                        return active_parent, acc, visible
+                log.info(ERROR_CODE_DICT['err_alternate_path'])
+                if errors: logger.print_on_console(ERROR_CODE_DICT['err_alternate_path'])
+                return False, '', False
+        return False, '', False
+    
+    def object_generator_using_coordinates(self,applicationname,locator,keyword,inputs,outputs,object_type,top,left,width,height, errors = False, allow_showing = False):
+        global accessContext
+        accessContext = ''
+        active_parent = None
+        #OBJECTLOCATION for the object is sent from the user
+        del oebs_key_objects.keyword_input[:]
+        oebs_key_objects.xpath = locator
+        #Application name is sent from the user
+        oebs_key_objects.applicationname = applicationname
+        oebs_key_objects.object_type = object_type
+        utils_obj=oebs_utils.Utils()
+        isjavares, hwnd = utils_obj.isjavawindow(oebs_key_objects.applicationname)
+        #method enables to move to perticular object and fetches its Contexts
+        uniquepath=oebs_key_objects.xpath
+        flag = 'false'
+        if ';' in uniquepath:
+            requiredxpath = uniquepath.split(';')
+            parentxpathtemp = ''
+            absolute_path = requiredxpath[0]
+
+            regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
+            newxpath = regularexp.findall(absolute_path)
+
+            newlist2=[]
+            for i in range(len(newxpath)):
+                newlist2.append(newxpath[i][0])
+
+            for i in range(len(newlist2)):
+                absolute_path = absolute_path.replace(newlist2[i],'frame')
+
+            active_parent, accessContextParent, visible = self.swooptoelement_using_coordinates(oebs_api.JABContext(hwnd), oebs_key_objects.xpath, absolute_path ,0 ,'', applicationname, object_type, top, left, width, height, errors, allow_showing)
+            accessContextParent = accessContextParent or ''
+            if active_parent is None:
+                active_parent = False
+
+            identifiers = oebs_key_objects.xpath.split(';')
+            uniquepath = identifiers[0]
+            name = identifiers[1]
+            description=''
+            try:
+                description=identifiers[10]
+            except Exception:
+                description=''
+            retacc = accessContextParent
+            keytocompare=name+';'+description
+            if(keytocompare in objectDictWithNameDesc):
+                xpathneeded=objectDictWithNameDesc.get(keytocompare)
+                regularexp = re.compile('(frame(.*?|\s)*[\]]+)')
+                newxpath = regularexp.findall(xpathneeded)
+
+                newlist2=[]
+                for i in range(len(newxpath)):
+                    newlist2.append(newxpath[i][0])
+
+                for i in range(len(newlist2)):
+                    xpathneeded=xpathneeded.replace(newlist2[i],'frame')
+                if(accessContextParent):
+                    accessContextParent.releaseJavaObject()
+                active_parent, accessContextParent, visible = self.swooptoelement_using_coordinates(oebs_api.JABContext(hwnd),oebs_key_objects.xpath,xpathneeded,0,'', applicationname, object_type, top, left, width, height)
+                flag='true'
+
+        accessContext=accessContextParent
+        #keyword is sent from the user
+        oebs_key_objects.keyword = keyword
+        #input sent from the user
+        inputs = ast.literal_eval(str(inputs))
+        inputs = [n for n in inputs]
+
+        for index in range(len(inputs)):
+            oebs_key_objects.keyword_input.append(inputs[index])
+        #output thats to be sent from the server to client
+        oebs_key_objects.keyword_output = outputs.split(';')
+        configvalues = readconfig.configvalues
+        ignore_hidden = configvalues['ignoreVisibilityCheck']
+        if str(accessContextParent) != '' and ((ignore_hidden == 'No' and visible) or ignore_hidden == 'Yes'):
+            if ignore_hidden == 'Yes' and not visible:
+                logger.print_on_console(ERROR_CODE_DICT['wrn_found_not_visible'])  
+            return accessContextParent, True, active_parent
+        elif str(accessContextParent) != '' and ignore_hidden == 'No' and not visible:
+            logger.print_on_console(ERROR_CODE_DICT['err_found_not_visible'])
+            return 'fail', False, False
+        else:
+            return 'fail', False, False
 
 
