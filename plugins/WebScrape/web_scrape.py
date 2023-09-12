@@ -39,26 +39,26 @@ class ScrapeWindow(wx.Frame):
                 "url_label_field": [(75, 34)],
                 "navigateURL_field": [(120, 30),(265, 30)],
                 "navigateurl_bttn_field":[(400,30 ), (80, 30)],
-                "scrape_type_label_field":[(20,83)],
+                "scrape_type_label_field":[(18,83)],
                 "fullscrapedropdown_field":[(120, 80 ),(265, 30)],
                 "fullscrapebutton": [(400, 80),(80, 30)],
                 "visibilityCheck":[(120,120), (86, 20)],
                 "cropbutton_field":[(290,160 ), (165, 30)],
                 "startbutton_field":[(110, 160), (165, 30)],
-                "startbutton_label":[(18, 163)]
+                "startbutton_label":[(16, 163)]
             }
         else:
             scrapper_window_config = {
                 "frame": [(300, 150), (510, 270)],
-                "url_label_field": [(75, 34)],
-                "navigateURL_field": [(110, 30), (260, 30)],
-                "navigateurl_bttn_field": [(380, 30), (80, 30)],
-                "startbutton_field": [(110, 160), (165, 30)],
-                "startbutton_label":[(18, 163)],
-                "scrape_type_label_field": [(20, 83)],
-                "fullscrapedropdown_field": [(110, 80), (260, 30)],
-                "fullscrapebutton": [(380, 80), (80, 30)],
-                "visibilityCheck": [(110, 120), (160, 20)],
+                "url_label_field": [(77, 34)],
+                "navigateURL_field": [(115, 30), (260, 30)],
+                "navigateurl_bttn_field": [(385, 30), (80, 30)],
+                "startbutton_field": [(115, 160), (165, 30)],
+                "startbutton_label":[(16, 163)],
+                "scrape_type_label_field": [(18, 83)],
+                "fullscrapedropdown_field": [(115, 80), (260, 30)],
+                "fullscrapebutton": [(385, 80), (80, 30)],
+                "visibilityCheck": [(115, 120), (160, 20)],
                 "cropbutton_field": [(290, 160), (165, 30)]
             }
         wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
