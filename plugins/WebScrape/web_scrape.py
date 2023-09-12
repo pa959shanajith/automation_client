@@ -16,7 +16,7 @@ import json
 from webscrape_utils import WebScrape_Utils
 from selenium.common.exceptions import NoSuchWindowException
 from os.path import normpath
-from constants import SYSTEM_OS
+from constants import SYSTEM_OS, IMAGES_PATH
 cropandaddobj = None
 browserobj = browserops.BrowserOperations()
 clickandaddoj = clickandadd.Clickandadd()
@@ -39,31 +39,37 @@ class ScrapeWindow(wx.Frame):
                 "url_label_field": [(75, 34)],
                 "navigateURL_field": [(120, 30),(265, 30)],
                 "navigateurl_bttn_field":[(400,30 ), (80, 30)],
-                "scrape_type_label_field":[(25,83)],
+                "scrape_type_label_field":[(20,83)],
                 "fullscrapedropdown_field":[(120, 80 ),(265, 30)],
                 "fullscrapebutton": [(400, 80),(80, 30)],
                 "visibilityCheck":[(120,120), (86, 20)],
                 "cropbutton_field":[(290,160 ), (165, 30)],
-                "startbutton_field":[(110, 160), (165, 30)]
+                "startbutton_field":[(110, 160), (165, 30)],
+                "startbutton_label":[(18, 163)]
             }
         else:
             scrapper_window_config = {
                 "frame": [(300, 150), (510, 270)],
                 "url_label_field": [(75, 34)],
                 "navigateURL_field": [(110, 30), (260, 30)],
-                "navigateurl_bttn_field": [(380, 30), (75, 30)],
+                "navigateurl_bttn_field": [(380, 30), (80, 30)],
                 "startbutton_field": [(110, 160), (165, 30)],
-                "scrape_type_label_field": [(25, 83)],
+                "startbutton_label":[(18, 163)],
+                "scrape_type_label_field": [(20, 83)],
                 "fullscrapedropdown_field": [(110, 80), (260, 30)],
-                "fullscrapebutton": [(380, 80), (75, 30)],
+                "fullscrapebutton": [(380, 80), (80, 30)],
                 "visibilityCheck": [(110, 120), (160, 20)],
                 "cropbutton_field": [(290, 160), (165, 30)]
             }
         wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
-        self.SetBackgroundColour('#e6e7e8')
+        self.SetBackgroundColour('#ffffff') # set background colour to white
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.wicon)
+        self.go_img = wx.Image(IMAGES_PATH +"go.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.capture_button_img = wx.Image(IMAGES_PATH +"capture.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.start_img = wx.Image(IMAGES_PATH +"start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.stop_img = wx.Image(IMAGES_PATH +"stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         obj = browserops.BrowserOperations()
 
         self.socketIO = socketIO
@@ -104,24 +110,24 @@ class ScrapeWindow(wx.Frame):
                     #-------------------------------------------------------------------------------
                     self.url_label = wx.StaticText((self.panel), label='URL', pos=scrapper_window_config["url_label_field"][0], style=0, name='')
                     self.navigateURL = wx.TextCtrl((self.panel), pos=scrapper_window_config["navigateURL_field"][0], size=scrapper_window_config["navigateURL_field"][1])
-                    self.navigateurl = wx.Button(self.panel, label="Navigate", pos=scrapper_window_config["navigateurl_bttn_field"][0], size=scrapper_window_config["navigateurl_bttn_field"][1])
+                    self.navigateurl = wx.BitmapButton(self.panel, bitmap=self.go_img, pos=scrapper_window_config["navigateurl_bttn_field"][0], size=scrapper_window_config["navigateurl_bttn_field"][1], name='go')
                     self.navigateurl.Bind(wx.EVT_BUTTON, self.navigateurl_scrape)
                     self.navigateurl.SetDefault()
-                    self.navigateurl.SetFocus()
 
-                    self.startbutton = wx.ToggleButton(self.panel, label="Start ClickAndAdd", pos=scrapper_window_config["startbutton_field"][0], size=scrapper_window_config["startbutton_field"][1])
+                    self.startbutton_label = wx.StaticText((self.panel), label='Click and Add', pos=scrapper_window_config["startbutton_label"][0], style=0, name='')
+                    self.startbutton = wx.BitmapToggleButton(self.panel, label=self.start_img, pos=scrapper_window_config["startbutton_field"][0], size=scrapper_window_config["startbutton_field"][1], name='start_button')
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
 
-                    self.scrape_type = wx.StaticText((self.panel), label='ScrapeType', pos=scrapper_window_config["scrape_type_label_field"][0], style=0, name='')
+                    self.scrape_type = wx.StaticText((self.panel), label='Capture Type', pos=scrapper_window_config["scrape_type_label_field"][0], style=0, name='')
                     self.fullscrapedropdown = wx.ComboBox(self.panel, value="Full", pos=scrapper_window_config["fullscrapedropdown_field"][0], size=scrapper_window_config["fullscrapedropdown_field"][1], choices=self.scrapeoptions, style=wx.CB_DROPDOWN)
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip("full objects will be scraped"))
                     self.fullscrapedropdown.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
 
-                    self.fullscrapebutton = wx.Button(self.panel, label="Scrape", pos=scrapper_window_config["fullscrapebutton"][0], size=scrapper_window_config["fullscrapebutton"][1])
+                    self.fullscrapebutton = wx.BitmapButton(self.panel, bitmap=self.capture_button_img, pos=scrapper_window_config["fullscrapebutton"][0], size=scrapper_window_config["fullscrapebutton"][1], name='capture_img')
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-                    self.visibilityCheck = wx.CheckBox(self.panel, label="VisibleElementsOnly", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
+                    self.visibilityCheck = wx.CheckBox(self.panel, label="Visible Elements", pos=scrapper_window_config["visibilityCheck"][0], size=scrapper_window_config["visibilityCheck"][1])
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
                     self.prevbutton = wx.StaticBitmap(self.panel, -1, wx.Bitmap(os.environ["IMAGES_PATH"] +"stepBack.png", wx.BITMAP_TYPE_ANY), (160, 90), (35, 28))
@@ -281,7 +287,7 @@ class ScrapeWindow(wx.Frame):
         state = self.startbutton.GetValue()
         if state == True:
             status = clickandaddoj.startclickandadd(self.window_handle_number)
-            self.startbutton.SetLabel("Stop ClickAndAdd")
+            self.startbutton.SetBitmapLabel(self.stop_img)
             if status.lower() == 'fail':
                 self.socketIO.emit('scrape',status)
                 self.Close()
