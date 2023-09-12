@@ -2581,7 +2581,7 @@ return (temp);"""
         try:
             log.info("Performing full page screenshot")
             total_width = driver.execute_script("return document.body.offsetWidth")
-            total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+            total_height = driver.execute_script("return document.body.offsetHeight")
             viewport_width = driver.execute_script("return window.innerWidth")
             viewport_height = driver.execute_script("return window.innerHeight")
             driver.execute_script("window.scrollTo({0}, {1})".format(0, total_height))
