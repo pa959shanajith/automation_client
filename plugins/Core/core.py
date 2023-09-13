@@ -319,22 +319,22 @@ class MainNamespace(BaseNamespace):
             exec_data = args[0]
             batch_id = exec_data["batchId"]
             if("integration" in exec_data):
-                if(exec_data["integration"]["alm"]["url"] != ""):
+                if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
                         core_utils.get_all_the_imports('Qc')
                         import QcController
                         qcObject = QcController.QcWindow()
-                if(exec_data["integration"]["qtest"]["url"] != ""):
+                if("qtest" in exec_data["integration"] and exec_data["integration"]["qtest"]["url"] != ""):
                     if(qtestObject == None):
                         core_utils.get_all_the_imports('QTest')
                         import QTestController
                         qtestObject = QTestController.QTestWindow()
-                if(exec_data["integration"]["zephyr"]["url"] != ""):
+                if("zephyr" in exec_data["integration"] and exec_data["integration"]["zephyr"]["url"] != ""):
                     if(zephyrObject == None):
                         core_utils.get_all_the_imports('Zephyr')
                         import ZephyrController
                         zephyrObject = ZephyrController.ZephyrWindow()
-                if(exec_data["integration"]["azure"]["url"] != ""):
+                if("azure" in exec_data["integration"] and exec_data["integration"]["azure"]["url"] != ""):
                     if(azureObject == None):
                         core_utils.get_all_the_imports('Azure')
                         import azurecontroller

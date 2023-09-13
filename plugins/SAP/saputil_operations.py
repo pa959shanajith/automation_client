@@ -16,6 +16,7 @@ import logger
 import logging
 import sap_highlight
 import readconfig
+import time
 log = logging.getLogger('saputil_operations.py')
 class SapUtilKeywords:
 
@@ -72,6 +73,7 @@ class SapUtilKeywords:
                 #-----------------------------------------------------
             id = wndId + sap_id[i:]
             temp_id = id
+            temp_ses = ses
 
             configvalues = readconfig.configvalues
             if "sap_object_indentification_order" in configvalues:
@@ -79,33 +81,59 @@ class SapUtilKeywords:
             else:
                 sap_object_indentification_order = "1"
 
+            delay_constant = int(configvalues["element_load_timeout"])
             if sap_object_indentification_order == "1":
                 logger.print_on_console('Finding the SAP element by ID')
-                try:
-                    # check element exists or not using find by id
-                    ses.FindById(id)
-                except:
-                    # logic to find the id by co-ordinate or position
-                    logger.print_on_console('Finding the SAP element by ID failed so finding the element by position')
-                    if len(args) >= 1:
-                        cord_value = args[0]
-                    else:
-                        cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
-                    id, ses = self.find_sap_element_by_position(cord_value)
-            else:
-                try:
-                    # logic to find the id by co-ordinate or position
-                    logger.print_on_console('Finding the SAP element by POSITION')
-                    if len(args) >= 1:
-                        cord_value = args[0]
-                    else:
-                        cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
-                    id, ses = self.find_sap_element_by_position(cord_value)
+                for _ in range(delay_constant):
+                    try:
+                        # check element exists or not using find by id
+                        ses.FindById(id)
+                        break
+                    except Exception as e:
+                        # logic to find the id by co-ordinate or position
+                        logger.print_on_console('Finding the SAP element by ID failed so finding the element by position')
+                        if len(args) >= 1:
+                            cord_value = args[0]
+                        else:
+                            cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
+                        id, ses = self.find_sap_element_by_position(cord_value)
 
-                    ses.FindById(id)
-                except:
-                    logger.print_on_console('Finding the SAP element by POSITION failed so finding the element by ID')
-                    id = temp_id
+                        if ses is not None and id is not None:
+                            break
+                        else:
+                            id = temp_id
+                            if ses is None:
+                                ses = temp_ses
+                            err_msg = sap_constants.ELELMENT_NOT_FOUND
+                            log.info(err_msg)
+                            time.sleep(1)
+            else:
+                # logic to find the id by co-ordinate or position
+                logger.print_on_console('Finding the SAP element by POSITION')
+                for _ in range(delay_constant):
+                    try:
+                        if len(args) >= 1:
+                            cord_value = args[0]
+                        else:
+                            cord_value = {'top': None, 'left': None, 'width': None, 'height': None}
+                        id, ses = self.find_sap_element_by_position(cord_value)
+
+                        if ses is None:
+                            ses = temp_ses
+
+                        ses.FindById(id)
+                        break
+                    except Exception as e:
+                        logger.print_on_console('Finding the SAP element by POSITION failed so finding the element by ID')
+                        id = temp_id
+
+                        try:
+                            ses.FindById(id)
+                            break
+                        except Exception as e:
+                            err_msg = sap_constants.ELELMENT_NOT_FOUND
+                            log.info(err_msg)
+                            time.sleep(1)
         except Exception as e:
             logger.print_on_console( 'No instance open error :',e)
         except AttributeError as e1:
