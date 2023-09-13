@@ -233,6 +233,7 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapebutton.Disable()
                     self.fullscrapedropdown.Disable()
                     self.visibilityCheck.Disable()
+                    self.startbutton.Disable()
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Disable()
                     if len(self.driver.window_handles) > 1 and not self.window_selected:
@@ -266,6 +267,7 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapebutton.Disable()
                 self.fullscrapedropdown.Disable()
                 self.visibilityCheck.Disable()
+                self.startbutton.Disable()
                 if checkWebPackage['isWebPackage'] == "False":
                     self.cropbutton.Disable()
                 if len(self.driver.window_handles) > 1 and not self.window_selected:
@@ -288,6 +290,7 @@ class ScrapeWindow(wx.Frame):
         if state == True:
             status = clickandaddoj.startclickandadd(self.window_handle_number)
             self.startbutton.SetBitmapLabel(self.stop_img)
+            self.startbutton.Enable()
             if status.lower() == 'fail':
                 self.socketIO.emit('scrape',status)
                 self.Close()
