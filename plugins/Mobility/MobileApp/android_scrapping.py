@@ -20,6 +20,7 @@ from constants import *
 from mobile_app_constants import *
 import logger, subprocess, socket, base64, platform, logging
 import device_keywords
+from appium import webdriver
 log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
@@ -183,6 +184,45 @@ class InstallAndLaunch():
             driver = None
             device_id = None
         return driver
+    
+    def installApplication_sl(self, inputs_value, *args):
+        global driver
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
+            driver = webdriver.Remote(command_executor=url, desired_capabilities=args[0])
+            log.info(driver)
+            log.info("APP INSTALLED")
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = self.print_error("Not able to install or launch application")
+            log.error(e,exc_info=True)    
+        return driver
+
+    def uninstallApplication_sl(self,objectname,input_val,*args):
+        status = TEST_RESULT_FAIL
+        output = OUTPUT_CONSTANT
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        driver_flag = False
+        output=OUTPUT_CONSTANT
+        global device_keywords_object
+        try:
+            # url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
+            # local_mak.driver = webdriver.Remote(command_executor=url, desired_capabilities=args[0])
+            local_mak.driver.remove_app('com.projects.sharath.materialvision')
+            log.info(local_mak.driver)
+            log.info("APP UNINSTALLED")
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = self.print_error("Not able to uninstall application")
+            log.error(e,exc_info=True)    
+        return status, result, output, err_msg
 
     def check_device_details(self,dv_name,platform_ver):
         res_1=TEST_RESULT_TRUE

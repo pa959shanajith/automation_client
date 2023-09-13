@@ -48,6 +48,7 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                         if SYSTEM_OS == 'Darwin': element.set_value(text)
+                        elif SYSTEM_OS == 'Windows': element.set_text(text)
                         else:
                             if args[1] == 'saucelabs':
                                 action = TouchAction(web_keywords_MA.local_mak.driver)
@@ -193,6 +194,7 @@ class Textbox_keywords():
                             log.debug('clearing  the existing text')
                             element.clear()
                         if SYSTEM_OS == 'Darwin': element.set_value(text)
+                        elif SYSTEM_OS == 'Windows': element.set_text(text)
                         else:
                             action = TouchAction(android_scrapping.driver)
                             action.tap(element).perform()

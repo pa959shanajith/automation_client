@@ -66,7 +66,7 @@ class MobileDispatcher:
     number_picker_object=Number_picker_Keywords.Number_Picker()
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
     custom_object=android_custom.custom()
-    install_and_launch_object_sl = web_keywords_MA.LaunchAndInstallSL()
+    install_and_launch_object_sl = android_scrapping.InstallAndLaunch()
 
     mob_dict={
         'settext':textbox_keywords_object.set_text,
@@ -157,7 +157,7 @@ class MobileDispatcher:
         self.action=None
         self.sauce_conf = web_keywords_MA.Sauce_Config().get_sauceconf()
 
-    def dispatcher(self,teststepproperty,input,reporting_obj, mythread,execution_env):
+    def dispatcher(self,teststepproperty,input,reporting_obj, mythread, execution_env):
         global apptypes,ip
         objectname = teststepproperty.objectname
         object_name_ios = objectname
@@ -243,10 +243,14 @@ class MobileDispatcher:
                             desired_caps = {}
                             desired_caps['platformName'] = config["platformName"]
                             desired_caps['appium:deviceName'] = config["deviceName"]
+                            # desired_caps['udid'] = config["deviceName"]
                             desired_caps['appium:platformVersion'] = config["platformVersion"]                           
-                            desired_caps['appium:app'] = 'storage:filename=Codex.apk'  # The filename of the mobile app   
+                            desired_caps['appium:app'] = 'storage:filename=codex.apk'  # The filename of the mobile app   
+                            # desired_caps['appium:app'] = 'storage:filename=mega.apk'  # The filename of the mobile app   
                             desired_caps['appium:appPackage'] = 'com.projects.sharath.materialvision'
-                            desired_caps['appium:appActivity'] = 'com.projects.sharath.materialvision.Codex.MyEntryScreen'                        
+                            desired_caps['appium:appActivity'] = 'com.projects.sharath.materialvision.Codex.MainActivity'         
+                            # desired_caps['appium:appPackage'] = 'mega.privacy.android.app'                           
+                            # desired_caps['appium:appActivity'] = 'mega.privacy.android.app.main.ManagerActivity'              
                             desired_caps['appium:deviceOrientation'] = 'portrait'
                             desired_caps['appium:automationName'] = 'UiAutomator2'
                             desired_caps['ignoreUnimportantViews'] = True
@@ -257,23 +261,24 @@ class MobileDispatcher:
                             desired_caps['log_level'] = False
                             desired_caps['appium:waitForQuiescence'] = True 
                             desired_caps['sauce:options'] = {}
-                            desired_caps['sauce:options']['appiumVersion'] = '2.0.0'
+                            desired_caps['sauce:options']['appiumVersion'] = '1.16.0'
                             desired_caps['sauce:options']['username'] = self.sauce_conf['sauce_username']
                             desired_caps['sauce:options']['accessKey'] = self.sauce_conf['sauce_access_key']
                             desired_caps['sauce:options']['name'] = teststepproperty.testscript_name
-                            # desired_caps['sauce:options']['name'] = 'Codex'
                             desired_caps['sauce:options']['extendedDebugging'] = True
                             desired_caps['sauce:options']['capturePerformance'] = True
                             desired_caps['sauce:options']['maxDuration'] = 3600
-                            desired_caps['sauce:options']['idleTimeout'] = 180
+                            desired_caps['sauce:options']['idleTimeout'] = 120
                             result=self.sauce_mobile_app_dict[keyword](input, desired_caps)
-                            driver = web_keywords_MA.local_mak.driver
+                            # driver = web_keywords_MA.local_mak.driver
+                            driver = android_scrapping.driver
                             log.info(driver)
                         else:
-                            element, xpath=self.getMobileElement(web_keywords_MA.local_mak.driver,objectname)
+                            # element, xpath=self.getMobileElement(web_keywords_MA.local_mak.driver,objectname)
+                            element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                             log.info(element)
                             log.info(xpath)
-                            result=self.sauce_mobile_app_dict[keyword](element,input,xpath)
+                            result=self.sauce_mobile_app_dict[keyword](element,input,xpath,execution_env['env'])
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
                     return False
@@ -361,9 +366,9 @@ class MobileDispatcher:
         'longpress' : button_link_object.long_press,
         'getbuttonname' : button_link_object.get_button_name,
         'verifybuttonname' : button_link_object.verify_button_name,
-        'installapplication' : install_and_launch_object_sl.installApplication,
-        'launchapplication' : install_and_launch_object_sl.installApplication,
-        'uninstallapplication' : install_and_launch_object.uninstallApplication,
+        'installapplication' : install_and_launch_object_sl.installApplication_sl,
+        'launchapplication' : install_and_launch_object_sl.installApplication_sl,
+        'uninstallapplication' : install_and_launch_object_sl.uninstallApplication_sl,
         'closeapplication' : install_and_launch_object.closeApplication,
         'swipeleft' : swipe_keywords_object.swipe_left,
         'swiperight': swipe_keywords_object.swipe_right,

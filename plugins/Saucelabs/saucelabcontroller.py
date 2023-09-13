@@ -15,25 +15,15 @@ import logger
 import logging
 import requests
 from requests.auth import HTTPBasicAuth
+import urllib3
 import json
 log = logging.getLogger("saucelabcontroller.py")
 import base64
 import time
-import urllib3
+import subprocess
+import re
 
 class SaucelabWindow():
-    # jira = None
-    # def __init__(self,x=0):
-    #     self.x = x
-    #     self.jira_details=None
-
-    # def connectJIRA(self,jira_serverlocation , jira_uname , jira_pwd ):
-    #     try:
-    #         jira_options = {'server': jira_serverlocation}
-    #         jira = JIRA(options=jira_options,basic_auth=(jira_uname,jira_pwd))
-    #         return jira
-    #     except Exception as e:
-    #         logger.print_on_console("Failed to connect to JIRA")
 
     def get_webconf_details(self,saucelab_input_dict,socket):
         """
@@ -267,7 +257,8 @@ class SaucelabWindow():
                                     'id':items['id'],
                                     'name':items['name'],
                                     'group_id': items['group_id'],
-                                    'kind': items['kind']
+                                    'kind': items['kind'],
+                                    'appPackageName': items['metadata']['identifier']
                                 })
                     
                     res['stored_files'] = stored_files
@@ -305,9 +296,28 @@ class SaucelabWindow():
             auth = (username, access_key)
 
             response = requests.post(upload_url, files=files, auth=auth)
+            aapt_path = r'D:\Avo_Assure\ICE\AvoAssure\build-tools\33.0.1\aapt.exe'
+            try:
+                result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], capture_output=True, text=True, check=True)
+                output = result.stdout
+            except subprocess.CalledProcessError as e:
+                print(f"Error executing aapt.exe: {e}")
+                exit(1)
+            # Use regular expressions to extract the app activity from the output
+            match = re.search(r"launchable-activity: name='([^']*)'", output)
+            if match:
+                res = match.group(1)
+                print(f"App Activity: {res}")
+            else:
+                print("Unable to find app activity in the APK file.")
+
+            data_to_server = {
+                "name": saucleb_input_dict['SauceLabUploadApk']['apkName'],
+                "activity": res
+            }
 
 
-            socket.emit('sauceconfresponse',res)
+            socket.emit('sauceconfresponse', data_to_server)
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
