@@ -20,8 +20,7 @@ import uuid
 from constants import *
 import constants
 import logging
-from webscrape_utils import WebScrape_Utils
-webscrape_utils_obj = WebScrape_Utils()
+
 log = logging.getLogger('screenshot_keywords.py')
 class Screenshot():
     def captureScreenshot(self,*args,web=False,driver=False,accessibility=False):
@@ -68,10 +67,7 @@ class Screenshot():
                         # tempPath = data['temppath']
                         # objpath = data['projectname']+'/'+data['releaseid']+'/'+data['cyclename']+'/'+data['executionid']+'/'+tempobj
                     if driver:
-                        try:
-                            screen, total_width, total_height = webscrape_utils_obj.fullpage_screenshot(driver, tempPath)
-                        except:
-                            driver.save_screenshot(tempPath)
+                        driver.save_screenshot(tempPath)
                     elif not(web):
                         img=ImageGrab.grab()
                         img.save(tempPath)
@@ -83,10 +79,7 @@ class Screenshot():
                     #     os.remove(tempPath)
                 if(genericStep):
                     if driver:
-                        try:
-                            screen, total_width, total_height = webscrape_utils_obj.fullpage_screenshot(driver, tempPath)
-                        except:
-                            driver.save_screenshot(genericStep)
+                        driver.save_screenshot(genericStep)
                     else:
                         if web:
                             log.warn("Capturing screenshot using generic since browser driver is not available")
