@@ -446,10 +446,10 @@ class Dispatcher:
             if browser_Keywords_MW.driver_obj is not None:
                 log.info('Finding the browser information')
                 browser_info=browser_Keywords_MW.driver_obj.capabilities
-                if execution_env['env'] == 'default':
+                if execution_env['env'] == 'default' and SYSTEM_OS == 'Windows':
                     adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                     cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                     reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)
@@ -465,10 +465,10 @@ class Dispatcher:
             # window_ops_list=['click','press','doubleclick','rightclick','uploadfile','acceptpopup','dismisspopup','selectradiobutton','selectcheckbox','unselectcheckbox','cellclick','clickelement','drag','drop','settext','sendvalue','cleartext','setsecuretext','sendsecurevalue','selectvaluebyindex','selectvaluebytext','selectallvalues','selectmultiplevaluesbyindexes','selectmultiplevaluesbytext','verifyvaluesexists','deselectall','setfocus','mousehover','tab','sendfunctionkeys','rightclick','mouseclick','openbrowser','navigatetourl','opennewbrowser','refresh','closebrowser','closesubwindows','switchtowindow','clearcache','navigatewithauthenticate']
             if browser_Keywords_MW.driver_obj is not None:
                 browser_info=browser_Keywords_MW.driver_obj.capabilities
-                if execution_env['env'] == 'default':
+                if execution_env['env'] == 'default' and SYSTEM_OS == 'Windows':
                     adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                     cmd = adb + ' -s '+ browser_info['deviceName']+ ' shell dumpsys package com.android.chrome | grep "versionName"'
-                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                     reporting_obj.browser_version=s.split("=")[1]
                 reporting_obj.browser_type=browser_info.get('browserName')
                 log.info(reporting_obj.browser_version)

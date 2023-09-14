@@ -74,7 +74,7 @@ class BrowserKeywords():
             if (SYSTEM_OS != 'Darwin'):
                 path = curdir + '/node_modules/appium/build/lib/main.js'
                 nodePath = os.environ["AVO_ASSURE_HOME"] + "/Lib/Drivers/node.exe"
-                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                proc = subprocess.Popen([nodePath, path], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 controller.process_ids.append(proc.pid)
                 start = time.time()
                 timeout = 120 #tentative; as it depends on the system performance.
@@ -236,7 +236,7 @@ class BrowserKeywords():
             adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
             if dv_name is not None:
                 cmd = adb + ' -s '+ dv_name+' shell pidof com.android.chrome'
-            s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+            s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
             if s!="":
                 res=webconstants_MW.TEST_RESULT_TRUE
         except subprocess.CalledProcessError as esc:
@@ -260,7 +260,7 @@ class BrowserKeywords():
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 if dv_name is not None:
                     cmd = adb + ' -s '+ dv_name+' shell getprop ro.build.version.release '
-                s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                 if s==platform_ver:
                     res_2=webconstants_MW.TEST_RESULT_TRUE
                 else:
@@ -592,7 +592,7 @@ class BrowserKeywords():
                 if android_home is not None:
                     adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                     cmd = adb + ' -s '+ device_id +' shell pm clear com.android.chrome '
-                    s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
+                    s = subprocess.check_output(cmd.split(),universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW).strip()
                     if (driver_obj) and s =='Success':
                         driver_obj = None
                         status=webconstants_MW.TEST_RESULT_PASS

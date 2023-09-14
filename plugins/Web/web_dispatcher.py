@@ -196,6 +196,7 @@ class Dispatcher:
             'closesubwindows':local_Wd.browser_object.closeSubWindows,
             'switchtowindow':local_Wd.browser_object.switch_to_window,
             'sendkeys':local_Wd.util_object.send_keys,
+            'sendsecurekeys':local_Wd.util_object.send_secure_keys,
             'verifytextexists':local_Wd.statict_text_object.verify_text_exists,
             'verifypagetitle':local_Wd.browser_object.verify_page_title,
             'clearcache':local_Wd.browser_object.clear_cache,
@@ -363,10 +364,15 @@ class Dispatcher:
         global simple_debug_gwto, status_gwto
         status_gwto =False
         simple_debug_gwto=False
+        global finalIdentifier
+        finalIdentifier = ''
         objectname = teststepproperty.objectname
         output = teststepproperty.outputval
         objectname = objectname.strip()
-        url=teststepproperty.url.strip()
+        if teststepproperty.url == None:
+            url = browser_Keywords.driver_pre.current_url
+        else:
+            url=teststepproperty.url.strip()
         keyword = teststepproperty.name
         keyword = keyword.lower()
         test_script = teststepproperty.testscript_name
@@ -674,6 +680,7 @@ class Dispatcher:
                     ## Issue #190 Driver control won't switch back to parent window
                     if local_Wd.popup_object.check_if_no_popup_exists():
                         local_Wd.browser_object.validate_current_window_handle()
+                    window_handles_count_begin = 0
                     if driver is not None and self.action == EXECUTE and configvalues['browser_screenshots'].lower() == 'yes':
                         window_handles_count_begin=len(driver.window_handles)
                     if objectname=="@Object":
@@ -690,7 +697,8 @@ class Dispatcher:
                             if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
-                        result= self.web_dict[keyword](webelement,input)
+                        #sending identifier that found webelement in keywords
+                        result= self.web_dict[keyword](webelement,input,finalIdentifier)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
                     if(result[1] == TERMINATE):
                         result = TERMINATE
@@ -737,32 +745,36 @@ class Dispatcher:
                       or screenShot_Flag == 'all'):
                         if browser_screenshots or headless_mode or sauceFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                window_handles_count_end=len(driver.window_handles)
-                                diff_whc=window_handles_count_end-window_handles_count_begin
-                                try:
-                                    if keyword.lower() in ["click","press","clickelement","mouseclick","clickiris"] and diff_whc==1:
-                                        local_Wd.log.debug("Look up window detected")  
-                                        local_Wd.log.debug("checking if system is locked or not")
-                                        process_name='LogonUI.exe'
-                                        callall='TASKLIST'
-                                        import subprocess
-                                        outputall=subprocess.check_output(callall)
-                                        outputstringall=str(outputall)
-                                        if process_name in outputstringall:
-                                            msg="System is Locked, Taking the screenshot using Driver"
-                                            logger.print_on_console(msg)
-                                            local_Wd.log.debug(msg)
-                                            temp=driver.current_window_handle
-                                            driver.switch_to_window(driver.window_handles[-1]) 
-                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
-                                            driver.switch_to_window(temp)
-                                        else:
-                                            local_Wd.log.debug("System is Unlocked, Taking the screenshot using generic functions")
-                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
-                                    else:
+                                if sauceFlag:
+                                    if keyword!='closebrowser':
                                         file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
-                                except Exception as e:
-                                    local_Wd.log.error(e,exc_info=True)
+                                else:
+                                    window_handles_count_end=len(driver.window_handles)
+                                    diff_whc=window_handles_count_end-window_handles_count_begin
+                                    try:
+                                        if keyword.lower() in ["click","press","clickelement","mouseclick","clickiris"] and diff_whc==1:
+                                            local_Wd.log.debug("Look up window detected")  
+                                            local_Wd.log.debug("checking if system is locked or not")
+                                            process_name='LogonUI.exe'
+                                            callall='TASKLIST'
+                                            import subprocess
+                                            outputall=subprocess.check_output(callall)
+                                            outputstringall=str(outputall)
+                                            if process_name in outputstringall:
+                                                msg="System is Locked, Taking the screenshot using Driver"
+                                                logger.print_on_console(msg)
+                                                local_Wd.log.debug(msg)
+                                                temp=driver.current_window_handle
+                                                driver.switch_to_window(driver.window_handles[-1]) 
+                                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                                driver.switch_to_window(temp)
+                                            else:
+                                                local_Wd.log.debug("System is Unlocked, Taking the screenshot using generic functions")
+                                                file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
+                                        else:
+                                            file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
+                                    except Exception as e:
+                                        local_Wd.log.error(e,exc_info=True)
                             elif not (headless_mode or sauceFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
@@ -847,14 +859,38 @@ class Dispatcher:
                 web_element = getattr(driver,self.identifier_dict[identifiers_type])(f'//*[@id="{web_element_id}"]')
             else:
                 web_element = temp_element
+        elif len(temp_element) > 1:
+            local_Wd.log.info(f'More than one element found by Lable: {identifier}')
         return web_element
 
     def element_locator(self,driver,identifiers_type,identifier,id_num):
-        if identifier=='null': return None
+        global finalIdentifier
+        if identifier=='null' or identifier == '': return None
+        display_identifier_type = identifiers_type
         webElement = None
         try:
             index = 0
-            if identifiers_type == "classname" :
+            driver.switch_to.default_content()
+            if identifiers_type == 'rxpath' or identifiers_type == 'xpath':
+                webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
+                
+                if webElement==None:
+                    # webelement might be in same origin iframe or xpath might have changed.
+                    iframes = driver.find_elements_by_tag_name('iframe')
+                    for iframe in iframes:
+                        driver.switch_to.frame(iframe)
+                        webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
+                        if webElement:
+                            logger.print_on_console('Element in iframe. Control switched to iframe and element found.')
+                            break
+
+                if webElement:
+                    finalIdentifier = identifier
+                    logger.print_on_console(f'Webelement found by OI '+identifiers_type)
+                    local_Wd.log.info(f'Webelement found by OI '+identifiers_type)
+                    return webElement
+                
+            elif identifiers_type == "classname" :
                 if '[' and ']' in identifier:
                     index = int(identifier.split('[')[1].split(']')[0])
                     identifier = identifier.split('[')[0]
@@ -872,8 +908,11 @@ class Dispatcher:
                     webElement = self.find_element_by_label(driver, identifiers_type, identifier)
             else:
                 webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
+            if webElement == None:
+                return None
             if len(webElement) == 1:
                 webElement=webElement[0]
+                finalIdentifier = identifier
                 try:
                     identifier_fullname = {'xpath':'Absolute X-Path',
                                             'id':'ID Attribute',
@@ -883,8 +922,8 @@ class Dispatcher:
                                             'css_selector':'CSS Selector',
                                             'href':'Href Attribute',
                                             'label':'Label'}
-                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[identifiers_type]}"')
-                    local_Wd.log.info(f'Webelement found by OI "{str(identifiers_type)}"')
+                    logger.print_on_console(f'Webelement found by OI "{identifier_fullname[display_identifier_type]}"')
+                    local_Wd.log.info(f'Webelement found by OI "{str(display_identifier_type)}"')
                 except:
                     logger.print_on_console(f'Webelement found by OI "{id_num}"')
                     local_Wd.log.info(f'Webelement found by OI "{id_num}"')
@@ -927,13 +966,15 @@ class Dispatcher:
                     for identifiers_type in identifiers_list:
                         identifiers_index = identifiers_sequence[identifiers_type]
                         identifiers_id = str(identifiers_index + 1)
-                        webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
+                        if identifiers_index<len(identifiers):
+                            webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
                         if not(webElement):
                             webElement=None
                             local_Wd.log.info(f'Webelement not found with Primary identifers "{identifiers_type}"')
                         else:
                             break
-                    if (webElement):
+                    if (webElement and webElement.is_enabled()):
+                        finalXpath = identifiers[0]     #finalXpath used in getCustomobject 
                         break
                     else:
                         time.sleep(1)
@@ -966,7 +1007,7 @@ class Dispatcher:
                                         if not(webElement):
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
-                    if (webElement):
+                    if (webElement and webElement.is_enabled()):
                         break
                     else:
                         time.sleep(1)

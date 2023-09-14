@@ -28,8 +28,775 @@ class WebScrape_Utils:
     SCRAPE_DATA_LIMIT = 30
     """Javascript logic to check if current frame is an iframe"""
     javascript_in_iframe = """function inIframe () { 	try { 		return window.self !== window.top; 	} catch (e) { 		return true; 	} } return inIframe()"""
+    
     """Javascript logic used in fullscrape operation"""
-    javascript_fullscrape = """if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {	(function () {		function hasAttribute(attrName) {			return typeof this[attrName] !== 'undefined';		}		var inputs = document.getElementsByTagName('*');		for (var i = 0; i < inputs.length; i++) {			inputs[i].hasAttribute = hasAttribute;		}	}		());}if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {	(function () {		function getAttribute(attrName) {			return typeof this[attrName] !== 'undefined';		}		var inputs = document.getElementsByTagName('*');		for (var i = 0; i < inputs.length; i++) {			inputs[i].getAttribute = getAttribute;		}	}		());}(function () {	if (!document.getElementsByClassName) {		var indexOf = [].indexOf || function (prop) {			for (var i = 0; i < this.length; i++) {				if (this[i] === prop)					return i;			}			return -1;		};		getElementsByClassName = function (className, context) {			var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {					var all = context.getElementsByTagName("*"),					elements = [],					i = 0;					for (; i < all.length; i++) {						if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1)							elements.push(all[i]);					}					return elements;				})();			return elems;		};		document.getElementsByClassName = function (className) {			return getElementsByClassName(className, document);		};		if (window.Element) {			window.Element.prototype.getElementsByClassName = function (className) {				return getElementsByClassName(className, this);			};		}	}})();var suseIdx = true;var suseId = true;var suseClass = true;var srelative = true;var sae = [];var sarr = [];var sele = [];var smyid = 0;var stextvalue = '';var stagname = 0;var sishidden = 0;var scustname = '';var smultipleFlag = false;var surl = arguments[0];var snonamecounter = 1;var txt_area_nonamecounter = 1;var select_nonamecounter = 1;var td_nonamecounter = 1;var a_nonamecounter = 1;var table_nonamecounter = 1;var input_nonamecounter = 1;var ssalesforcecounter = 1;var stagtype = '';var ssname = 'null';var sstagname = 'null';var ssclassname = 'null';var sclassname = 'null';var parentele = 'null';var top = 0;var left = 0;var height = 0;var width = 0;var coordinates = '';var scrapeOption = arguments[1][0];var scrapeOptionValue;var salesF = false;if (arguments[1].length > 1)	scrapeOptionValue = arguments[1][1];var sisVisible = (function () {	function inside(schild, sparent) {		while (schild) {			if (schild === sparent)				return true;			schild = schild.parentNode;		}		return false;	};	return function (selem) {		if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0)			return false;		var srect = selem.getBoundingClientRect();		if (window.getComputedStyle || selem.currentStyle) {			var sel = selem,			scomp = null;			while (sel) {				if (sel === document) {					break;				} else if (sel.nodeName == '#document-fragment') {					sel = sel.host;				} else if (!sel.parentNode)					return false;				if (sel instanceof(HTMLElement))					scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;				if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0))))					return false;				sel = sel.parentNode;			}		}		return true;	}})();Array.prototype.extend = function (other_array) {	other_array.forEach(function (v) {		this.push(v)	}, this);};sae = sgetNodesOuter();for (var j = 0; j < sae.length; j++) {	parentele = 'null';	stagtype = '';	ssname = 'null';	sstagname = 'null';	sid = sae[j].id;	sname = sae[j].name;	salttext = sae[j].alt;	splaceholder = sae[j].placeholder;	sclassname = sae[j].className;	sid = (String(sid));	sclassname = (String(sclassname));	sname = (String(sname));	splaceholder = (String(splaceholder));	stextvalue = stext_content(sae[j]);	stextvalue = (String(stextvalue));	stagname = sae[j].tagName.toLowerCase();	ssname = 'null';	sstagname = 'null';	role = 'null';	ssclassname = 'null';	findCoordinates(sae[j]);	salesF = (sae[j].tagName.toLowerCase().indexOf('lightning') != -1);	if (stagname == 'lightning-datatable') {		parentele = sae[j];		sae[j] = sae[j].getElementsByTagName('table')[0];		sid = sae[j].id;		sname = sae[j].name;		salttext = sae[j].alt;		splaceholder = sae[j].placeholder;		sclassname = sae[j].className;		sid = (String(sid));		sclassname = (String(sclassname));		sname = (String(sname));		splaceholder = (String(splaceholder));		stextvalue = stext_content(sae[j]);		stextvalue = (String(stextvalue));		stagname = sae[j].tagName.toLowerCase();	}	if (sae[j].hasAttribute('role')) {		if (sae[j].getAttribute('role') === 'grid' && sae[j].tagName.toLowerCase() === 'div') {			role = 'grid';		}	}	if (stagname.indexOf(':') != -1) {		stagname = stagname.replace(':', '');		stagname = 'custom' + stagname;	}	if (sname != '' && sname != 'undefined') {		snames = document.getElementsByName(sname);		if (snames.length > 1) {			for (var k = 0; k < snames.length; k++) {				if (sae[j] == snames[k]) {					ssname = sname + '[' + k + ']'				}			}		} else {			ssname = sname;		}	}	if (stagname != '' && stagname != 'undefined') {		stagnames = document.getElementsByTagName(stagname);		if (stagnames.length > 1) {			for (var k = 0; k < stagnames.length; k++) {				if (sae[j] == stagnames[k]) {					sstagname = stagname + '[' + k + ']'				}			}		} else {			sstagname = stagname;		}	}	if (sclassname != '' && sclassname != 'undefined') {		try {			sclassnames = document.getElementsByClassName(sclassname);			if (sclassnames.length > 1) {				for (var k = 0; k < sclassnames.length; k++) {					if (sae[j] == sclassnames[k]) {						ssclassname = sclassname + '[' + k + ']'					}				}			} else {				ssclassname = sclassname;			}		} catch (err) {			console.log(sclassname);			console.log("skipping this element: " + err);		}	}	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {		if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {			if (sname != '' && sname != 'undefined') {				snames = document.getElementsByName(sname);				if (snames.length > 1) {					for (var k = 0; k < snames.length; k++) {						if (sae[j] == snames[k]) {							stextvalue = sname + k;						}					}				} else {					stextvalue = sname;				}			} else if (sid != '' && sid != 'undefined') {				stextvalue = sid;			} else if (splaceholder != '' && splaceholder != 'undefined') {				stextvalue = splaceholder;			} else {				var seles = document.getElementsByTagName(stagname);				for (var k = 0; k < seles.length; k++) {					if (sae[j] == seles[k]) {						stextvalue = stagname + '_NONAME' + (k + 1);					}				}			}		}		if (sid == '') {			sid = 'null';		}		smultipleFlag = sae[j].hasAttribute('multiple');		sishidden = sisVisible(sae[j]);		if (sishidden == true || sishidden == 'True' || sishidden == 'true') {			sishidden = 'No';		} else {			sishidden = 'Yes';		}		var sfirstpass = 0;		var srpath = '';		var setype = sae[j].getAttribute('type');		setype = (String(setype)).toLowerCase();		for (var spath = ''; sae[j] && sae[j].nodeType == 1; sae[j] = sae[j].parentNode.host || sae[j].parentNode) {			var spredicate = [];			var ssiblings = sae[j].parentNode.children;			var scount = 0;			var sunique = false;			var snewPath = '';			var sidx = 0;			for (var i = 0; ssiblings && (i < ssiblings.length); i++) {				if (ssiblings[i].tagName == sae[j].tagName) {					scount++;					if (ssiblings[i] == sae[j]) {						sidx = scount;					}				}			}			if (sidx == 1 && scount == 1) {				sidx = null;			}			if (suseId && sae[j].id) {				spredicate[spredicate.length] = '@id=' + '"' + sae[j].id + '"';				sunique = true;			}			xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';			sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';			spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';			spath = '/' + sae[j].tagName.toLowerCase() + xidx + spath;			if (sfirstpass == 0) {				if (sunique && srelative) {					srpath = '//*' + sidx + spredicate + srpath;					sfirstpass = 1;				} else if (salesF) {					srpath = '//' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;				} else {					srpath = '/' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;				}			}		}		var firstpass = 0;		var rpath1 = '';		if (parentele != 'null') {			g = parentele;			for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode) {				var predicate1 = [];				var siblings1 = g.parentNode.children;				var count1 = 0;				var unique1 = false;				for (var i = 0; siblings1 && (i < siblings1.length); i++) {					if (siblings1[i].tagName == g.tagName) {						count1++;						if (siblings1[i] == g) {							idx1 = count1;						}					}				}				if (idx1 == 1 && count1 == 1) {					idx1 = null;				}				if (suseId && g.id) {					predicate1[predicate1.length] = '@id=' + '"' + g.id + '"';					unique1 = true;				}				xidx1 = (suseIdx && idx1) ? ('[' + idx1 + ']') : '';				idx1 = (suseIdx && idx1 && !unique1) ? ('[' + idx1 + ']') : '';				predicate1 = (predicate1.length > 0) ? ('[' + predicate1.join(' and ') + ']') : '';				path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;				if (firstpass == 0) {					if (unique1 && srelative) {						rpath1 = '//*' + idx1 + predicate1 + rpath1;						firstpass = 1;					} else {						rpath1 = '/' + g.tagName.toLowerCase() + idx1 + predicate1 + rpath1;					}				}			}			spath = path1 + spath;			srpath = rpath1 + srpath;		}		if (stagname == 'textarea') {			stagname = 'input';			stagtype = 'txtarea';		} else if (stagname == 'select' && smultipleFlag) {			stagname = 'list';			stagtype = 'lst';		} else if (stagname == 'select') {			stagtype = 'select';		} else if (stagname == 'td' || stagname == 'tr') {			stagname = 'tablecell';			stagtype = 'tblcell';		} else if (stagname == 'a') {			stagtype = 'lnk';		} else if (stagname == 'table') {			stagtype = 'tbl';		} else if (stagname == 'img') {			stagtype = 'img';		} else if (stagname == 'input' && setype == 'image') {			stagname = 'img';			stagtype = 'img';		}		if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {			stagname = 'button';			stagtype = 'btn';		} else if (stagname == 'input' && setype == 'radio') {			stagname = 'radiobutton';			stagtype = 'radiobtn';		} else if (stagname == 'input' && setype == 'checkbox') {			stagname = 'checkbox';			stagtype = 'chkbox';		} else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {			stagname = 'input';			stagtype = 'txtbox';		} else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {			stagname = 'div';			stagtype = 'elmnt';		} else if (stagname == 'button') {			stagname = 'button';			stagtype = 'btn';		} else if (stagname == 'lightning-combobox' || stagname == 'lightning-grouped-combobox') {			stagtype = stagname;			stagname = 'select';		}		if (role == 'grid') {			stagname = 'grid';			stagtype = 'grid';		}		if (salesF) {			stextvalue = stagname + '_Salesforce' + ssalesforcecounter + '_sfc';			ssalesforcecounter = ssalesforcecounter + 1;		}		stextvalue = stextvalue.replace(">", "");		stextvalue = stextvalue.replace("</", "");		stextvalue = stextvalue.replace("<", "");		stextvalue = stextvalue.replace("/>", "");		stextvalue = stextvalue.split("\\n").join("");		stextvalue = stextvalue.split("\\t").join("");		stextvalue = stextvalue.split("\\r").join("");		stextvalue = stextvalue.split("  ").join("");		stextvalue = stextvalue.split("\\u00a0").join("");		if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {			stextvalue = 'NONAME' + snonamecounter;			snonamecounter = snonamecounter + 1;			scustname = stextvalue;		} else {			scustname = stextvalue;		}		if (stagtype != '') {			scustname = scustname + '_' + stagtype;		} else {			scustname = scustname + '_elmnt';		}		coordinates = left + ';' + top + ';' + height + ';' + width;		coordinates = String(coordinates);		snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue;		sarr.push({			'xpath': snewPath,			'tag': stagname,			'hiddentag': sishidden,			'url': surl,			'height': height,			'width': width,			'custname': scustname,			'top': top,			'left': left		});	}}return sarr;function findCoordinates(element) {	height = element.offsetHeight;	width = element.offsetWidth;	top = 0;	left = 0;	do {		top += element.offsetTop || 0;		left += element.offsetLeft || 0;		element = element.offsetParent;	} while (element);}function sgetNodesOuter() {	var elementsarray = [];	scrapeOption = scrapeOption.toLowerCase();	if (scrapeOption === 'full') {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));		salele = document.getElementsByTagName('one-record-home-flexipage2');		salele1 = document.getElementsByTagName('records-lwc-detail-panel');		if (salele.length > 0) {			for (var i = 0; i < salele.length; i++) {				elementsarray = elementsarray.concat(HTMLCollectionToArray(salele[i].getElementsByTagName('*')));			}		}		if (salele1.length > 0) {			for (var i = 0; i < salele1.length; i++) {				elementsarray = elementsarray.concat(HTMLCollectionToArray(salele1[i].getElementsByTagName('*')));			}		}	} else if (scrapeOption === 'button') {		var array1 = HTMLCollectionToArray(document.getElementsByTagName('button'));		var temparray2 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array2 = [];		temparray2.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				elementType = elementType.toLowerCase();				if (elementType == 'button' || elementType == 'submit' || elementType == 'reset' || elementType == 'file')					array2.push(element);			}		});		elementsarray.extend(array1);		elementsarray.extend(array2);	} else if (scrapeOption === 'checkbox' || scrapeOption === 'radiobutton') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array1 = [];		var typeCheck = scrapeOption === 'checkbox' ? 'checkbox' : 'radio';		temparray1.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				if (elementType.toLowerCase() == typeCheck)					array1.push(element);			}		});		elementsarray.extend(array1);	} else if (scrapeOption === 'textbox') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array1 = [];		var typeCheck = ["text", "email", "number", "password", "range", "search", "url"];		temparray1.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				if (typeCheck.indexOf(elementType.toLowerCase()) != -1)					array1.push(element);			}		});		elementsarray.extend(array1);	} else if (scrapeOption === 'dropdown' || scrapeOption === 'listbox') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('select'));		var array1 = [];		var array2 = [];		temparray1.forEach(function (element) {			if (element.hasAttribute('multiple')) {				if (scrapeOption === 'listbox')					array2.push(element);			} else				array1.push(element);		});		scrapeOption === 'dropdown' ? elementsarray.extend(array1) : elementsarray.extend(array2);	} else if (scrapeOption === 'image' || scrapeOption === 'link' || scrapeOption === 'table') {		var tagCheck = {			"image": "img",			"link": "a",			"table": "table"		};		elementsarray = HTMLCollectionToArray(document.getElementsByTagName(tagCheck[scrapeOption]));	} else if (scrapeOption === 'grid') {		var array1 = HTMLCollectionToArray(document.getElementsByTagName('*'));		array1.forEach(function (element) {			if (element.hasAttribute('role')) {				if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {					elementsarray.push(element);				}			}		});	} else if (scrapeOption === 'element') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('*'));		excludeTagList = ["button", "input", "select", "img", "a", "textarea", "table", "td", "tr"];		temparray1.forEach(function (element) {			elementTagName = element.tagName;			if (elementTagName) {				if (excludeTagList.indexOf(elementTagName.toLowerCase()) == -1)					elementsarray.push(element);			}		});	} else if (scrapeOption == 'other tag') {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName(scrapeOptionValue));	} else if (scrapeOption.toLowerCase() == 'select a section using xpath') {		elementsarray.push(scrapeOptionValue);		elementsarray.extend(HTMLCollectionToArray(scrapeOptionValue.getElementsByTagName('*')));	} else {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));	}	return elementsarray;};function HTMLCollectionToArray(x) {	for (var i = 0, a = []; i < x.length; i++)		a.push(x[i]);	return a};function saddNodesOuter(sarray, scollection) {	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {		sarray.push(scollection[i]);	}};function stext_content(f) {	var sfirstText = '';	var stextdisplay = '';	for (var z = 0; z < f.childNodes.length; z++) {		var scurNode = f.childNodes[z];		swhitespace = /^\s*$/;		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {			sfirstText = scurNode.nodeValue;			stextdisplay = stextdisplay + sfirstText;		}	}	return (stextdisplay);};"""
+    javascript_fullscrape = """
+        if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {
+            (function () {
+                function hasAttribute(attrName) {
+                    return typeof this[attrName] !== 'undefined';
+                }
+                var inputs = document.getElementsByTagName('*');
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].hasAttribute = hasAttribute;
+                }
+            }());
+        }
+        if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {
+            (function () {
+                function getAttribute(attrName) {
+                    return typeof this[attrName] !== 'undefined';
+                }
+                var inputs = document.getElementsByTagName('*');
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].getAttribute = getAttribute;
+                }
+            }());
+        }(function () {
+            if (!document.getElementsByClassName) {
+                var indexOf = [].indexOf || function (prop) {
+                    for (var i = 0; i < this.length; i++) {
+                        if (this[i] === prop) return i;
+                    }
+                    return -1;
+                };
+                getElementsByClassName = function (className, context) {
+                    var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {
+                        var all = context.getElementsByTagName("*"),
+                            elements = [],
+                            i = 0;
+                        for (; i < all.length; i++) {
+                            if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1) elements.push(all[i]);
+                        }
+                        return elements;
+                    })();
+                    return elems;
+                };
+                document.getElementsByClassName = function (className) {
+                    return getElementsByClassName(className, document);
+                };
+                if (window.Element) {
+                    window.Element.prototype.getElementsByClassName = function (className) {
+                        return getElementsByClassName(className, this);
+                    };
+                }
+            }
+        })();
+        var suseIdx = true;
+        var suseId = true;
+        var suseClass = true;
+        var srelative = true;
+        var sae = [];
+        var sarr = [];
+        var sele = [];
+        var smyid = 0;
+        var stextvalue = '';
+        var slabel = '';
+        var stagname = 0;
+        var sishidden = 0;
+        var scustname = '';
+        var smultipleFlag = false;
+        var surl = arguments[0];
+        var snonamecounter = 1;
+        var txt_area_nonamecounter = 1;
+        var select_nonamecounter = 1;
+        var td_nonamecounter = 1;
+        var a_nonamecounter = 1;
+        var table_nonamecounter = 1;
+        var input_nonamecounter = 1;
+        var ssalesforcecounter = 1;
+        var stagtype = '';
+        var ssname = 'null';
+        var sstagname = 'null';
+        var ssclassname = 'null';
+        var sclassname = 'null';
+        var parentele = 'null';
+        var top = 0;
+        var left = 0;
+        var height = 0;
+        var width = 0;
+        var coordinates = '';
+        var scrapeOption = arguments[1][0];
+        var scrapeOptionValue;
+        var salesF = false;
+        if (arguments[1].length > 1) scrapeOptionValue = arguments[1][1];
+        var sisVisible = (function () {
+            function inside(schild, sparent) {
+                while (schild) {
+                    if (schild === sparent) return true;
+                    schild = schild.parentNode;
+                }
+                return false;
+            };
+            return function (selem) {
+                if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0) return false;
+                var srect = selem.getBoundingClientRect();
+                if (window.getComputedStyle || selem.currentStyle) {
+                    var sel = selem,
+                        scomp = null;
+                    while (sel) {
+                        if (sel === document) {
+                            break;
+                        } else if (sel.nodeName == '#document-fragment') {
+                            sel = sel.host;
+                        } else if (!sel.parentNode) return false;
+                        if (sel instanceof(HTMLElement)) scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;
+                        if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0)))) return false;
+                        sel = sel.parentNode;
+                    }
+                }
+                return true;
+            }
+        })();
+        Array.prototype.extend = function (other_array) {
+            other_array.forEach(function (v) {
+                this.push(v)
+            }, this);
+        };
+        sae = sgetNodesOuter();
+        for (var j = 0; j < sae.length; j++) {
+            parentele = 'null';
+            stagtype = '';
+            ssname = 'null';
+            sstagname = 'null';
+            sid = sae[j].id;
+            sname = sae[j].name;
+            salttext = sae[j].alt;
+            splaceholder = sae[j].placeholder;
+            sclassname = sae[j].className;
+            sid = (String(sid));
+            sclassname = (String(sclassname));
+            sname = (String(sname));
+            splaceholder = (String(splaceholder));
+            stextvalue = stext_content(sae[j]);
+            stextvalue = (String(stextvalue));
+            slabel = stext_content(sae[j]);
+            slabel = (String(slabel));
+            stagname = sae[j].tagName.toLowerCase();
+            ssname = 'null';
+            sstagname = 'null';
+            role = 'null';
+            ssclassname = 'null';
+            findCoordinates(sae[j]);
+            salesF = (sae[j].tagName.toLowerCase().indexOf('lightning') != -1);
+            if (stagname == 'lightning-datatable') {
+                parentele = sae[j];
+                sae[j] = sae[j].getElementsByTagName('table')[0];
+                sid = sae[j].id;
+                sname = sae[j].name;
+                salttext = sae[j].alt;
+                splaceholder = sae[j].placeholder;
+                sclassname = sae[j].className;
+                sid = (String(sid));
+                sclassname = (String(sclassname));
+                sname = (String(sname));
+                splaceholder = (String(splaceholder));
+                stextvalue = stext_content(sae[j]);
+                stextvalue = (String(stextvalue));
+                stagname = sae[j].tagName.toLowerCase();
+            }
+            if (sae[j].hasAttribute('role')) {
+                if (sae[j].getAttribute('role') === 'grid' && sae[j].tagName.toLowerCase() === 'div') {
+                    role = 'grid';
+                }
+            }
+            if (stagname.indexOf(':') != -1) {
+                stagname = stagname.replace(':', '');
+                stagname = 'custom' + stagname;
+            }
+            if (sname != '' && sname != 'undefined') {
+                snames = document.getElementsByName(sname);
+                if (snames.length > 1) {
+                    for (var k = 0; k < snames.length; k++) {
+                        if (sae[j] == snames[k]) {
+                            ssname = sname + '[' + k + ']'
+                        }
+                    }
+                } else {
+                    ssname = sname;
+                }
+            }
+            if (stagname != '' && stagname != 'undefined') {
+                stagnames = document.getElementsByTagName(stagname);
+                if (stagnames.length > 1) {
+                    for (var k = 0; k < stagnames.length; k++) {
+                        if (sae[j] == stagnames[k]) {
+                            sstagname = stagname + '[' + k + ']'
+                        }
+                    }
+                } else {
+                    sstagname = stagname;
+                }
+            }
+            if (sclassname != '' && sclassname != 'undefined') {
+                try {
+                    sclassnames = document.getElementsByClassName(sclassname);
+                    if (sclassnames.length > 1) {
+                        for (var k = 0; k < sclassnames.length; k++) {
+                            if (sae[j] == sclassnames[k]) {
+                                ssclassname = sclassname + '[' + k + ']'
+                            }
+                        }
+                    } else {
+                        ssclassname = sclassname;
+                    }
+                } catch (err) {
+                    console.log(sclassname);
+                    console.log("skipping this element: " + err);
+                }
+            }
+            if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {
+                if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {
+                    if (sname != '' && sname != 'undefined') {
+                        snames = document.getElementsByName(sname);
+                        if (snames.length > 1) {
+                            for (var k = 0; k < snames.length; k++) {
+                                if (sae[j] == snames[k]) {
+                                    stextvalue = sname + k;
+                                }
+                            }
+                        } else {
+                            stextvalue = sname;
+                        }
+                    } else if (sid != '' && sid != 'undefined') {
+                        stextvalue = sid;
+                    } else if (splaceholder != '' && splaceholder != 'undefined') {
+                        stextvalue = splaceholder;
+                    } else {
+                        var seles = document.getElementsByTagName(stagname);
+                        for (var k = 0; k < seles.length; k++) {
+                            if (sae[j] == seles[k]) {
+                                stextvalue = stagname + '_NONAME' + (k + 1);
+                            }
+                        }
+                    }
+                }
+                // capture label content of the element
+                function findLableForControl(ele) {
+                    try {
+                        var idVal = ele.id;
+                        labels = document.getElementsByTagName('label');
+                        if (labels.length !== 0) {
+                            for( var i = 0; i < labels.length; i++ ) {
+                                if (labels[i].htmlFor == idVal) {
+                                    return labels[i].textContent;
+                                }
+                            }
+                        }
+                        else {
+                            return null;
+                        }
+                    } catch (err) {
+                        console.log("skipping this element: " + err);
+                    }
+                }
+                if (slabel == '' || slabel == 'null' || slabel == 'undefined' || slabel == '0') {
+                    if (splaceholder != '' && splaceholder != 'undefined') {
+                        slabel = splaceholder;
+                    } else if (sae[j].nodeName.toLowerCase() == 'input' || sae[j].nodeName.toLowerCase() == 'select' || sae[j].nodeName.toLowerCase() == 'textarea' || sae[j].nodeName.toLowerCase() == 'progress' || sae[j].nodeName.toLowerCase() == 'meter') {
+                        slabel = findLableForControl(sae[j]);
+                    }
+                    if (sae[j].nodeName.toLowerCase() == 'input' && (slabel == null || slabel == '')) {
+                        if (sae[j].hasAttribute('value')) {
+                            slabel = sae[j].getAttribute('value');
+                        }
+                        else {
+                            slabel = null;
+                        }
+                    }
+                }
+
+                // capture css selector of the element
+                var sCssSelector = '';
+                function getElementCount(ele, tag) {
+                    try {
+                        let tagIndex = '';
+                        let arr = Array.from(ele.parentNode.children);
+                        let tagNameArr = [];
+                        for (i = 0; i < arr.length; i++) {
+                            let tag = arr[i].tagName.toLowerCase();
+                            tagNameArr.push(tag);
+                        }
+                        let count = tagNameArr.toString().match(new RegExp(tag, 'g')).length;
+                        if (count > 1) {
+                            let sib = ele.previousSibling, nth = 1;
+                            while((sib != null) && nth++) {
+                                if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                    nth--;
+                                }
+                                sib = sib.previousSibling;
+                            }
+                            tagIndex = ":nth-child("+nth+")";
+                        }
+                        return tagIndex;
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+                function getAttr(ele) {
+                    try {
+                        let arr = ['id','class','name','value','placeholder','title', 'href'];
+                        let nodes=[], values=[];
+                        for (var att, i = 0, atts = ele.attributes, n = atts.length; i < n; i++){
+                            att = atts[i];
+                            if (arr.includes(att.nodeName)) {
+                                nodes.push(att.nodeName);
+                                values.push(att.nodeValue);
+                            }
+                        }
+                        return [nodes, values];
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+                function getCssSelector(ele) {
+                    try {
+                        let selector = parentSelector = childSelector = '';
+                        let parentFlag = false;
+                        let tag = ele.nodeName.toLowerCase();
+                        if (ele != null && ele.attributes.length) {
+                            let [nodes, values] = getAttr(ele);
+                            for (let index=0; index < nodes.length; index++) {
+                                if (values[index] != '') {
+                                    if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
+                                        selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '') {
+                                childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
+                                parentFlag = true;
+                            }
+                            else if (selector == '' && nodes.length != 0 && values.slice(-1) == '') {
+                                if (childSelector == '' && nodes.length > 1 && nodes.slice(-1) == 'class') {
+                                    childSelector = `${tag}[${nodes[nodes.length-2]}="${values[values.length-2]}"]`;
+                                    parentFlag = true;
+                                }
+                                else {
+                                    let tagIndex = getElementCount(ele, tag);
+                                    if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                        selector = `${tag}${tagIndex}`;
+                                    }
+                                    else {
+                                        childSelector = `${tag}${tagIndex}`;
+                                        parentFlag = true;
+                                    }
+                                }
+                            }
+                            else if (selector == '' && childSelector == '') {
+                                let tagIndex = getElementCount(ele, tag);
+                                if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                    selector = `${tag}${tagIndex}`;
+                                }
+                                else {
+                                    childSelector = tag;
+                                    parentFlag = true;
+                                }
+                            }
+                        }
+                        else {
+                            let tagIndex = getElementCount(ele, tag);
+                            if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                selector = `${tag}${tagIndex}`;
+                            }
+                            else {
+                                childSelector = `${tag}${tagIndex}`;
+                                parentFlag = true;
+                            }
+                        }
+                        if (parentFlag) {
+                            let parentEle = ele.parentNode;
+                            while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
+                                let parentTag = parentEle.nodeName.toLowerCase();
+                                if (parentEle != null && parentEle.attributes.length) {
+                                    let [parentNodes, parentValues] = getAttr(parentEle);
+                                    for (let index=0; index < parentNodes.length; index++) {
+                                        if (parentValues[index] != '') {
+                                            if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                                parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                                selector = `${parentSelector} ${childSelector}`;
+                                                parentFlag = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (selector == '') {
+                                        if (document.querySelectorAll(`${parentTag} ${childSelector}`).length == 1) {
+                                            selector = `${parentTag} ${childSelector}`;
+                                            parentFlag = false;
+                                        }
+                                        else if (document.querySelectorAll(`${parentTag} ${childSelector}`).length > 1) {
+                                            let tagIndex = getElementCount(parentEle, parentTag);
+                                            if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                                selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                                parentFlag = false;
+                                            }
+                                            else {
+                                                parentEle = parentEle.parentNode;
+                                            }
+                                        }
+                                        else {
+                                            parentEle = parentEle.parentNode;
+                                        }
+                                    }
+                                    else {
+                                        parentFlag = false;
+                                    }
+                                }
+                                else {
+                                    let tagIndex = getElementCount(parentEle, parentTag);
+                                    if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                        selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                        parentFlag = false;
+                                    }
+                                    else {
+                                        parentEle = parentEle.parentNode;
+                                    }
+                                }
+                            }
+                        }
+                        return selector;
+                    } catch (err) {
+                        console.log("ERROR in get getCssSelector(): " + err);
+                    }
+                }
+                sCssSelector = getCssSelector(sae[j]);
+
+                // capture href of the element
+                var shref='';
+                function getHref(ele) {
+                    try {
+                        var href='';
+                        if (ele.hasAttribute('href')) {
+                            href = ele.getAttribute('href');
+                        }
+                        else {
+                            href = null;
+                        }
+                        return href
+                    } catch (err) {
+                        console.log("skipping this element: " + err);
+                    }
+                }
+                shref = getHref(sae[j]);
+
+                if (sid == '') {
+                    sid = 'null';
+                }
+                smultipleFlag = sae[j].hasAttribute('multiple');
+                sishidden = sisVisible(sae[j]);
+                if (sishidden == true || sishidden == 'True' || sishidden == 'true') {
+                    sishidden = 'No';
+                } else {
+                    sishidden = 'Yes';
+                }
+                var sfirstpass = 0;
+                var srpath = '';
+                var setype = sae[j].getAttribute('type');
+                setype = (String(setype)).toLowerCase();
+                for (var spath = ''; sae[j] && sae[j].nodeType == 1; sae[j] = sae[j].parentNode.host || sae[j].parentNode) {
+                    var spredicate = [];
+                    var ssiblings = sae[j].parentNode.children;
+                    var scount = 0;
+                    var sunique = false;
+                    var snewPath = '';
+                    var sidx = 0;
+                    for (var i = 0; ssiblings && (i < ssiblings.length); i++) {
+                        if (ssiblings[i].tagName == sae[j].tagName) {
+                            scount++;
+                            if (ssiblings[i] == sae[j]) {
+                                sidx = scount;
+                            }
+                        }
+                    }
+                    if (sidx == 1 && scount == 1) {
+                        sidx = null;
+                    }
+                    if (suseId && sae[j].id) {
+                        spredicate[spredicate.length] = '@id=' + '"' + sae[j].id + '"';
+                        sunique = true;
+                    }
+                    xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';
+                    sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';
+                    spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';
+                    spath = '/' + sae[j].tagName.toLowerCase() + xidx + spath;
+                    if (sfirstpass == 0) {
+                        if (sunique && srelative) {
+                            srpath = '//*' + sidx + spredicate + srpath;
+                            sfirstpass = 1;
+                        } else if (salesF) {
+                            srpath = '//' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;
+                        } else {
+                            srpath = '/' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;
+                        }
+                    }
+                }
+                var firstpass = 0;
+                var rpath1 = '';
+                if (parentele != 'null') {
+                    g = parentele;
+                    for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode) {
+                        var predicate1 = [];
+                        var siblings1 = g.parentNode.children;
+                        var count1 = 0;
+                        var unique1 = false;
+                        for (var i = 0; siblings1 && (i < siblings1.length); i++) {
+                            if (siblings1[i].tagName == g.tagName) {
+                                count1++;
+                                if (siblings1[i] == g) {
+                                    idx1 = count1;
+                                }
+                            }
+                        }
+                        if (idx1 == 1 && count1 == 1) {
+                            idx1 = null;
+                        }
+                        if (suseId && g.id) {
+                            predicate1[predicate1.length] = '@id=' + '"' + g.id + '"';
+                            unique1 = true;
+                        }
+                        xidx1 = (suseIdx && idx1) ? ('[' + idx1 + ']') : '';
+                        idx1 = (suseIdx && idx1 && !unique1) ? ('[' + idx1 + ']') : '';
+                        predicate1 = (predicate1.length > 0) ? ('[' + predicate1.join(' and ') + ']') : '';
+                        path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;
+                        if (firstpass == 0) {
+                            if (unique1 && srelative) {
+                                rpath1 = '//*' + idx1 + predicate1 + rpath1;
+                                firstpass = 1;
+                            } else {
+                                rpath1 = '/' + g.tagName.toLowerCase() + idx1 + predicate1 + rpath1;
+                            }
+                        }
+                    }
+                    spath = path1 + spath;
+                    srpath = rpath1 + srpath;
+                }
+                if (stagname == 'textarea') {
+                    stagname = 'input';
+                    stagtype = 'txtarea';
+                } else if (stagname == 'select' && smultipleFlag) {
+                    stagname = 'list';
+                    stagtype = 'lst';
+                } else if (stagname == 'select') {
+                    stagtype = 'select';
+                } else if (stagname == 'td' || stagname == 'tr') {
+                    stagname = 'tablecell';
+                    stagtype = 'tblcell';
+                } else if (stagname == 'a') {
+                    stagtype = 'lnk';
+                } else if (stagname == 'table') {
+                    stagtype = 'tbl';
+                } else if (stagname == 'img') {
+                    stagtype = 'img';
+                } else if (stagname == 'input' && setype == 'image') {
+                    stagname = 'img';
+                    stagtype = 'img';
+                }
+                if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {
+                    stagname = 'button';
+                    stagtype = 'btn';
+                } else if (stagname == 'input' && setype == 'radio') {
+                    stagname = 'radiobutton';
+                    stagtype = 'radiobtn';
+                } else if (stagname == 'input' && setype == 'checkbox') {
+                    stagname = 'checkbox';
+                    stagtype = 'chkbox';
+                } else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {
+                    stagname = 'input';
+                    stagtype = 'txtbox';
+                } else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {
+                    stagname = 'div';
+                    stagtype = 'elmnt';
+                } else if (stagname == 'button') {
+                    stagname = 'button';
+                    stagtype = 'btn';
+                } else if (stagname == 'lightning-combobox' || stagname == 'lightning-grouped-combobox') {
+                    stagtype = stagname;
+                    stagname = 'select';
+                }
+                if (role == 'grid') {
+                    stagname = 'grid';
+                    stagtype = 'grid';
+                }
+                if (salesF) {
+                    stextvalue = stagname + '_Salesforce' + ssalesforcecounter + '_sfc';
+                    ssalesforcecounter = ssalesforcecounter + 1;
+                }
+                stextvalue = stextvalue.replace(">", "");
+                stextvalue = stextvalue.replace("</", "");
+                stextvalue = stextvalue.replace("<", "");
+                stextvalue = stextvalue.replace("/>", "");
+                stextvalue = stextvalue.split("\\n").join("");
+                stextvalue = stextvalue.split("\\t").join("");
+                stextvalue = stextvalue.split("\\r").join("");
+                stextvalue = stextvalue.split("  ").join("");
+                stextvalue = stextvalue.split("\\u00a0").join("");
+                if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {
+                    stextvalue = 'NONAME' + snonamecounter;
+                    snonamecounter = snonamecounter + 1;
+                    scustname = stextvalue;
+                } else {
+                    scustname = stextvalue;
+                }
+                if (stagtype != '') {
+                    scustname = scustname + '_' + stagtype;
+                } else {
+                    scustname = scustname + '_elmnt';
+                }
+                coordinates = left + ';' + top + ';' + height + ';' + width;
+                coordinates = String(coordinates);
+                snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector;
+                sarr.push({
+                    'xpath': snewPath,
+                    'tag': stagname,
+                    'hiddentag': sishidden,
+                    'url': surl,
+                    'height': height,
+                    'width': width,
+                    'custname': scustname,
+                    'top': top,
+                    'left': left
+                });
+            }
+        }
+        return sarr;
+
+        function findCoordinates(element) {
+            height = element.offsetHeight;
+            width = element.offsetWidth;
+            top = 0;
+            left = 0;
+            do {
+                top += element.offsetTop || 0;
+                left += element.offsetLeft || 0;
+                element = element.offsetParent;
+            } while (element);
+        }
+
+        function sgetNodesOuter() {
+            var elementsarray = [];
+            scrapeOption = scrapeOption.toLowerCase();
+            if (scrapeOption === 'full') {
+                elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));
+                salele = document.getElementsByTagName('one-record-home-flexipage2');
+                salele1 = document.getElementsByTagName('records-lwc-detail-panel');
+                if (salele.length > 0) {
+                    for (var i = 0; i < salele.length; i++) {
+                        elementsarray = elementsarray.concat(HTMLCollectionToArray(salele[i].getElementsByTagName('*')));
+                    }
+                }
+                if (salele1.length > 0) {
+                    for (var i = 0; i < salele1.length; i++) {
+                        elementsarray = elementsarray.concat(HTMLCollectionToArray(salele1[i].getElementsByTagName('*')));
+                    }
+                }
+            } else if (scrapeOption === 'button') {
+                var array1 = HTMLCollectionToArray(document.getElementsByTagName('button'));
+                var temparray2 = HTMLCollectionToArray(document.getElementsByTagName('input'));
+                var array2 = [];
+                temparray2.forEach(function (element) {
+                    elementType = element.getAttribute('type');
+                    if (elementType) {
+                        elementType = elementType.toLowerCase();
+                        if (elementType == 'button' || elementType == 'submit' || elementType == 'reset' || elementType == 'file') array2.push(element);
+                    }
+                });
+                elementsarray.extend(array1);
+                elementsarray.extend(array2);
+            } else if (scrapeOption === 'checkbox' || scrapeOption === 'radiobutton') {
+                var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));
+                var array1 = [];
+                var typeCheck = scrapeOption === 'checkbox' ? 'checkbox' : 'radio';
+                temparray1.forEach(function (element) {
+                    elementType = element.getAttribute('type');
+                    if (elementType) {
+                        if (elementType.toLowerCase() == typeCheck) array1.push(element);
+                    }
+                });
+                elementsarray.extend(array1);
+            } else if (scrapeOption === 'textbox') {
+                var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));
+                var array1 = [];
+                var typeCheck = ["text", "email", "number", "password", "range", "search", "url"];
+                temparray1.forEach(function (element) {
+                    elementType = element.getAttribute('type');
+                    if (elementType) {
+                        if (typeCheck.indexOf(elementType.toLowerCase()) != -1) array1.push(element);
+                    }
+                });
+                elementsarray.extend(array1);
+            } else if (scrapeOption === 'dropdown' || scrapeOption === 'listbox') {
+                var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('select'));
+                var array1 = [];
+                var array2 = [];
+                temparray1.forEach(function (element) {
+                    if (element.hasAttribute('multiple')) {
+                        if (scrapeOption === 'listbox') array2.push(element);
+                    } else array1.push(element);
+                });
+                scrapeOption === 'dropdown' ? elementsarray.extend(array1) : elementsarray.extend(array2);
+            } else if (scrapeOption === 'image' || scrapeOption === 'link' || scrapeOption === 'table') {
+                var tagCheck = {
+                    "image": "img",
+                    "link": "a",
+                    "table": "table"
+                };
+                elementsarray = HTMLCollectionToArray(document.getElementsByTagName(tagCheck[scrapeOption]));
+            } else if (scrapeOption === 'grid') {
+                var array1 = HTMLCollectionToArray(document.getElementsByTagName('*'));
+                array1.forEach(function (element) {
+                    if (element.hasAttribute('role')) {
+                        if (element.getAttribute('role') === 'grid' && element.tagName.toLowerCase() === 'div') {
+                            elementsarray.push(element);
+                        }
+                    }
+                });
+            } else if (scrapeOption === 'element') {
+                var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('*'));
+                excludeTagList = ["button", "input", "select", "img", "a", "textarea", "table", "td", "tr"];
+                temparray1.forEach(function (element) {
+                    elementTagName = element.tagName;
+                    if (elementTagName) {
+                        if (excludeTagList.indexOf(elementTagName.toLowerCase()) == -1) elementsarray.push(element);
+                    }
+                });
+            } else if (scrapeOption == 'other tag') {
+                elementsarray = HTMLCollectionToArray(document.getElementsByTagName(scrapeOptionValue));
+            } else if (scrapeOption.toLowerCase() == 'select a section using xpath') {
+                elementsarray.push(scrapeOptionValue);
+                elementsarray.extend(HTMLCollectionToArray(scrapeOptionValue.getElementsByTagName('*')));
+            } else {
+                elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));
+            }
+            return elementsarray;
+        };
+
+        function HTMLCollectionToArray(x) {
+            for (var i = 0, a = []; i < x.length; i++) a.push(x[i]);
+            return a
+        };
+
+        function saddNodesOuter(sarray, scollection) {
+            for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {
+                sarray.push(scollection[i]);
+            }
+        };
+
+        function stext_content(f) {
+            var sfirstText = '';
+            var stextdisplay = '';
+            for (var z = 0; z < f.childNodes.length; z++) {
+                var scurNode = f.childNodes[z];
+                swhitespace = /^\s*$/;
+                if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {
+                    sfirstText = scurNode.nodeValue;
+                    stextdisplay = stextdisplay + sfirstText;
+                }
+            }
+            return (stextdisplay);
+        };
+    """
 
     """Javascript logic used in fullscrape operation with Visibility Flag"""
     javascript_fullscrape_Visiblity = """if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {	(function () {		function hasAttribute(attrName) {			return typeof this[attrName] !== 'undefined';		}		var inputs = document.getElementsByTagName('*');		for (var i = 0; i < inputs.length; i++) {			inputs[i].hasAttribute = hasAttribute;		}	}		());}if (!window.Element || !window.Element.prototype || !window.Element.prototype.getAttribute) {	(function () {		function getAttribute(attrName) {			return typeof this[attrName] !== 'undefined';		}		var inputs = document.getElementsByTagName('*');		for (var i = 0; i < inputs.length; i++) {			inputs[i].getAttribute = getAttribute;		}	}		());}(function () {	if (!document.getElementsByClassName) {		var indexOf = [].indexOf || function (prop) {			for (var i = 0; i < this.length; i++) {				if (this[i] === prop)					return i;			}			return -1;		};		getElementsByClassName = function (className, context) {			var elems = document.querySelectorAll ? context.querySelectorAll("." + className) : (function () {					var all = context.getElementsByTagName("*"),					elements = [],					i = 0;					for (; i < all.length; i++) {						if (all[i].className && (" " + all[i].className + " ").indexOf(" " + className + " ") > -1 && indexOf.call(elements, all[i]) === -1)							elements.push(all[i]);					}					return elements;				})();			return elems;		};		document.getElementsByClassName = function (className) {			return getElementsByClassName(className, document);		};		if (window.Element) {			window.Element.prototype.getElementsByClassName = function (className) {				return getElementsByClassName(className, this);			};		}	}})();var suseIdx = true;var suseId = true;var suseClass = true;var srelative = true;var sae = [];var sarr = [];var sele = [];var smyid = 0;var stextvalue = '';var stagname = 0;var sishidden = 0;var scustname = '';var smultipleFlag = false;var surl = arguments[0];var snonamecounter = 1;var txt_area_nonamecounter = 1;var select_nonamecounter = 1;var td_nonamecounter = 1;var a_nonamecounter = 1;var table_nonamecounter = 1;var input_nonamecounter = 1;var ssalesforcecounter = 1;var stagtype = '';var ssname = 'null';var sstagname = 'null';var ssclassname = 'null';var sclassname = 'null';var top = 0;var left = 0;var height = 0;var width = 0;var coordinates = '';var scrapeOption = arguments[1][0];var scrapeOptionValue;var salesF = false;if (arguments[1].length > 1)	scrapeOptionValue = arguments[1][1];var sisVisible = (function () {	function inside(schild, sparent) {		while (schild) {			if (schild === sparent)				return true;			schild = schild.parentNode;		}		return false;	};	return function (selem) {		if (document.hidden || selem.offsetWidth == 0 || selem.offsetHeight == 0 || selem.style.visibility == 'hidden' || selem.style.display == 'none' || selem.style.opacity === 0)			return false;		var srect = selem.getBoundingClientRect();		if (window.getComputedStyle || selem.currentStyle) {			var sel = selem,			scomp = null;			var sal = (selem.tagName.toLowerCase().indexOf('lightning') != -1);			while (sel) {				if (sel === document) {					break;				} else if (sel.nodeName == '#document-fragment') {					sel = sel.host;				} else if (!sel.parentNode)					return false;				if (sel instanceof(HTMLElement))					scomp = window.getComputedStyle ? window.getComputedStyle(sel, null) : sel.currentStyle;				if (scomp && (scomp.visibility == 'hidden' || scomp.display == 'none' || (typeof scomp.opacity !== 'undefined' && !(scomp.opacity > 0))))					return false;				sel = sel.parentNode;			}		}		return true;	}})();Array.prototype.extend = function (other_array) {	other_array.forEach(function (v) {		this.push(v)	}, this);};sae = sgetNodesOuter();for (var j = 0; j < sae.length; j++) {	stagtype = '';	ssname = 'null';	sstagname = 'null';	sid = sae[j].id;	sname = sae[j].name;	salttext = sae[j].alt;	splaceholder = sae[j].placeholder;	sclassname = sae[j].className;	sid = (String(sid));	sclassname = (String(sclassname));	sname = (String(sname));	splaceholder = (String(splaceholder));	stextvalue = stext_content(sae[j]);	stextvalue = (String(stextvalue));	stagname = sae[j].tagName.toLowerCase();	ssname = 'null';	sstagname = 'null';	ssclassname = 'null';	findCoordinates(sae[j]);	salesF = (sae[j].tagName.toLowerCase().indexOf('lightning') != -1);	if (stagname.indexOf(':') != -1) {		stagname = stagname.replace(':', '');		stagname = 'custom' + stagname;	}	if (sname != '' && sname != 'undefined') {		snames = document.getElementsByName(sname);		if (snames.length > 1) {			for (var k = 0; k < snames.length; k++) {				if (sae[j] == snames[k]) {					ssname = sname + '[' + k + ']'				}			}		} else {			ssname = sname;		}	}	if (stagname != '' && stagname != 'undefined') {		stagnames = document.getElementsByTagName(stagname);		if (stagnames.length > 1) {			for (var k = 0; k < stagnames.length; k++) {				if (sae[j] == stagnames[k]) {					sstagname = stagname + '[' + k + ']'				}			}		} else {			sstagname = stagname;		}	}	if (sclassname != '' && sclassname != 'undefined') {		try {			sclassnames = document.getElementsByClassName(sclassname);			if (sclassnames.length > 1) {				for (var k = 0; k < sclassnames.length; k++) {					if (sae[j] == sclassnames[k]) {						ssclassname = sclassname + '[' + k + ']'					}				}			} else {				ssclassname = sclassname;			}		} catch (err) {			console.log(sclassname);			console.log("skipping this element: " + err);		}	}	if (stagname != 'script' && stagname != 'meta' && stagname != 'html' && stagname != 'head' && stagname != 'style' && stagname != 'body' && stagname != 'form' && stagname != 'link' && stagname != 'noscript' && stagname != 'option' && stagname != '!' && stagname != 'code' && stagname != 'pre' && stagname != 'br' && stagname != 'animatetransform' && stagname != 'noembed') {		if (stextvalue == '' || stextvalue == 'null' || stextvalue == 'undefined' || stextvalue == '0') {			if (sname != '' && sname != 'undefined') {				snames = document.getElementsByName(sname);				if (snames.length > 1) {					for (var k = 0; k < snames.length; k++) {						if (sae[j] == snames[k]) {							stextvalue = sname + k;						}					}				} else {					stextvalue = sname;				}			} else if (sid != '' && sid != 'undefined') {				stextvalue = sid;			} else if (splaceholder != '' && splaceholder != 'undefined') {				stextvalue = splaceholder;			} else {				var seles = document.getElementsByTagName(stagname);				for (var k = 0; k < seles.length; k++) {					if (sae[j] == seles[k]) {						stextvalue = stagname + '_NONAME' + (k + 1);					}				}			}		}		if (sid == '') {			sid = 'null';		}		smultipleFlag = sae[j].hasAttribute('multiple');		sishidden = sisVisible(sae[j]);		if (sishidden == true || sishidden == 'True' || sishidden == 'true') {			sishidden = 'No';		} else {			sishidden = 'Yes';		}		var sfirstpass = 0;		var srpath = '';		var setype = sae[j].getAttribute('type');		setype = (String(setype)).toLowerCase();		for (var spath = ''; sae[j] && sae[j].nodeType == 1; sae[j] = sae[j].parentNode.host || sae[j].parentNode) {			var spredicate = [];			var ssiblings = sae[j].parentNode.children;			var scount = 0;			var sunique = false;			var snewPath = '';			var sidx = 0;			for (var i = 0; ssiblings && (i < ssiblings.length); i++) {				if (ssiblings[i].tagName == sae[j].tagName) {					scount++;					if (ssiblings[i] == sae[j]) {						sidx = scount;					}				}			}			if (sidx == 1 && scount == 1) {				sidx = null;			}			if (suseId && sae[j].id) {				spredicate[spredicate.length] = '@id=' + '"' + sae[j].id + '"';				sunique = true;			}			xidx = (suseIdx && sidx) ? ('[' + sidx + ']') : '';			sidx = (suseIdx && sidx && !sunique) ? ('[' + sidx + ']') : '';			spredicate = (spredicate.length > 0) ? ('[' + spredicate.join(' and ') + ']') : '';			spath = '/' + sae[j].tagName.toLowerCase() + xidx + spath;			if (sfirstpass == 0) {				if (sunique && srelative) {					srpath = '//*' + sidx + spredicate + srpath;					sfirstpass = 1;				} else if (salesF) {					srpath = '//' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;				} else {					srpath = '/' + sae[j].tagName.toLowerCase() + sidx + spredicate + srpath;				}			}		}		if (stagname == 'textarea') {			stagname = 'input';			stagtype = 'txtarea';		} else if (stagname == 'select' && smultipleFlag) {			stagname = 'list';			stagtype = 'lst';		} else if (stagname == 'select') {			stagtype = 'select';		} else if (stagname == 'td' || stagname == 'tr') {			stagname = 'tablecell';			stagtype = 'tblcell';		} else if (stagname == 'a') {			stagtype = 'lnk';		} else if (stagname == 'table') {			stagtype = 'tbl';		} else if (stagname == 'img') {			stagtype = 'img';		} else if (stagname == 'input' && setype == 'image') {			stagname = 'img';			stagtype = 'img';		}		if (stagname == 'input' && (setype == 'button' || setype == 'submit' || setype == 'reset' || setype == 'file')) {			stagname = 'button';			stagtype = 'btn';		} else if (stagname == 'input' && setype == 'radio') {			stagname = 'radiobutton';			stagtype = 'radiobtn';		} else if (stagname == 'input' && setype == 'checkbox') {			stagname = 'checkbox';			stagtype = 'chkbox';		} else if (stagname == 'input' && (setype == 'text' || setype == 'email' || setype == 'number' || setype == 'password' || setype == 'range' || setype == 'search' || setype == 'url')) {			stagname = 'input';			stagtype = 'txtbox';		} else if (stagname == 'input' && stagtype == '' && (setype == 'hidden' || setype == 'null')) {			stagname = 'div';			stagtype = 'elmnt';		} else if (stagname == 'button') {			stagname = 'button';			stagtype = 'btn';		} else if (stagname == 'lightning-combobox' || stagname == 'lightning-grouped-combobox') {			stagtype = stagname;			stagname = 'select';		}		if (salesF) {			stextvalue = stagname + '_Salesforce' + ssalesforcecounter + '_sfc';			ssalesforcecounter = ssalesforcecounter + 1;		}		stextvalue = stextvalue.replace(">", "");		stextvalue = stextvalue.replace("</", "");		stextvalue = stextvalue.replace("<", "");		stextvalue = stextvalue.replace("/>", "");		stextvalue = stextvalue.split("\\n").join("");		stextvalue = stextvalue.split("\\t").join("");		stextvalue = stextvalue.split("\\r").join("");		stextvalue = stextvalue.split("  ").join("");		stextvalue = stextvalue.split("\\u00a0").join("");		if (stextvalue == '' || stextvalue.length == 0 || stextvalue == '0') {			stextvalue = 'NONAME' + snonamecounter;			snonamecounter = snonamecounter + 1;			scustname = stextvalue;		} else {			scustname = stextvalue;		}		if (stagtype != '') {			scustname = scustname + '_' + stagtype;		} else {			scustname = scustname + '_elmnt';		}		coordinates = left + ';' + top + ';' + height + ';' + width;		coordinates = String(coordinates);		snewPath = String(srpath) + ';' + String(sid) + ';' + String(spath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + stextvalue;		if (sishidden === 'No') {			sarr.push({				'xpath': snewPath,				'tag': stagname,				'hiddentag': sishidden,				'url': surl,				'height': height,				'width': width,				'custname': scustname,				'top': top,				'left': left			});		}	}}return sarr;function findCoordinates(element) {	height = element.offsetHeight;	width = element.offsetWidth;	top = 0;	left = 0;	do {		top += element.offsetTop || 0;		left += element.offsetLeft || 0;		element = element.offsetParent;	} while (element);}function sgetNodesOuter() {	var elementsarray = [];	scrapeOption = scrapeOption.toLowerCase();	if (scrapeOption === 'full') {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));		salele = document.getElementsByTagName('one-record-home-flexipage2');		salele1 = document.getElementsByTagName('records-lwc-detail-panel');		if (salele.length > 0) {			for (var i = 0; i < salele.length; i++) {				elementsarray = elementsarray.concat(HTMLCollectionToArray(salele[i].getElementsByTagName('*')));			}		}		if (salele1.length > 0) {			for (var i = 0; i < salele1.length; i++) {				elementsarray = elementsarray.concat(HTMLCollectionToArray(salele1[i].getElementsByTagName('*')));			}		}	} else if (scrapeOption === 'button') {		var array1 = HTMLCollectionToArray(document.getElementsByTagName('button'));		var temparray2 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array2 = [];		temparray2.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				elementType = elementType.toLowerCase();				if (elementType == 'button' || elementType == 'submit' || elementType == 'reset' || elementType == 'file')					array2.push(element);			}		});		elementsarray.extend(array1);		elementsarray.extend(array2);	} else if (scrapeOption === 'checkbox' || scrapeOption === 'radiobutton') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array1 = [];		var typeCheck = scrapeOption === 'checkbox' ? 'checkbox' : 'radio';		temparray1.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				if (elementType.toLowerCase() == typeCheck)					array1.push(element);			}		});		elementsarray.extend(array1);	} else if (scrapeOption === 'textbox') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('input'));		var array1 = [];		var typeCheck = ["text", "email", "number", "password", "range", "search", "url"];		temparray1.forEach(function (element) {			elementType = element.getAttribute('type');			if (elementType) {				if (typeCheck.indexOf(elementType.toLowerCase()) != -1)					array1.push(element);			}		});		elementsarray.extend(array1);	} else if (scrapeOption === 'dropdown' || scrapeOption === 'listbox') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('select'));		var array1 = [];		var array2 = [];		temparray1.forEach(function (element) {			if (element.hasAttribute('multiple')) {				if (scrapeOption === 'listbox')					array2.push(element);			} else				array1.push(element);		});		scrapeOption === 'dropdown' ? elementsarray.extend(array1) : elementsarray.extend(array2);	} else if (scrapeOption === 'image' || scrapeOption === 'link' || scrapeOption === 'table') {		var tagCheck = {			"image": "img",			"link": "a",			"table": "table"		};		elementsarray = HTMLCollectionToArray(document.getElementsByTagName(tagCheck[scrapeOption]));	} else if (scrapeOption === 'element') {		var temparray1 = HTMLCollectionToArray(document.getElementsByTagName('*'));		excludeTagList = ["button", "input", "select", "img", "a", "textarea", "table", "td", "tr"];		temparray1.forEach(function (element) {			elementTagName = element.tagName;			if (elementTagName) {				if (excludeTagList.indexOf(elementTagName.toLowerCase()) == -1)					elementsarray.push(element);			}		});	} else if (scrapeOption == 'other tag') {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName(scrapeOptionValue));	} else if (scrapeOption.toLowerCase() == 'select a section using xpath') {		elementsarray.push(scrapeOptionValue);		elementsarray.extend(HTMLCollectionToArray(scrapeOptionValue.getElementsByTagName('*')));	} else {		elementsarray = HTMLCollectionToArray(document.getElementsByTagName('*'));	}	return elementsarray;};function HTMLCollectionToArray(x) {	for (var i = 0, a = []; i < x.length; i++)		a.push(x[i]);	return a};function saddNodesOuter(sarray, scollection) {	for (var i = 0; scollection && scollection.length && i < scollection.length; i++) {		sarray.push(scollection[i]);	}};function stext_content(f) {	var sfirstText = '';	var stextdisplay = '';	for (var z = 0; z < f.childNodes.length; z++) {		var scurNode = f.childNodes[z];		swhitespace = /^\s*$/;		if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {			sfirstText = scurNode.nodeValue;			stextdisplay = stextdisplay + sfirstText;		}	}	return (stextdisplay);};"""
@@ -394,6 +1161,9 @@ class WebScrape_Utils:
                 // }
                 var className = e.className;
                 var rpath = '';
+                var cpath = '';
+                var healedXpath = '';
+                debugger;
                 var firstpass = 0;
                 var role = 'null';
                 var svgTags = ['svg', 'circle', 'rect', 'ellipse', 'line', 'polygon', 'polyline', 'path', 'g', 'text', 'image', 'use'];
@@ -413,8 +1183,11 @@ class WebScrape_Utils:
                     else
                         var siblings = parentNode.children;
                     var count = 0;
+                    var xpathTag = ''
                     var unique = false;
+                    var isSizeZero = false;
                     for (var i = 0; siblings && (i < siblings.length); i++) {
+                        isSizeZero = isSizeZero||(siblings[i].getBoundingClientRect().height==0 && siblings[i].getBoundingClientRect().width==0);
                         if (siblings[i].tagName == e.tagName) {
                             count++;
                             if (siblings[i] == e) {
@@ -433,11 +1206,29 @@ class WebScrape_Utils:
                     idx = (useIdx && idx && !unique) ? ('[' + idx + ']') : '';
                     predicate = (predicate.length > 0) ? ('[' + predicate.join(' and ') + ']') : '';
                     if (svgTags.indexOf(e.tagName.toLowerCase()) !== -1) {
+                        xpathTag = '*[local-name()="' + e.tagName.toLowerCase() + '"]';
                         path = '/*[local-name()="' + e.tagName.toLowerCase() + '"]' + xidx + path;
                     } else if (e.tagName.toLowerCase() === 'foreignobject') {
+                        xpathTag = '*[local-name()="foreignObject"]';
                         path = '/*[local-name()="foreignObject"]' + xidx + path;
                     } else {
+                        xpathTag = e.tagName.toLowerCase();
                         path = '/' + e.tagName.toLowerCase() + xidx + path;
+                    }
+                    if (healedXpath==''){
+                        if (e.dynamicComponentType!=undefined){
+                            if (cpath[0]!='/' || cpath[1]!='/')
+                                cpath = '/' + cpath;
+                        }
+                        else if (isSizeZero)
+                            cpath = '/' + xpathTag + cpath;
+                        else
+                            cpath = '/' + xpathTag + xidx + cpath;
+
+                        var xres = document.evaluate('/'+cpath,document);
+                        xres.iterateNext();
+                        if (xres.iterateNext()==null)
+                            healedXpath = '/'+cpath
                     }
                     if (firstpass == 0) {
                         if (unique && relative) {
@@ -458,6 +1249,7 @@ class WebScrape_Utils:
                 }
                 var firstpass1 = 0;
                 var rpath1 = '';
+                var cpath1 = '';
                 if (parentele != 'null') {
                     g = parentele;
                     for (var path1 = ''; g && g.nodeType == 1; g = g.parentNode.host || g.parentNode) {
@@ -465,7 +1257,9 @@ class WebScrape_Utils:
                         var siblings1 = g.parentNode.children;
                         var count1 = 0;
                         var unique1 = false;
+                        isSizeZero = false;
                         for (var i = 0; siblings1 && (i < siblings1.length); i++) {
+                            isSizeZero = isSizeZero||(siblings[i].getBoundingClientReact().height==0 && siblings[i].getBoundingClientReact().width==0);
                             if (siblings1[i].tagName == g.tagName) {
                                 count1++;
                                 if (siblings1[i] == g) {
@@ -489,6 +1283,14 @@ class WebScrape_Utils:
                             path1 = '/*[local-name()="foreignObject"]' + xidx1 + path1;
                         } else {
                             path1 = '/' + g.tagName.toLowerCase() + xidx1 + path1;
+                            if (g.dynamicComponentType!=undefined)
+                                if (c1path[0]!='/' || c1path[1]!='/'){
+                                    cpath1 = '/' + cpath1;
+                            }
+                            else if (isSizeZero)
+                                cpath1 = '/' + g.tagName.toLowerCase() + cpath1;
+                            else
+                                cpath1 = '/' + g.tagName.toLowerCase() + xidx1 + cpath1;
                         }
                         if (firstpass1 == 0) {
                             if (unique1 && relative) {
@@ -506,6 +1308,7 @@ class WebScrape_Utils:
                         }
                     }
                     path = path1 + path;
+                    cpath = cpath1 + cpath;
                     rpath = rpath1 + rpath;
                 }
                 ishidden = isVisible(f);
@@ -769,38 +1572,164 @@ class WebScrape_Utils:
 
                     // capture css selector of the element
                     var cssSelector = '';
+                    function getElementCount(ele, tag) {
+                        try {
+                            let tagIndex = '';
+                            let arr = Array.from(ele.parentNode.children);
+                            let tagNameArr = [];
+                            for (i = 0; i < arr.length; i++) {
+                                let tag = arr[i].tagName.toLowerCase();
+                                tagNameArr.push(tag);
+                            }
+                            let count = tagNameArr.toString().match(new RegExp(tag, 'g')).length;
+                            if (count > 1) {
+                                let sib = ele.previousSibling, nth = 1;
+                                while((sib != null) && nth++) {
+                                    if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                        nth--;
+                                    }
+                                    sib = sib.previousSibling;
+                                }
+                                tagIndex = ":nth-child("+nth+")";
+                            }
+                            return tagIndex;
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                    function getAttr(ele) {
+                        try {
+                            let arr = ['id','class','name','value','placeholder','title', 'href'];
+                            let nodes=[], values=[];
+                            for (var att, i = 0, atts = ele.attributes, n = atts.length; i < n; i++){
+                                att = atts[i];
+                                if (arr.includes(att.nodeName)) {
+                                    nodes.push(att.nodeName);
+                                    values.push(att.nodeValue);
+                                }
+                            }
+                            return [nodes, values];
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
                     function getCssSelector(ele) {
                         try {
-                            let path = [];
-                            let parentEle = ele.parentNode;
-                            while (ele.nodeName.toLowerCase() != 'body') {
-                                let selector = ele.nodeName.toLowerCase();
-                                let arr = Array.from(ele.parentNode.children);
-                                let tagNameArr = [];
-                                for (i = 0; i < arr.length; i++) {
-                                    let tag = arr[i].tagName.toLowerCase();
-                                    tagNameArr.push(tag);
-                                }
-                                let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
-                                if (ele.id) {
-                                    selector += '#' + ele.id;
-                                }
-                                else if (count > 1) {
-                                    let sib = ele.previousSibling, nth = 1;
-                                    while((sib != null) && nth++) {
-                                        if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
-                                            nth--;
+                            let selector = parentSelector = childSelector = '';
+                            let parentFlag = false;
+                            let tag = ele.nodeName.toLowerCase();
+                            if (ele != null && ele.attributes.length) {
+                                let [nodes, values] = getAttr(ele);
+                                for (let index=0; index < nodes.length; index++) {
+                                    if (values[index] != '' && !(values[index].includes('AvoAssure'))) {
+                                        let elementCount = '';
+                                        if (nodes[index] == 'class') {
+                                            elementCount = document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length + document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]} AvoAssure_Highlight"]`).length;
                                         }
-                                        sib = sib.previousSibling;
+                                        else {
+                                            elementCount = document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length;
+                                        }
+                                        if (elementCount == 1) {
+                                            selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                            break;
+                                        }
                                     }
-                                    selector += ":nth-child("+nth+")";
                                 }
-                                path.unshift(selector);
-                                ele = ele.parentNode;
+                                if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '' && !(values.slice(-1)[0].includes('AvoAssure'))) {
+                                    childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
+                                    parentFlag = true;
+                                }
+                                else if (selector == '' && nodes.length != 0 && (values.slice(-1) == '' || !(values.slice(-1)[0].includes('AvoAssure')))) {
+                                    if (childSelector == '' && nodes.length > 1 && nodes.slice(-1) == 'class') {
+                                        childSelector = `${tag}[${nodes[nodes.length-2]}="${values[values.length-2]}"]`;
+                                        parentFlag = true;
+                                    }
+                                    else {
+                                        let tagIndex = getElementCount(ele, tag);
+                                        if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                            selector = `${tag}${tagIndex}`;
+                                        }
+                                        else {
+                                            childSelector = `${tag}${tagIndex}`;
+                                            parentFlag = true;
+                                        }
+                                    }
+                                }
+                                else if (selector == '' && childSelector == '') {
+                                    let tagIndex = getElementCount(ele, tag);
+                                    if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                        selector = `${tag}${tagIndex}`;
+                                    }
+                                    else {
+                                        childSelector = tag;
+                                        parentFlag = true;
+                                    }
+                                }
                             }
-                            return path.join(" > ");
+                            else {
+                                let tagIndex = getElementCount(ele, tag);
+                                if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                    selector = `${tag}${tagIndex}`;
+                                }
+                                else {
+                                    childSelector = `${tag}${tagIndex}`;
+                                    parentFlag = true;
+                                }
+                            }
+                            if (parentFlag) {
+                                let parentEle = ele.parentNode;
+                                while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
+                                    let parentTag = parentEle.nodeName.toLowerCase();
+                                    if (parentEle != null && parentEle.attributes.length) {
+                                        let [parentNodes, parentValues] = getAttr(parentEle);
+                                        for (let index=0; index < parentNodes.length; index++) {
+                                            if (parentValues[index] != '') {
+                                                if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                                    parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                                    selector = `${parentSelector} ${childSelector}`;
+                                                    parentFlag = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (selector == '') {
+                                            if (document.querySelectorAll(`${parentTag} ${childSelector}`).length == 1) {
+                                                selector = `${parentTag} ${childSelector}`;
+                                                parentFlag = false;
+                                            }
+                                            else if (document.querySelectorAll(`${parentTag} ${childSelector}`).length > 1) {
+                                                let tagIndex = getElementCount(parentEle, parentTag);
+                                                if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                                    selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                                    parentFlag = false;
+                                                }
+                                                else {
+                                                    parentEle = parentEle.parentNode;
+                                                }
+                                            }
+                                            else {
+                                                parentEle = parentEle.parentNode;
+                                            }
+                                        }
+                                        else {
+                                            parentFlag = false;
+                                        }
+                                    }
+                                    else {
+                                        let tagIndex = getElementCount(parentEle, parentTag);
+                                        if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                            selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                            parentFlag = false;
+                                        }
+                                        else {
+                                            parentEle = parentEle.parentNode;
+                                        }
+                                    }
+                                }
+                            }
+                            return selector;
                         } catch (err) {
-                            console.log("skipping this element: " + err);
+                            console.log("ERROR in get getCssSelector(): " + err);
                         }
                     }
                     cssSelector = getCssSelector(f);
@@ -824,7 +1753,8 @@ class WebScrape_Utils:
                     href = getHref(f);
 
                     //We will be using absolute xpath first as relative xpath has id that may change and incorrect element may get selected.
-                    newPath = String(path) + ';' + String(id) + ';' + String(rpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
+                    debugger;
+                    newPath = String(path) + ';' + String(id) + ';' + String(healedXpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + label + ';' + String(href) + ';' + cssSelector;
                     for (var i = 0; i < arr.length; i++) {
                         if (arr[i].xpath == newPath) {
                             uniqueFlag = true;
@@ -1305,38 +2235,157 @@ return (temp);"""
 
             // capture css selector of the element
             var sCssSelector = '';
+            function getElementCount(ele, tag) {
+                try {
+                    let tagIndex = '';
+                    let arr = Array.from(ele.parentNode.children);
+                    let tagNameArr = [];
+                    for (i = 0; i < arr.length; i++) {
+                        let tag = arr[i].tagName.toLowerCase();
+                        tagNameArr.push(tag);
+                    }
+                    let count = tagNameArr.toString().match(new RegExp(tag, 'g')).length;
+                    if (count > 1) {
+                        let sib = ele.previousSibling, nth = 1;
+                        while((sib != null) && nth++) {
+                            if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
+                                nth--;
+                            }
+                            sib = sib.previousSibling;
+                        }
+                        tagIndex = ":nth-child("+nth+")";
+                    }
+                    return tagIndex;
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+            function getAttr(ele) {
+                try {
+                    let arr = ['id','class','name','value','placeholder','title', 'href'];
+                    let nodes=[], values=[];
+                    for (var att, i = 0, atts = ele.attributes, n = atts.length; i < n; i++){
+                        att = atts[i];
+                        if (arr.includes(att.nodeName)) {
+                            nodes.push(att.nodeName);
+                            values.push(att.nodeValue);
+                        }
+                    }
+                    return [nodes, values];
+                } catch (err) {
+                    console.log(err);
+                }
+            }
             function getCssSelector(ele) {
                 try {
-                    let path = [];
-                    let parentEle = ele.parentNode;
-                    while (ele.nodeName.toLowerCase() != 'body') {
-                        let selector = ele.nodeName.toLowerCase();
-                        let arr = Array.from(ele.parentNode.children);
-                        let tagNameArr = [];
-                        for (i = 0; i < arr.length; i++) {
-                            let tag = arr[i].tagName.toLowerCase();
-                            tagNameArr.push(tag);
-                        }
-                        let count = tagNameArr.toString().match(new RegExp(selector, 'g')).length;
-                        if (ele.id) {
-                            selector += '#' + ele.id;
-                        }
-                        else if (count > 1) {
-                            let sib = ele.previousSibling, nth = 1;
-                            while((sib != null) && nth++) {
-                                if ((sib.nodeName.toLowerCase() == '#text') || (sib.nodeName.toLowerCase() == '#comment')) {
-                                    nth--;
+                    let selector = parentSelector = childSelector = '';
+                    let parentFlag = false;
+                    let tag = ele.nodeName.toLowerCase();
+                    if (ele != null && ele.attributes.length) {
+                        let [nodes, values] = getAttr(ele);
+                        for (let index=0; index < nodes.length; index++) {
+                            if (values[index] != '') {
+                                if (document.querySelectorAll(`${tag}[${nodes[index]}="${values[index]}"]`).length == 1) {
+                                    selector = `${tag}[${nodes[index]}="${values[index]}"]`;
+                                    break;
                                 }
-                                sib = sib.previousSibling;
                             }
-                            selector += ":nth-child("+nth+")";
                         }
-                        path.unshift(selector);
-                        ele = ele.parentNode;
+                        if (selector == '' && !parentFlag && nodes.length != 0 && values.slice(-1) != '') {
+                            childSelector = `${tag}[${nodes.slice(-1)}="${values.slice(-1)}"]`;
+                            parentFlag = true;
+                        }
+                        else if (selector == '' && nodes.length != 0 && values.slice(-1) == '') {
+                            if (childSelector == '' && nodes.length > 1 && nodes.slice(-1) == 'class') {
+                                childSelector = `${tag}[${nodes[nodes.length-2]}="${values[values.length-2]}"]`;
+                                parentFlag = true;
+                            }
+                            else {
+                                let tagIndex = getElementCount(ele, tag);
+                                if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                    selector = `${tag}${tagIndex}`;
+                                }
+                                else {
+                                    childSelector = `${tag}${tagIndex}`;
+                                    parentFlag = true;
+                                }
+                            }
+                        }
+                        else if (selector == '' && childSelector == '') {
+                            let tagIndex = getElementCount(ele, tag);
+                            if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                                selector = `${tag}${tagIndex}`;
+                            }
+                            else {
+                                childSelector = tag;
+                                parentFlag = true;
+                            }
+                        }
                     }
-                    return path.join(" > ");
+                    else {
+                        let tagIndex = getElementCount(ele, tag);
+                        if (document.querySelectorAll(`${tag}${tagIndex}`).length == 1) {
+                            selector = `${tag}${tagIndex}`;
+                        }
+                        else {
+                            childSelector = `${tag}${tagIndex}`;
+                            parentFlag = true;
+                        }
+                    }
+                    if (parentFlag) {
+                        let parentEle = ele.parentNode;
+                        while (parentFlag && parentEle.nodeName.toLowerCase() != 'body') {
+                            let parentTag = parentEle.nodeName.toLowerCase();
+                            if (parentEle != null && parentEle.attributes.length) {
+                                let [parentNodes, parentValues] = getAttr(parentEle);
+                                for (let index=0; index < parentNodes.length; index++) {
+                                    if (parentValues[index] != '') {
+                                        if (document.querySelectorAll(`${parentTag}[${parentNodes[index]}="${parentValues[index]}"] ${childSelector}`).length == 1) {
+                                            parentSelector = `${parentTag}[${parentNodes[index]}="${parentValues[index]}"]`;
+                                            selector = `${parentSelector} ${childSelector}`;
+                                            parentFlag = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (selector == '') {
+                                    if (document.querySelectorAll(`${parentTag} ${childSelector}`).length == 1) {
+                                        selector = `${parentTag} ${childSelector}`;
+                                        parentFlag = false;
+                                    }
+                                    else if (document.querySelectorAll(`${parentTag} ${childSelector}`).length > 1) {
+                                        let tagIndex = getElementCount(parentEle, parentTag);
+                                        if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                            selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                            parentFlag = false;
+                                        }
+                                        else {
+                                            parentEle = parentEle.parentNode;
+                                        }
+                                    }
+                                    else {
+                                        parentEle = parentEle.parentNode;
+                                    }
+                                }
+                                else {
+                                    parentFlag = false;
+                                }
+                            }
+                            else {
+                                let tagIndex = getElementCount(parentEle, parentTag);
+                                if (document.querySelectorAll(`${parentTag}${tagIndex} ${childSelector}`).length == 1) {
+                                    selector = `${parentTag}${tagIndex} ${childSelector}`;
+                                    parentFlag = false;
+                                }
+                                else {
+                                    parentEle = parentEle.parentNode;
+                                }
+                            }
+                        }
+                    }
+                    return selector;
                 } catch (err) {
-                    console.log("skipping this element: " + err);
+                    console.log("ERROR in get getCssSelector(): " + err);
                 }
             }
             sCssSelector = getCssSelector(element);
@@ -1475,7 +2524,7 @@ return (temp);"""
             }
             coordinates = left + ';' + top + ';' + height + ';' + width;
             coordinates = String(coordinates);
-            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector;
+            snewPath = String(spath) + ';' + String(sid) + ';' + String(srpath) + ';' + ssname + ';' + sstagname + ';' + ssclassname + ';' + coordinates + ';' + slabel + ';' + shref + ';' + sCssSelector + ';' + 'null' + ';' + stagname;
             sarr.push({
                 'xpath': snewPath,
                 'tag': stagname,

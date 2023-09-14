@@ -63,14 +63,16 @@ class Object_Mapper():
                 check_xpath_list = [i for i in xpath_string if i.strip()]
                 if len(check_xpath_list) == 0:
                     raise ValueError('xpath of the object is empty')
-                if len(xpath_string) == 3:
-                    left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
-                    right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
-                else:
-                    left_part = str(xpath_string[0])
-                    right_part = ';'.join(map(str,xpath_string[2:]))
-                decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
-                decryptedelementurl = self.coreutilsobj.scrape_unwrap(element['url'])
+                # if len(xpath_string) == 3:
+                #     left_part = self.coreutilsobj.scrape_unwrap(xpath_string[0])
+                #     right_part = self.coreutilsobj.scrape_unwrap(xpath_string[2])
+                # else:
+                #     left_part = str(xpath_string[0])
+                #     right_part = ';'.join(map(str,xpath_string[2:]))
+                # decryptedxpath = left_part + ';' + xpath_string[1] + ';' + right_part
+                decryptedxpath = element['xpath']
+                # decryptedelementurl = self.coreutilsobj.scrape_unwrap(element['url'])
+                decryptedelementurl = element['url']
                 identifiers = decryptedxpath.split(';')
 
                 # Locate the webelement
@@ -79,16 +81,21 @@ class Object_Mapper():
                 webElement = self.webscrapeutilsobj.locate_webelement(self.driver, identifiers)
                 if webElement is not None:
                     new_properties = self.driver.execute_script(self.webscrapeutilsobj.javascript_get_object_properties,webElement[0],decryptedelementurl)[0]
-                    if new_properties['xpath'] != decryptedxpath:
-                        # print "new: ",new_properties['xpath']
-                        # log.debug("changed object found")
+                    # removing coordinates from xpath for Anayze screen condition check
+                    new_properties_list = new_properties['xpath'].split(';')
+                    new_properties_list = new_properties_list[:6] + new_properties_list[10:]
+                    new_properties_xpath = ';'.join(map(str,new_properties_list))
+                    decryptedxpath_list = decryptedxpath.split(';')
+                    decryptedxpath_list = decryptedxpath_list[:6] + decryptedxpath_list[10:]
+                    decrypted_xpath = ';'.join(map(str,decryptedxpath_list))
+                    if new_properties_xpath != decrypted_xpath:
                         # Xpath Encryption logic implemented
                         new_properties['custname']=element['custname']
-                        new_properties['url'] = self.coreutilsobj.scrape_wrap(new_properties['url'])
-                        xpath_string = new_properties['xpath'].split(';')
-                        left_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[:2]))
-                        right_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[3:]))
-                        new_properties['xpath'] = left_part + ';' + xpath_string[2] + ';' + right_part
+                        # new_properties['url'] = self.coreutilsobj.scrape_wrap(new_properties['url'])
+                        # xpath_string = new_properties['xpath'].split(';')
+                        # left_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[:2]))
+                        # right_part = self.coreutilsobj.scrape_wrap(';'.join(xpath_string[3:]))
+                        # new_properties['xpath'] = left_part + ';' + xpath_string[2] + ';' + right_part
                         self.changedobjects.append(new_properties)
                         self.changedobjectskeys.append(count)
                     else:

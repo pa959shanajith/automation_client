@@ -31,7 +31,7 @@ import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
-    def fullscrape(self,scrape_option,window_handle_number,visiblity_status):
+    def fullscrape(self,scrape_option,window_handle_number,visiblity_status,tagfilter,xpathfilter,scenarioFlag):
         global currenthandle
         start_time = time.clock()
         data = {}
@@ -119,7 +119,7 @@ class Fullscrape():
                             tempne.extend(temp)
                         callback_fullscrape_frames(path, tempne)
                         callback_fullscrape_iframes(path, tempne)
-                    else:
+                    else:   
                         log.info('could not switch to iframe/frame %s', path)
 
             # scrape through iframes/frames iff OS is windows and scrape_option is not the xpath one
@@ -133,15 +133,21 @@ class Fullscrape():
             tempne = json.dumps(tempne)
             tempne = json.loads(tempne)
             new_obj=[]
+            new_obj_in_screen = []
             obj = CoreUtils()
             # XPath Encryption logic implemented
             for a in tempne:
-                a['url']= obj.scrape_wrap(a['url'])
+                # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
-                left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
-                right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
-                a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
-                new_obj.append(a)
+                # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
+                # right_part=obj.scrape_wrap(';'.join(xpath_string[3:]))
+                # a['xpath'] = left_part+';'+xpath_string[2]+';'+right_part
+                a['xpath'] = ';'.join(map(str,xpath_string))
+                
+                if ((tagfilter=={} and xpathfilter=={}) or (tagfilter.get(a['tag']) and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a))):
+                    new_obj.append(a)
+                if scenarioFlag and xpathfilter.get(xpath_string[0])==None and ((a['tag'] in ['button', 'a', 'table', 'tr', 'td', 'input', 'select']) or 'role' in a):
+                    new_obj_in_screen.append(a)
             tempne=new_obj
             log.info('json operations dumps and loads are performed on the return data')
             scrape_time = time.clock() - start_time
@@ -168,7 +174,14 @@ class Fullscrape():
                 scrapedin = 'EDGE CHROMIUM'
             data['scrapetype'] = 'fs'
             data['scrapedin'] = scrapedin
-            data['view'] = tempne
+            #collecting new elements for analyze screen and scenario impact analyzer.
+            if scenarioFlag:
+                filtered_data={}
+                filtered_data['new_obj_for_not_found']=tempne
+                filtered_data['new_obj_in_screen']=new_obj_in_screen
+                data['view']=filtered_data
+            else:    
+                data['view'] = tempne
             data['mirror'] = screen
             log.info('Creating a json object with key view with value as return data')
             with open(os.environ["AVO_ASSURE_HOME"] + '/output/domelements.json', 'w') as outfile:

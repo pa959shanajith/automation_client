@@ -90,6 +90,18 @@ class AzureWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating data')
+            
+    def modify_data(self,input_data, parent_name=""):
+        modified_data = []
+        for item in input_data:
+            current_name = f"{parent_name}/{item['name']}" if parent_name else item['name']
+            print(item["id"],current_name)
+            modified_data.append({"id": item["id"], "name": current_name})
+
+            if item["hasChildren"] and "children" in item and len(item["children"])>0 :
+                modified_data.extend(self.modify_data(item["children"], current_name))
+
+        return modified_data        
 
     def get_configure_fields(self,azure_input_dict,socket):
         """
@@ -119,18 +131,33 @@ class AzureWindow():
             project_name = azure_input_dict['project']
 
             # API endpoint URL for classification nodes
-            area_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/areas?$depth=2&api-version=6.1'
-            iteration_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/iterations?$depth=2&api-version=6.1'
+            area_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/areas?$depth=100&api-version=6.1'
+            iteration_url = f'{org_url}/{project_name}/_apis/wit/classificationnodes/iterations?$depth=100&api-version=6.1'
 
             response_area = requests.get(area_url, headers=headers)
             if response_area.status_code == 200:
                 data_area = response_area.json()
-                area_paths = [{'id':node['id'],'name':node['name']} for node in data_area['children']]
+                if 'children' in data_area and len(data_area['children']) > 0:
+                  area_paths.append({'id':data_area['id'],'name':data_area['name']})  
+                  for node in data_area['children']:
+                    grandparent_name = f"{data_area['name']}/{node['name']}"  
+                    area_paths.append({'id':node['id'],'name':grandparent_name})    
+                    if node['hasChildren'] and "children" in node and len(node["children"])>0 :
+                        child_data = self.modify_data(node["children"], grandparent_name)
+                        area_paths.extend(child_data)
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
                 data_iteration = response_iteration.json()
-                iteration_paths = [{'id':node['id'],'name':node['name']} for node in data_iteration['children']]
+                if 'children' in data_iteration and len(data_iteration['children']) > 0:
+                  iteration_paths.append({'id':data_iteration['id'],'name':data_iteration['name']})  
+                  for node in data_iteration['children']:
+                    grandparent_name = f"{data_iteration['name']}/{node['name']}"  
+                    iteration_paths.append({'id':node['id'],'name':grandparent_name})    
+                    if node['hasChildren'] and "children" in node and len(node["children"])>0 :
+                        child_data = self.modify_data(node["children"], grandparent_name)
+                        iteration_paths.extend(child_data)     
+
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
 
@@ -142,10 +169,13 @@ class AzureWindow():
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
+                    if details['name'] == 'State':
+                        details['allowedValues'] = ['New']
                     required_comp[details['name']] = details
                 required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
                 required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
-
+            if respon.status_code == 404:
+                required_comp['Error']={'status':404,'msg':'project not found'}
             socket.emit('configure_field',required_comp)
         except Exception as e:
             log.error(e)
@@ -224,7 +254,7 @@ class AzureWindow():
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/wiql?api-version=6.1'
 
             # WIQL query to fetch all user stories
-            wiql_query = "SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' ORDER BY [System.CreatedDate] DESC"
+            wiql_query = f"SELECT * FROM WorkItems WHERE [System.WorkItemType] = 'User Story' AND [System.TeamProject] = '{project_name}' ORDER BY [System.CreatedDate] DESC"
 
             # Request body with WIQL query
             body = {
@@ -293,13 +323,13 @@ class AzureWindow():
                             logger.print_on_console("Connection error occurred with:"+ endpoint_url)
                             time.sleep(2)
                         else:
-                            # break
                             if respon.status_code == 200:
                                 JsonObject = respon.json()
                                 if len(JsonObject)>0:
                                     res = {}
                                     res['userStories'] = JsonObject['value']
                                     res['total_count'] = total_count
+                            break
                     
                     except Exception as e:
                         log.error(e)
@@ -468,7 +498,11 @@ class AzureWindow():
                    res = {}
                    res['testcases'] = []
                    for details in JsonObject['value']:
-                    res['testcases'].append(details['workItem'])
+                    inputs = {
+                        'workItem':details['workItem'],
+                        'points': [i['id'] for i in details['pointAssignments']]
+                    }
+                    res['testcases'].append(inputs)
 
             # if(';' in org_url):
             #     log.debug('Connecting to JIRA through proxy')
@@ -511,6 +545,7 @@ class AzureWindow():
             # Azure DevOps organization URL
             org_url = azure_input_dict['url']
             project_name = azure_input_dict['info']['project']['text']
+            userstory_id = azure_input_dict['mappedId'] if 'mappedId' in azure_input_dict else ''
             type='Bug'
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitems/${type}?api-version=6.0'
 
@@ -521,7 +556,11 @@ class AzureWindow():
                 if isinstance(value['data'], dict):
                     data = value['data']['text']
                 elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
-                    data = f'{project_name}\\' + value['data']
+                    convert_str = value['data'].replace("/","\\")
+                    # if(project_name != convert_str):
+                    #    data = f'{project_name}\\' + convert_str
+                    # else:
+                    data = convert_str   
                 else:
                     data = value['data']
 
@@ -535,6 +574,20 @@ class AzureWindow():
                         "value": data
                     }
                 )
+            if 'mappedId' in azure_input_dict:
+                patch_document.append(
+                        {
+                            'op': 'add',
+                            'path': '/relations/-',
+                            'value': {
+                                'rel': 'System.LinkTypes.Hierarchy-Reverse',
+                                'url': f'{org_url}/{project_name}/_apis/wit/workitems/{userstory_id}',
+                                'attributes': {
+                                    'comment': 'Relates to'
+                                }
+                            }
+                        }
+                    )
             respon = requests.patch(endpoint_url, headers=headers, data=json.dumps(patch_document))
 
             if respon.status_code == 200:
@@ -560,3 +613,72 @@ class AzureWindow():
             else:
                 socket.emit('auto_populate','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
+
+    def update_azure_test_details(self,azure_input_dict):
+        """
+            Method to update executed test details to Azure (Azure Execution)
+        """
+        try:
+            pat = azure_input_dict['azurepat']
+            testplan_id = azure_input_dict['mapping_details']['TestPlanId']
+            testsuite_id = azure_input_dict['mapping_details']['TestSuiteId']
+            testpoint_id = azure_input_dict['mapping_details']['TestPoints']
+            test_status = azure_input_dict['status'] 
+            org_url = azure_input_dict['azureBaseUrl']
+
+            testpoint_id_flat_string = ','.join([str(num) for num in testpoint_id])
+
+                        
+            authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
+            headers = {
+                            'Accept': 'application/json',
+                            'Authorization': 'Basic '+authorization
+                        }
+            #finding user details before update
+            # org_name = azure_input_dict['azureOrgname']
+            users_endpoint = f'{org_url}/_apis/connectionData?connectOptions=includeServices&api-version=7.1-preview.1'
+                        
+            user_respon = requests.get(users_endpoint, headers=headers)
+            if user_respon.status_code == 200:
+                user_json = user_respon.json()
+
+            # Azure DevOps organization URL
+            project_name = azure_input_dict['mapping_details']['projectName']
+            endpoint_url = f'{org_url}/{project_name}/_apis/test/Plans/{testplan_id}/Suites/{testsuite_id}/points/{testpoint_id_flat_string}?api-version=7.0'
+            payload = {
+                    "outcome":test_status,
+                    "tester":{
+                        "id":user_json['authenticatedUser']['id'],
+                        "displayName":user_json['authenticatedUser']['providerDisplayName']
+                    }
+                    }
+            # Send request to API endpoint
+            respon = requests.patch(endpoint_url,json=payload, headers=headers)
+            if respon.status_code == 200:
+                logger.print_on_console(' azure devops test details updated successfully')
+                return 1
+            elif respon.status_code == 400:
+                logger.print_on_console('Bad Request')
+                return 0
+            elif respon.status_code == 401:
+                logger.print_on_console('Unauthorized user')
+                return 0
+            elif respon.status_code == 403:
+                logger.print_on_console('user does not have the necessary permissions to access')
+                return 0
+            elif respon.status_code == 404 :
+                logger.print_on_console('Source not found')
+                return 0
+            elif respon.status_code == 500 :
+                logger.print_on_console('Internal Server Error')
+                return 0
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                log.error('Invalid URL')
+            elif 'Unauthorized' in str(e):
+                log.error('Invalid Credentials')
+            else:
+                log.error(e,' Fail')
+            logger.print_on_console('Exception in updating test details in azure')
+            return 0

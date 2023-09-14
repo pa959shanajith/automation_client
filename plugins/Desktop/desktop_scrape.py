@@ -102,14 +102,14 @@ class ScrapeWindow(wx.Frame):
                     self.rbox = wx.RadioBox(self.panel,label = 'Capture options',  choices = lblList , pos = (20, 140), size = (300,60), style = wx.RA_SPECIFY_COLS)
                     self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 
-                    import cropandadd
+                    import cropandadd_manual
                     import cropandadd_auto
 
 
                     global cropandaddobj_manual
                     global cropandaddobj_auto
 
-                    cropandaddobj_manual = cropandadd.Cropandadd()
+                    cropandaddobj_manual = cropandadd_manual.Cropandadd()
                     cropandaddobj_auto = cropandadd_auto.Cropandadd()
                     self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(20, 210), size = (300, 30))
                     self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)

@@ -143,6 +143,7 @@ class Controller():
             if self.mobile_web_dispatcher_obj==None:
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
+                    core_utils.get_all_the_imports('Saucelabs')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
@@ -425,6 +426,10 @@ class Controller():
             self.status=index
         ellapsed_time=''
         statusflag = self.step_execution_status(tsp)
+        if tsp.name.lower() == "getparam" and tsp.step_description.lower() == DATA_PARAMETERIZATION_FAILED:
+            self.reporting_obj.overallstatus = TEST_RESULT_FAIL
+            status_percentage["total"] += 2
+            status_percentage["Fail"] += 2
         if ignore_stat:
             statusflag=True
         if keyword_flag:
@@ -793,7 +798,8 @@ class Controller():
                 self.pause_execution()
             # logger.print_on_console( 'Result in methodinvocation : ', teststepproperty.name,' : ',temp_result)
             log.info('Result in methodinvocation : '+ str(teststepproperty.name)+' : ')
-            log.info(result)
+            if keyword != 'secureGetData':
+                log.info(result)
             self.keyword_status=TEST_RESULT_FAIL
             if result!=TERMINATE:
                 self.store_result(result,teststepproperty)
@@ -1105,7 +1111,7 @@ class Controller():
         obj.clear_const_variables()
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,cicd_mode,aws_mode,browserno='0',threadName=''):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
         global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
@@ -1115,6 +1121,11 @@ class Controller():
         zephyr_url=''
         zephyr_apitoken=''
         zephyr_authtype=''
+
+        azure_password=''
+        azure_username=''
+        azure_url=''
+
         con = Controller()
         obj = handler.Handler()
         status=COMPLETED
@@ -1233,14 +1244,14 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        if(qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
+                        if("alm" in qc_creds and qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
                             qc_url=qc_creds['alm']['url']
                             qc_sceanrio_data=scenario['qcdetails'][integ]
                             integ += 1
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'qTest'):
-                        if(qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
+                        if("qtest" in qc_creds and qc_creds["qtest"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "qTest"):
                             qtest_username=qc_creds["qtest"]["username"]
                             qtest_password=qc_creds["qtest"]["password"]
                             qtest_url=qc_creds["qtest"]["url"]
@@ -1252,7 +1263,7 @@ class Controller():
                             qtest_suite=qtest_sceanrio_data['qtestsuite']
                             qtest_suiteid=qtest_sceanrio_data['qtestsuiteid']
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'Zephyr'):
-                        if(qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
+                        if("zephyr" in qc_creds and qc_creds["zephyr"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Zephyr"):
                             zephyr_url=qc_creds["zephyr"]["url"]
                             zephyr_username=qc_creds["zephyr"]["username"]
                             zephyr_password=qc_creds["zephyr"]["password"]
@@ -1266,6 +1277,21 @@ class Controller():
                             zephy_testid=zephyr_sceanrio_data['testid']
                             if 'parentid' in zephyr_sceanrio_data: zephyr_parentid=zephyr_sceanrio_data['parentid']
                             else: zephyr_parentid=''
+
+                        # Updating the azure variables to update the test case status
+                        if("azure" in qc_creds and qc_creds["azure"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ]["type"] == "Azure" and 'TestCaseId' in scenario['qcdetails'][integ]):
+                            azure_url=qc_creds["azure"]["url"]
+                            azure_username=qc_creds["azure"]["username"]
+                            azure_password=qc_creds["azure"]["password"]
+                            # azure_apitoken=qc_creds["azure"]["apitoken"]
+                            # azure_authtype=qc_creds["azure"]["authtype"]
+                            azure_sceanrio_data=scenario['qcdetails'][integ]
+                            integ += 1
+                            azure_test_plan_id=azure_sceanrio_data['TestPlanId']
+                            azure_test_suite_id=azure_sceanrio_data['TestSuiteId']
+                            azure_test_case_id=azure_sceanrio_data['TestCaseId']
+                            if 'parentid' in azure_sceanrio_data: azure_parentid=azure_sceanrio_data['parentid']
+                            else: azure_parentid=''
 
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
@@ -1428,7 +1454,8 @@ class Controller():
                                 time.sleep(5)
                                 import constants
                                 if constants.SCREENSHOT_PATH  not in ['screenshot_path', 'Disabled']:
-                                    path = constants.SCREENSHOT_PATH+json_data['suitedetails'][0]['projectname']+os.sep+json_data['suitedetails'][0]['releaseid']+os.sep+json_data['suitedetails'][0]['cyclename']+os.sep+datetime.now().strftime("%Y-%m-%d")+os.sep
+                                    path = os.path.join(constants.SCREENSHOT_PATH,json_data['suitedetails'][0]['projectname'],json_data['suitedetails'][0]['releaseid'],json_data['suitedetails'][0]['cyclename'],datetime.now().strftime("%Y-%m-%d"))
+                                    
                                     if not os.path.exists(path):
                                         os.makedirs(path)
                                     file_name = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -1653,6 +1680,39 @@ class Controller():
                             except Exception as e:
                                 log.error('Error in Updating Zephyr details '+str(e))
                                 logger.print_on_console('Error in Updating Zephyr details')
+                        
+                        # Azure - Updating the scenario status to the azure test case
+                        if len(scenario["qcdetails"]) > integ and 'azure' in qc_creds and qc_creds['azure']['url'] != '' and scenario['qcdetails'][integ]["type"] == "Azure" and 'TestCaseId' in scenario['qcdetails'][integ]:
+                            azure_status_over=report_json
+                            integ += 1
+                            try:
+                                azure_status = {}
+                                azure_status['azureaction']='azureupdate'
+                                azure_status['azurepat']=azure_password
+                                azure_status['azureBaseUrl']=azure_url
+                                azure_status['azure_username']=azure_username
+                                azure_status['mapping_details'] = scenario['qcdetails'][integ-1]
+                                azure_update_status=azure_status_over['overallstatus']
+                                if(azure_update_status.lower()=='pass'):
+                                    azure_status['status']='passed'
+                                elif(azure_update_status.lower()=='fail'):
+                                    azure_status['status']='failed'
+                                elif(azure_update_status.lower()=='terminate'):
+                                    azure_status['status']='failed'
+                                logger.print_on_console('****Updating Azure Details****')
+                                if azureObject is not None:
+                                    azure_update_status = azureObject.update_azure_test_details(azure_status)
+                                    if azure_update_status:
+                                        logger.print_on_console('****Updated Azure Details****')
+                                    else:
+                                        logger.print_on_console('****Failed to Update Azure Details****')
+                                else:
+                                    logger.print_on_console('****Failed to Update Azure Details****')
+                            except Exception as e:
+                                log.error('Error in Updating Azure details '+str(e))
+                                logger.print_on_console('Error in Updating Azure details')
+
+
                         if local_cont.module_stop:
                             break
                     else:
@@ -1853,7 +1913,7 @@ class Controller():
             logger.print_on_console("Exception in aws_report")
             log.error("Exception in aws_report. Error: " + str(e))
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,cicd_mode,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,azure_soc,cicd_mode,*args):
         status = COMPLETED
         global socket_object
         self.conthread=mythread
@@ -1876,9 +1936,9 @@ class Controller():
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
                 if self.execution_mode == SERIAL:
-                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,cicd_mode)
+                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,aws_mode,cicd_mode)
                 elif self.execution_mode == PARALLEL:
-                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,aws_mode,cicd_mode)
+                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,aws_mode,cicd_mode)
                 # Remove all the added custom handlers. Handler at 0 index is main one. So we start removing from 1st index.
                 for _ in range(len(log.root.handlers)-1):
                     log.root.handlers[1].writeManifest()

@@ -62,6 +62,12 @@ if args.execute:
         parser.error("For execution configuration key, executionListId, serverurl and serverport are mandatory")
 
 os.environ["AVO_ASSURE_HOME"] = os.path.normpath(args.AVO_ASSURE_HOME)
+os.environ["ANDROID_HOME"] = os.path.normpath(args.AVO_ASSURE_HOME) 
+os.environ["JAVA_HOME"] = os.path.normpath(args.AVO_ASSURE_HOME) + os.sep +'jre'
+os.environ["NODE_HOME"] = os.path.normpath(args.AVO_ASSURE_HOME) + os.sep +'avoAssureClient_Mobile'+ os.sep + 'node18'
+path_separator = ';'
+new_path = f"{os.environ.get('PATH', '')}{path_separator}{os.environ['NODE_HOME']}"
+os.environ['PATH'] = new_path
 os.environ['AVO_ASSURE_VERSION'] = ice_ver
 os.environ["ICE_CLEAR_STORAGE"] = os.getenv("ICE_CLEAR_STORAGE", "False")
 

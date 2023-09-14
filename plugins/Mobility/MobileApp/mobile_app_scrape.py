@@ -20,6 +20,7 @@ log = logging.getLogger('mobile_app_scrape.py')
 obj=android_scrapping.InstallAndLaunch()
 import core_utils
 from threading import Thread
+import json
 # cropandaddobj = None
 img=None
 from queue import Queue
@@ -34,10 +35,11 @@ class ScrapeWindow(wx.Frame):
 
 
     def __init__(self, parent,id, title,filePath,socketIO):
-        wx.Frame.__init__(self, parent, title=title, size=(190, 202), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX|wx.CLOSE_BOX))
+        wx.Frame.__init__(self, parent, title=title, size=(430, 180), style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER|wx.MAXIMIZE_BOX))#|wx.CLOSE_BOX))
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.wicon)
         self.core_utilsobject = core_utils.CoreUtils()
         self.parent = parent
         if (SYSTEM_OS != 'Darwin'):
@@ -104,24 +106,25 @@ class ScrapeWindow(wx.Frame):
                 self.max_y = size['height']*0.75
                 self.x_Value = size['width']*0.50
             self.panel = wx.Panel(self)
-            self.scrapedropdown = wx.ComboBox(self.panel, value="Full",pos=(12, 28), size=(87.5, 28),choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
+            self.startbutton = wx.Button(self.panel, label="Start Capture", pos=(120,28), size=(180, 28))
+            self.startbutton.Bind(wx.EVT_BUTTON, self.startClickAndAdd)
+            self.scrapedropdown = wx.ComboBox(self.panel, value="Full",pos=(22, 60), size=(180, 28),choices=self.scrapeoptions, style = wx.CB_DROPDOWN)
             self.scrapedropdown.SetEditable(False)
             self.scrapedropdown.SetToolTip(wx.ToolTip("selected objects will be scraped"))
             self.scrapedropdown.Bind(wx.EVT_COMBOBOX,self.OnFullscrapeChoice)
             
-            self.scrapebutton = wx.Button(self.panel, label="Scrape",pos=(100,28), size=(63, 28))
+            self.scrapebutton = wx.Button(self.panel, label="Capture",pos=(210,60), size=(180, 28))
             self.scrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-            self.swipedownbutton = wx.Button(self.panel, label="Swipe Down",pos=(12, 60), size=(150, 28))
+            self.swipedownbutton = wx.Button(self.panel, label="Swipe Down",pos=(22, 92), size=(180, 28))
             self.swipedownbutton.Bind(wx.EVT_BUTTON, self.swipedown)
-            self.swipeupbutton = wx.Button(self.panel, label="Swipe Up",pos=(12,92), size=(150, 28))
+            self.swipeupbutton = wx.Button(self.panel, label="Swipe Up",pos=(210,92), size=(180, 28))
             self.swipeupbutton.Bind(wx.EVT_BUTTON, self.swipeup)
-
             import mobile_crop_and_add
             self.cropandaddobj = mobile_crop_and_add.Cropandadd()
             self.queue = Queue()
-            self.irisbutton = wx.ToggleButton(self.panel, label="Start IRIS", pos=(12, 124), size=(150, 28))
-            self.irisbutton.Bind(wx.EVT_TOGGLEBUTTON, self.iris)
+            # self.irisbutton = wx.ToggleButton(self.panel, label="Start IRIS", pos=(12, 124), size=(150, 28))
+            # self.irisbutton.Bind(wx.EVT_TOGGLEBUTTON, self.iris)
             self.Centre()
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
@@ -244,7 +247,89 @@ class ScrapeWindow(wx.Frame):
             self.parent.schedule.Enable()
             self.Close()
             log.error(e, exc_info=True)
-        
+    
+    def startClickAndAdd(self,event):
+        state = event.GetEventObject().LabelText
+        if state == 'Start Capture':
+            # logger.print_on_console('Performing full scrape')
+            self.scrapebutton.Disable()       
+            self.scrapedropdown.Disable()
+            self.startbutton.SetLabel("Stop Capture")        
+            try:
+                if(self.selected_choice.lower()=="full"):
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    command = "npm start"
+                    self.process = subprocess.Popen(command, shell=True, cwd=folder_path)
+                else:
+                    logger.print_on_console("Fail to start Capture Element Screen")  
+            except Exception as e:
+                self.print_error("Error occurred in Capture Element")
+                self.parent.schedule.Enable()
+                self.Close()
+                log.error(e, exc_info=True)
+        else:      
+            try:
+                if(self.selected_choice.lower()=="full"):
+                    if self.process.poll() is None:
+                            subprocess.call(["taskkill", "/F", "/T", "/PID", str(self.process.pid)])
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    file_name = 'scraped_data.json'
+                    file_path = folder_path + os.sep + file_name
+
+                    with open(file_path) as file:
+                        # Step 2: Parse the JSON data
+                        capturedData = json.load(file)
+                    # 10 is the limit of MB set as per Avo Assure standards
+                    if capturedData is not None:
+                        if self.core_utilsobject.getdatasize(str(capturedData),'mb') < 10:
+                            self.socketIO.emit('scrape',capturedData)
+                            # Step 1: Open the JSON file in write mode
+                            with open(file_path, 'w') as file:
+                                # Step 2: Write an empty dictionary to the file
+                                json.dump({}, file)
+
+                        else:
+                            self.print_error('Error Ocurred in Capture Screen')
+                            self.socketIO.emit('scrape','Error Ocurred in Capture Screen')
+                    else:
+                        self.print_error('Error in Capturing')
+                        self.socketIO.emit('scrape','fail')
+                    self.parent.schedule.Enable()
+                    self.Close()
+                    log.info('Capturing Elements completed')
+                else:
+                    capturedData = obj.scrape()
+                    if capturedData is not None:
+                        new = {'view':[]}
+                        for i in capturedData:
+                            if i not in new:
+                                new[i] = capturedData[i]
+                        for i in range(len(capturedData['view'])):
+                            for j in self.classes[self.selected_choice.lower()]:
+                                if(capturedData['view'][i]['custname'].endswith(j)):
+                                    new['view'].append(capturedData['view'][i])
+                                    break
+                        if new["view"]==[]:
+                            self.print_error('Selected type of objects not found while scraping')
+                            self.socketIO.emit('scrape','fail')
+                        else:
+                            if self.core_utilsobject.getdatasize(str(new),'mb') < 10:
+                                self.socketIO.emit('scrape',new)
+                            else:
+                                self.print_error('Scraped data exceeds max. Limit.')
+                                self.socketIO.emit('scrape','Response Body exceeds max. Limit.')
+                    else:
+                        self.print_error('Error in scraping')
+                        self.socketIO.emit('scrape','fail')
+                    self.parent.schedule.Enable()
+                    self.Close()
+                    log.info('Selective scrape completed')
+            except Exception as e:
+                self.print_error("Error occurred in Capture Screen")
+                self.socketIO.emit('scrape','fail')
+                self.parent.schedule.Enable()
+                self.Close()
+                log.error(e, exc_info=True)
 
     def OnFullscrapeChoice(self,event):
         self.selected_choice = self.scrapedropdown.GetValue()
@@ -337,7 +422,7 @@ class MobileWindow():
         """
         try:
             adb_path = os.environ["AVO_ASSURE_HOME"] + "/platform-tools/adb.exe"
-            result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True)
+            result = subprocess.run([adb_path, 'devices'], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
             if result.returncode == 0:
                 output = result.stdout.strip()
                 devices = output.split('\n')[1:]
@@ -349,3 +434,21 @@ class MobileWindow():
         except Exception as e:
             socket.emit('get_serial_number', 'Error occurred in getting the serial number of connected device')
             logger.print_on_console("ADB command not found. Make sure ADB is installed and added to your system's PATH.")
+
+    def checking_mobile_client(self, socket):
+        """
+            Method to check Mobile Client Present in ICE or Not
+            related to android native scraping
+            Returns Mobile CLient is Present or not 
+        """
+        try:
+            folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'avoAssureClient_Mobile'
+            if os.path.exists(folder_path):
+                socket.emit('checking_Mobile_Client', 'true')
+            else:
+                logger.print_on_console('avoAssureClient_Mobile Folder is not Available in ICE package')
+                socket.emit('checking_Mobile_Client','false')
+                
+        except Exception as e:
+            socket.emit('checking_Mobile_Client', 'Error occurred in Finding Mobile Client')
+            logger.print_on_console("Please Check Mobile Client Folder in the ICE Package")

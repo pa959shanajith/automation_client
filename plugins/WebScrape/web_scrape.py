@@ -9,6 +9,7 @@ import time
 import objectspy
 import core_utils
 import readconfig
+import controller
 import logger
 import logging
 import json
@@ -26,11 +27,10 @@ checkWebPackage = None
 # Name: A sreenivaulu Date:02/08/2022
 # scraping is allowed for list of allowed_urls only if istrail=1  
 allowed_urls = readconfig.configvalues["sample_application_urls"]
-isTrial = readconfig.configvalues["isTrial"]
 
 class ScrapeWindow(wx.Frame):
 
-    def __init__(self, parent,id, title,browser,socketIO,action,data):
+    def __init__(self, parent, id, title, browser, socketIO, action, data):  #called in core #1646
         global checkWebPackage
         checkWebPackage = self.get_client_manifest()
         if SYSTEM_OS == 'Linux':
@@ -149,22 +149,32 @@ class ScrapeWindow(wx.Frame):
 
                     # Name : A sreenivasulu Date: 02/08/2022
                     # setting the URL from allowed_urls when istrail is true
-                    if isTrial:
+                    if readconfig.configvalues["isTrial"]:
                         self.navigateURL.SetValue(allowed_urls[0])
 
                 elif(self.action == 'compare'):
-                    try:
-                        browserops.driver.get(data['scrapedurl'])
-                    except:
-                        log.error("scrapedurl is Empty")
-                    self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
-                    self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
-                style = self.GetWindowStyle()
-                self.SetWindowStyle( style|wx.STAY_ON_TOP )
-                wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
-                screen_width, screen_height = wx.GetDisplaySize()
-                self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
-                self.Show()
+                    if (data.get('scenarioLevel')==True):
+                        screen = data['view']
+                        try:
+                            browserops.driver.get(screen['scrapedurl'])
+                        except:
+                            log.error("scrapedurl is Empty")
+                        self.compare(None)
+                        logger.print_on_console('Compared objects for '+screen['name']+'.')
+                    else:
+                        try:
+                            browserops.driver.get(data['scrapedurl'])
+                        except:
+                            log.error("scrapedurl is Empty")
+                        self.comparebutton = wx.ToggleButton(self.panel, label="Start Compare",pos=(110,80 ), size=(260, 30))
+                        self.comparebutton.Bind(wx.EVT_TOGGLEBUTTON, self.compare)
+                if (data.get('scenarioLevel')==None or data.get('scenarioLevel')==False):
+                    style = self.GetWindowStyle()
+                    self.SetWindowStyle( style|wx.STAY_ON_TOP )
+                    wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+                    screen_width, screen_height = wx.GetDisplaySize()
+                    self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
+                    self.Show()
             except Exception as e:
                 log.error(e)
                 self.parent.schedule.Enable()
@@ -195,7 +205,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
@@ -298,12 +308,45 @@ class ScrapeWindow(wx.Frame):
             logger.print_on_console('Click and add scrape  completed')
 
     def compare(self,event):
-        state = event.GetEventObject().GetValue()
-        if state == True:
+        if event!=None:
+            state = event.GetEventObject().GetValue()
+        if event==None or state == True:
             obj = objectspy.Object_Mapper()
-            event.GetEventObject().SetLabel("Comparing...")
-            self.comparebutton.Disable()
-            d = obj.perform_compare(self.data)
+            if event!=None:
+                event.GetEventObject().SetLabel("Comparing...")
+            if event!=None:
+                self.comparebutton.Disable()
+            if (self.data['scenarioLevel']):
+                currentScrapedData = self.data['view']
+
+            else:
+                currentScrapedData = self.data
+            
+            d = obj.perform_compare(currentScrapedData)  #self.data is the current scraped objects
+
+            if (self.data['scenarioLevel']):
+                d['orderlist']=currentScrapedData['orderlist']
+                
+            tagfilter = {}
+            for elem in d['view'][2]['notfoundobject']:
+                tagfilter[elem['tag']]=True
+            
+            core_obj=core_utils.CoreUtils()
+            xpathfilter = {}
+            for elem in currentScrapedData['view']:
+                # if len(elem['xpath'].split(';'))==3:    #xpath is encrypted
+                #     decry_abs_xpath = core_obj.scrape_unwrap(elem['xpath'].split(';')[0]).split(';')[0] 
+                #     xpathfilter[decry_abs_xpath] = True
+                # else:
+                #     xpathfilter[elem['xpath'].split(';')[0]] = True
+                xpathfilter[elem['xpath'].split(';')[0]] = True
+                
+            #Full scraping for scenario level impact analysis and analyze screen. Decided by scenario flag
+            fullScrapeData = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,tagfilter,xpathfilter,self.data['scenarioLevel'])
+            
+            d['view'].append({'newElements':fullScrapeData['view']})
+            logger.print_on_console('Full scrape completed for compare object.')
+
             if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
                 if  isinstance(d,str):
                     if d.lower() == 'fail':
@@ -323,7 +366,7 @@ class ScrapeWindow(wx.Frame):
         current_url = driver.current_url
         # Name: SN adiga Date:02/08/2022
         # conditional statements for check the browser current url in allowed urls list
-        if isTrial:
+        if readconfig.configvalues["isTrial"]:
             allowed = False
             for url in allowed_urls:
                 if url in driver.current_url:
@@ -410,7 +453,9 @@ class ScrapeWindow(wx.Frame):
             self.scrape_selected_option.append(self.fullscrapedropdown.GetValue().lower())
         if len(self.scrape_selected_option) > 1:
             logger.print_on_console("value is: ",self.scrape_selected_option[1])
-        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status)
+        
+        #Full scraping for normal. Passing filters as empty and scenario flag as
+        d = fullscrapeobj.fullscrape(self.scrape_selected_option,self.window_handle_number,visiblity_status,{},{}, False)
 
         '''Check the limit of data size as per Avo Assure standards'''
         if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:

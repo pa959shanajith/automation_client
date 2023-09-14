@@ -166,8 +166,8 @@ class StepDescription:
             return "Perform String operation MID on string '" + input+ "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def concatenate():
             return "Concatenate string '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
-        def numberFormatter():
-            return "Format value'"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
+        def numberformatter():
+            return "Format value '"+ input + "' and save the value '" + output + "' in '"+ tsp.outputval + "'"
         def find():
             return "Verify input string '"+ input + "' contains '"+ inputval[1] + "'"
         def replace():
@@ -966,6 +966,8 @@ class StepDescription:
             return 'Set attachment/attachments from the path '+"'"+input+"'"+' for the email and save the value in '+"'"+tsp_outputval+"'."
         def sendemail():
             return 'Send the email and save the value in '+"'"+tsp_outputval+"'."
+        def verifyattachmentcontent():
+            return 'Verify the attachment content of the file '+"'"+inputval[1]+"'"+' for the email '+"'"+inputval[0]+"'."
 
         #TextBox keywords( 5 keywords)
         def cleartext():

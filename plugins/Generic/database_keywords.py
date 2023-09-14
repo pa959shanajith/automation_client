@@ -392,6 +392,7 @@ class DatabaseOperation():
             status,result,value,err_msg=self.getData(ip,port,userName,decrypted_password,dbName,query,dbtype,temp)
         except Exception as e:
             err_msg = self.processException(e)
+        log.info('secureGetData keyword obtained result is: '+str(result))    
         return status,result,value,err_msg
 
     def verifyData(self, ip , port , userName , password, dbName, query, dbtype,inp_file,inp_sheet,*args):

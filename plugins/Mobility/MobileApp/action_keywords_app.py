@@ -70,7 +70,7 @@ class Action_Key_App():
                     cmd = adb + ' -s '+ device+' shell input text '+inp_val
                 else:
                     cmd = adb +' shell input text '+inp_val
-                s = subprocess.check_output(cmd.split())
+                s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
             elif(len(inputs)==2):
@@ -83,7 +83,7 @@ class Action_Key_App():
                                 cmd = adb + ' -s '+ device+send_values[inp_val]
                             else:
                                 cmd = adb +send_values[inp_val]
-                            s = subprocess.check_output(cmd.split())
+                            s = subprocess.check_output(cmd.split(), creationflags=subprocess.CREATE_NO_WINDOW)
                             input=input-1
                             if input < 1 :
                                 break
