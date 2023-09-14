@@ -257,7 +257,10 @@ class ScrapeWindow(wx.Frame):
             self.startbutton.SetLabel("Stop Capture")        
             try:
                 if(self.selected_choice.lower()=="full"):
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    if (SYSTEM_OS == 'Darwin'):
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile_MAC'
+                    else:
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     command = "npm start"
                     self.process = subprocess.Popen(command, shell=True, cwd=folder_path)
                 else:
@@ -271,8 +274,14 @@ class ScrapeWindow(wx.Frame):
             try:
                 if(self.selected_choice.lower()=="full"):
                     if self.process.poll() is None:
+                        if (SYSTEM_OS == 'Darwin'):
+                            subprocess.call(["kill", "-15", str(self.process.pid)])
+                        else:
                             subprocess.call(["taskkill", "/F", "/T", "/PID", str(self.process.pid)])
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    if (SYSTEM_OS == 'Darwin'):
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile_MAC'
+                    else:
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     file_name = 'scraped_data.json'
                     file_path = folder_path + os.sep + file_name
 
