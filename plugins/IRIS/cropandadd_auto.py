@@ -65,6 +65,7 @@ class Cropandadd():
 
             # New Changes
             import client
+            #predict_img=cv2.imread()
             box_dict=client.api_request().aimodel(im)
             image_orig = cv2.imread(test_img_path)
             #logger.print_on_console(box_dict)
@@ -105,7 +106,7 @@ class Cropandadd():
                     tag = 'constant'
                     RGB_img_crop = image_orig[elem[3]:elem[5],elem[2]:elem[4]]
 
-                    cv2.rectangle(image_orig, (elem[2],elem[3]), (elem[4], elem[5]),color=(0,255,0), thickness=2)
+                    cv2.rectangle(image_orig, (int(elem[2]),int(elem[3])), (int(elem[4]), int(elem[5])),color=(0,255,0), thickness=2)
 
                     cv2.imwrite(crop_img_path, RGB_img_crop)
                     with open(crop_img_path, "rb") as imageFile:
@@ -119,7 +120,7 @@ class Cropandadd():
                     tag = 'relative'
                     RGB_img_crop = image_orig[elem[3]:elem[5],elem[2]:elem[4]]
 
-                    cv2.rectangle(image_orig, (elem[2],elem[3]), (elem[4], elem[5]),color=(0,255,0), thickness=2)
+                    cv2.rectangle(image_orig, (int(elem[2]),int(elem[3])), (int(elem[4]), int(elem[5])),color=(0,255,0), thickness=2)
 
                     cv2.imwrite(crop_img_path, RGB_img_crop)
                     with open(crop_img_path, "rb") as imageFile:
@@ -238,11 +239,17 @@ class Cropandadd():
 
     def stopcropandadd(self):
         try:
+
+            #logger.print_on_console(self.data)
+
+
             log.debug('Inside stopcropandadd')
             im = PIL.ImageGrab.grab()
             out_path = TEMP_PATH + OS_SEP + "out.png"
             im.save(out_path)
             log.debug('out.png saved in '+TEMP_PATH+' folder')
+
+            #self.data['mirror']='no'
             with open(out_path, "rb") as imageFile:
                 self.data['mirror'] = base64.b64encode(imageFile.read()).decode('UTF-8').strip()
             os.remove(out_path)

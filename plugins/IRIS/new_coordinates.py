@@ -4,8 +4,8 @@ import logger
 
 def getting_new_coor(cord1,cord2):
 
-    logger.print_on_console(cord1)
-    logger.print_on_console(cord2)
+    # logger.print_on_console(cord1)
+    # logger.print_on_console(cord2)
  
 
 
