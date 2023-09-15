@@ -2436,6 +2436,8 @@ class IRISKeywords():
         text_sentence='True'
         verify_screen=args[0]
 
+        time.sleep(2)
+
         im_new = PIL.ImageGrab.grab()
 
         im_bytes_old = base64.b64decode(im_norm_old)
@@ -2449,10 +2451,6 @@ class IRISKeywords():
 
         global relativeCoordinates
         global verifyFlag
-
-        time.sleep(2)
-
-        
 
         width_new=im_new.size[0]
         height_new=im_new.size[1]
