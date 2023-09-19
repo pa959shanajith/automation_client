@@ -7,7 +7,7 @@ Created on Tue Dec  6 09:39:42 2022
 from __future__ import print_function
 import requests
 import json
-import jsonpickle
+#import jsonpickle
 import cv2
 import base64
 from io import BytesIO
