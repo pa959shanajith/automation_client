@@ -41,8 +41,8 @@ class api_request():
             im_b64 = base64.b64encode(im_bytes)
             response = requests.post(test_url, data=im_b64,verify = False , timeout = 120)
             logger.print_on_console(response.text)
-            coordinates=jsonpickle.decode(response.content)['coordinates']
-            #coordinates=json.loads(response.text)['coordinates']
+            #coordinates=jsonpickle.decode(response.content)['coordinates']
+            coordinates=json.loads(response.text)['coordinates']
             #logger.print_on_console(coordinates)
             log.info('server response is : '+str(response.status_code))
             return coordinates
