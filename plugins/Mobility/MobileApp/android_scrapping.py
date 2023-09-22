@@ -212,8 +212,6 @@ class InstallAndLaunch():
         output=OUTPUT_CONSTANT
         global device_keywords_object
         try:
-            # url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
-            # local_mak.driver = webdriver.Remote(command_executor=url, desired_capabilities=args[0])
             local_mak.driver.remove_app('com.projects.sharath.materialvision')
             log.info(local_mak.driver)
             log.info("APP UNINSTALLED")

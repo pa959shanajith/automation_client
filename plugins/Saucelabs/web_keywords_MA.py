@@ -80,24 +80,6 @@ class LaunchAndInstallSL():
         logger.print_on_console(e)
         return e
 
-    def installApplication(self, inputs_value, *args):
-        status = TEST_RESULT_FAIL
-        result = TEST_RESULT_FALSE
-        output = OUTPUT_CONSTANT
-        err_msg = None
-        driver = ''
-        try:
-            url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
-            local_mak.driver = webdriver.Remote(command_executor=url, desired_capabilities=args[0])
-            log.info(local_mak.driver)
-            log.info("APP INSTALLED")
-            status = TEST_RESULT_PASS
-            result = TEST_RESULT_TRUE
-        except Exception as e:
-            err_msg = self.print_error("Not able to install or launch application")
-            log.error(e,exc_info=True)    
-        return status, result, output, err_msg
-
 class Sauce_Config():
 
     def save_sauceconf(self,*args):

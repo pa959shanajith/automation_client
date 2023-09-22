@@ -240,17 +240,14 @@ class MobileDispatcher:
                     else:
                         if teststepproperty.name.lower() == "installapplication":
                             config = self.sauce_conf["mobile"]
+                            apkName = config['uploadedApk']
                             desired_caps = {}
                             desired_caps['platformName'] = config["platformName"]
                             desired_caps['appium:deviceName'] = config["deviceName"]
-                            # desired_caps['udid'] = config["deviceName"]
                             desired_caps['appium:platformVersion'] = config["platformVersion"]                           
-                            desired_caps['appium:app'] = 'storage:filename=codex.apk'  # The filename of the mobile app   
-                            # desired_caps['appium:app'] = 'storage:filename=mega.apk'  # The filename of the mobile app   
-                            desired_caps['appium:appPackage'] = 'com.projects.sharath.materialvision'
-                            desired_caps['appium:appActivity'] = 'com.projects.sharath.materialvision.Codex.MainActivity'         
-                            # desired_caps['appium:appPackage'] = 'mega.privacy.android.app'                           
-                            # desired_caps['appium:appActivity'] = 'mega.privacy.android.app.main.ManagerActivity'              
+                            desired_caps['appium:app'] = 'storage:filename=' + apkName['key']  # The filename of the mobile app      
+                            desired_caps['appium:appPackage'] = config["appPackageName"]
+                            desired_caps['appium:appActivity'] = config["apkDetails"][0]["activity"]                       
                             desired_caps['appium:deviceOrientation'] = 'portrait'
                             desired_caps['appium:automationName'] = 'UiAutomator2'
                             desired_caps['ignoreUnimportantViews'] = True
