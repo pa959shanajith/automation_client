@@ -308,7 +308,7 @@ class SaucelabWindow():
             auth = (username, access_key)
 
             response = requests.post(upload_url, files=files, auth=auth)
-            aapt_path = r'D:\Avo_Assure\ICE\AvoAssure\build-tools\33.0.1\aapt.exe'
+            aapt_path=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\aapt.exe"
             try:
                 result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], capture_output=True, text=True, check=True)
                 output = result.stdout
