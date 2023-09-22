@@ -561,6 +561,9 @@ class AzureWindow():
                     #    data = f'{project_name}\\' + convert_str
                     # else:
                     data = convert_str   
+                elif value['name'] == "Failed Retest" and value['data'].isdigit():
+                    convert_num = int(value['data'])
+                    data =  convert_num      
                 else:
                     data = value['data']
 
