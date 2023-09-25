@@ -95,7 +95,6 @@ class AzureWindow():
         modified_data = []
         for item in input_data:
             current_name = f"{parent_name}/{item['name']}" if parent_name else item['name']
-            print(item["id"],current_name)
             modified_data.append({"id": item["id"], "name": current_name})
 
             if item["hasChildren"] and "children" in item and len(item["children"])>0 :
@@ -145,6 +144,8 @@ class AzureWindow():
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
                         child_data = self.modify_data(node["children"], grandparent_name)
                         area_paths.extend(child_data)
+                elif 'id' in data_area and 'name' in data_area:
+                    area_paths.append({'id':data_area['id'],'name':data_area['name']})         
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
@@ -156,7 +157,9 @@ class AzureWindow():
                     iteration_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
                         child_data = self.modify_data(node["children"], grandparent_name)
-                        iteration_paths.extend(child_data)     
+                        iteration_paths.extend(child_data)
+                elif 'id' in data_iteration and 'name' in data_iteration:
+                    iteration_paths.append({'id':data_iteration['id'],'name':data_iteration['name']})             
 
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
