@@ -887,6 +887,16 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+        def on_logintobrowserstack(self,*args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('Browserstack')
+            import browserstackcontroller
+            obj = browserstackcontroller.BrowserstackWindow()
+            if args[0]['action'] == Browserstack_ACTION_1:
+                data = args[0]
+                obj.get_webconf_details(data,socketIO)        
+
     def on_update_screenshot_path(self,*args):
         if root.gui: benchmark.init(args[1], socketIO)
         intv = 120000

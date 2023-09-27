@@ -47,6 +47,7 @@ pause_flag=False
 iris_constant_step = -1
 socket_object = None
 saucelabs_count = 0
+browserstack_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -196,6 +197,7 @@ class Controller():
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             core_utils.get_all_the_imports('Saucelabs')
+            core_utils.get_all_the_imports('Browserstack')
             core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
             import web_accessibility_testing
@@ -1112,7 +1114,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
-        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
+        global terminate_flag, status_percentage, browserstack_count,saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1359,7 +1361,30 @@ class Controller():
                             sc_idx+=1
                             execute_flag=False
                         execution_env = json_data.get('exec_env', 'default').lower()
-                        if execution_env == 'saucelabs':
+
+                         if execution_env == 'browserstack':
+                            # self.__load_web()
+                            # import script_generator
+                            scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            core_utils.get_all_the_imports('Browserstack')
+                            import browserstack_web_keywords
+                            s = ''
+                            browserstack_details = {
+                                'browserstack_username': json_data['browserstack_username'],
+                                'browserstack_access_key': json_data['browserstack_access_key'],
+                            }
+                            if(json_data['apptype'] == 'Web'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['osVersion'] = json_data['osVersion']
+                                browserstack_details['os'] = json_data['os']
+                                browserstack_details['browserName'] = json_data['browserName']
+                                browserstack_details['browserVersion'] = json_data['browserVersion']
+
+                            s.save_browserstackconf(browserstack_details)
+                            execution_env = {'env': 'browserstack','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
+                            now=datetime.now()
+
+                        elif execution_env == 'saucelabs':
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
@@ -1442,7 +1467,14 @@ class Controller():
                             if len(accessibility_reports) > 0:
                                 execute_result_data["accessibility_reports"] = accessibility_reports
                             execute_result_data['report_type'] = report_type
-                            if execution_env['env'] == 'saucelabs':
+                            if execution_env['env'] == 'browserstack':
+                                browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                self.__load_web()
+                                import browserstack_web_keywords
+                                self.obj = browserstack_web_keywords.Browserstack_config()
+                                self.obj.get_browserstackconf()
+                                time.sleep(5)
+                            elif execution_env['env'] == 'saucelabs':
                                 browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
                                 self.__load_web()
                                 import web_keywords
