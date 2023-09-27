@@ -1727,11 +1727,11 @@ class Main():
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Desktop-Element Identification",filePath = browsername,socketIO = socketIO)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SAP-Element Identification",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
                 oebsScrapeFlag=False
@@ -1749,7 +1749,7 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
+                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification > To <Element Identification>
                     # changed  on Date:08/07/2022
                     # Author : sreenivasulu
                     cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Element Identification",browser = browsername,socketIO = socketIO,action=action,data=data)

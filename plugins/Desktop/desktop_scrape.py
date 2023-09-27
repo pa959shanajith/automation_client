@@ -35,10 +35,15 @@ class ScrapeWindow(wx.Frame):
         try:
             wx.Frame.__init__(self, parent, title = title,
                        pos = (300, 150), size = (360, 310), style = wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.CLOSE_BOX) )
-            self.SetBackgroundColour('#e6e7e8')
+            self.SetBackgroundColour('#ffffff')
             self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
+            self.start_clickandadd_img = wx.Image(os.environ["IMAGES_PATH"] +"/start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.stop_clickandadd_img = wx.Image(os.environ["IMAGES_PATH"] +"/stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.capture_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/desktop_capture.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.startiris_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.stopiris_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
             global obj
             obj = desktop_launch_keywords.Launch_Keywords()
             self.socketIO = socketIO
@@ -78,7 +83,8 @@ class ScrapeWindow(wx.Frame):
                 if ( status != TERMINATE ):
                     self.panel = wx.Panel(self)
                     self.vsizer = wx.BoxSizer(wx.VERTICAL)
-                    self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos = (20, 20), size = (300, 30))
+                    self.startbutton_label = wx.StaticText((self.panel), label='Click and Add', pos = (20, 22), name='Click and Add')
+                    self.startbutton = wx.BitmapToggleButton(self.panel, label = self.start_clickandadd_img, pos = (175, 20), size = (145, 30))
                     self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
                     self.startbutton.SetToolTip(wx.ToolTip( "Elements will be scraped via Click and Add method." ))
 
@@ -86,10 +92,10 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapedropdown.SetEditable(False)
                     self.fullscrapedropdown.SetToolTip(wx.ToolTip( "Full objects will be scraped" ))
 
-                    self.fullscrapebutton = wx.Button(self.panel, label = "Scrape", pos = (175, 60), size = (145, 30))
+                    self.fullscrapebutton = wx.BitmapButton(self.panel, bitmap = self.capture_button_img, pos = (175, 60), size = (145, 30))
                     self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-                    self.visibilityCheck = wx.CheckBox(self.panel, label = "Visibility", pos = (20,100), size = (80, 30))
+                    self.visibilityCheck = wx.CheckBox(self.panel, label = "Visible Elements", pos = (20,100))
                     self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
                     self.delaytext=wx.StaticText(self.panel, label="Delay", pos=(175,100), size=(40,30), style=0, name="")
@@ -99,7 +105,7 @@ class ScrapeWindow(wx.Frame):
                     #radio buttons
                     
                     lblList = ['Manual', 'Auto']
-                    self.rbox = wx.RadioBox(self.panel,label = 'Capture options',  choices = lblList , pos = (20, 140), size = (300,60), style = wx.RA_SPECIFY_COLS)
+                    self.rbox = wx.RadioBox(self.panel,label = 'Capture options',  choices = lblList , pos = (20, 140), size = (300,65), style = wx.RA_SPECIFY_COLS)
                     self.rbox.Bind(wx.EVT_RADIOBOX,self.onRadioBox)
 
                     import cropandadd_manual
@@ -111,7 +117,8 @@ class ScrapeWindow(wx.Frame):
 
                     cropandaddobj_manual = cropandadd_manual.Cropandadd()
                     cropandaddobj_auto = cropandadd_auto.Cropandadd()
-                    self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(20, 210), size = (300, 30))
+                    self.startbutton_label = wx.StaticText((self.panel), label='IRIS Capture', pos = (20, 212), name='IRIS Capture')
+                    self.cropbutton = wx.BitmapToggleButton(self.panel, label = self.startiris_button_img, pos=(175, 210), size = (145, 30))
                     self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                     self.Centre()
                     style = self.GetWindowStyle()
@@ -155,7 +162,7 @@ class ScrapeWindow(wx.Frame):
                     self.visibilityCheck.Disable()
                     self.cropbutton.Disable()
                     desktop_scraping_obj.clickandadd('STARTCLICKANDADD', self)
-                    event.GetEventObject().SetLabel("Stop ClickAndAdd")
+                    self.startbutton.SetBitmapLabel(self.stop_clickandadd_img)
                     logger.print_on_console( 'click and add initiated, select the elements from AUT' )
 
                 else:
