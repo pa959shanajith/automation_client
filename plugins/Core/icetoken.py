@@ -153,7 +153,7 @@ class Token_window(wx.Frame):
             # SN Adiga 07-Aug-2022: Show registration window if auto registration failure
             # A sreenivasulu , auto registration is required for servicelevel = 2(means trinee registration)
             # licenectype = 1(means trial), 2(means trinee), 3(starter),4(enterprise)
-            if configvalues.get('isTrial') or configvalues.get("servicelevel") == 2:
+            if configvalues.get('isTrial') or configvalues.get("licensetype") == 2:
                 res = self.auto_registration()
                 if (res == False) or (res == None):
                     self.Show()

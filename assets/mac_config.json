@@ -48,5 +48,5 @@
     "use_custom_debugport": "No",
     "element_load_timeout": "30",
     "verify_wait_time": "60",
-    "servicelevel" : 0
+    "licensetype":  4
 }
