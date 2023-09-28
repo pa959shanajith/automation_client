@@ -32,16 +32,10 @@ windownametoscrape = ''
 class ScrapeDispatcher(wx.Frame):
     def __init__(self, parent,id, title,filePath,socketIO):
         wx.Frame.__init__(self, parent, title=title,
-                   pos=(300, 150),  size=(360, 310) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
+                   pos=(300, 150),  size=(210, 180) ,style = wx.CAPTION|wx.CLIP_CHILDREN )
         self.SetBackgroundColour('#e6e7e8')
         self.iconpath = os.environ["IMAGES_PATH"] + "/avo.ico"
         self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
-        self.SetIcon(self.wicon)
-        self.start_clickandadd_img = wx.Image(os.environ["IMAGES_PATH"] +"/start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.stop_clickandadd_img = wx.Image(os.environ["IMAGES_PATH"] +"/stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.capture_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/desktop_capture.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.startiris_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.stopiris_button_img = wx.Image(os.environ["IMAGES_PATH"] +"/stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         global obj
         obj = oebs_utils.Utils()
         self.utils_obj=oebs_utils.Utils()
@@ -55,7 +49,6 @@ class ScrapeDispatcher(wx.Frame):
         self.img_path = AVO_ASSURE_HOME + OS_SEP + 'output' + OS_SEP +'oebs_form.png'
         global windownametoscrape
         windownametoscrape = filePath
-        scrape_pop_window = False
         self.socketIO = socketIO
         windowname=filePath
         input_val=[]
@@ -67,19 +60,18 @@ class ScrapeDispatcher(wx.Frame):
         if ( status!=TERMINATE and status ):
             self.panel = wx.Panel(self)
             self.vsizer = wx.BoxSizer(wx.VERTICAL)
-            self.startbutton_label = wx.StaticText((self.panel), label='Click and Add', pos = (20, 22), name='Click and Add')
-            self.startbutton = wx.BitmapToggleButton(self.panel, label = self.start_clickandadd_img, pos = (175, 20), size = (145, 30))
+            self.startbutton = wx.ToggleButton(self.panel, label = "Start ClickAndAdd", pos = (12, 18), size = (175, 25))
             self.startbutton.Bind(wx.EVT_TOGGLEBUTTON, self.clickandadd)
             self.startbutton.SetToolTip(wx.ToolTip( "Elements will be scraped via Click and Add method." ))
 
-            self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (20, 65), size = (145, 30), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
+            self.fullscrapedropdown = wx.ComboBox(self.panel, value = "Full", pos = (12, 48), size = (87.5, 25), choices = self.scrapeoptions, style = wx.CB_DROPDOWN)
             self.fullscrapedropdown.SetEditable(False)
             self.fullscrapedropdown.SetToolTip(wx.ToolTip( "Elements will be scraped via Full Scrape method." ))
 
-            self.fullscrapebutton = wx.BitmapButton(self.panel, bitmap = self.capture_button_img, pos = (175, 65), size = (145, 30))
+            self.fullscrapebutton = wx.Button(self.panel, label = "Scrape", pos = (101, 48), size = (86, 25))
             self.fullscrapebutton.Bind(wx.EVT_BUTTON, self.fullscrape)
 
-            self.visibilityCheck = wx.CheckBox(self.panel, label = "Visible Elements", pos = (20,100))
+            self.visibilityCheck = wx.CheckBox(self.panel, label = "Visibility", pos = (12,78), size = (60, 25))
             self.visibilityCheck.Bind(wx.EVT_CHECKBOX, self.visibility)
 
             self.delaytext=wx.StaticText(self.panel, label="Delay", pos=(104,83), size=(30,25), style=0, name="")
@@ -89,8 +81,7 @@ class ScrapeDispatcher(wx.Frame):
 
             global cropandaddobj
             cropandaddobj = cropandadd.Cropandadd()
-            self.startbutton_label = wx.StaticText((self.panel), label='IRIS Capture', pos = (20, 212), name='IRIS Capture')
-            self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos = (20, 140), size = (300,65))
+            self.cropbutton = wx.ToggleButton(self.panel, label = "Start IRIS", pos=(12, 108), size = (175, 25))
             self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
             self.Centre()
             style = self.GetWindowStyle()
