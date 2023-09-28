@@ -1752,7 +1752,7 @@ class Main():
                     # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
                     # changed  on Date:08/07/2022
                     # Author : sreenivasulu
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Element Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="AvoAssure Object Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation
