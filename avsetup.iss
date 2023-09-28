@@ -48,7 +48,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: ".\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "C:\Avo\configTrial.json"; DestName:config.json;  DestDir: "{app}\Avoassure\assets"; 
+;Source: "C:\Avo\configTrial.json"; DestName:config.json;  DestDir: "{app}\Avoassure\assets"; 
 ;Source: "C:\Avo\updateICEConfig.ps1"; DestDir: "{app}"; 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
