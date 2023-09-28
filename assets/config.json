@@ -43,6 +43,7 @@
     "server_cert": "./assets/CA_BUNDLE/server.crt",
     "server_ip": "localhost",
     "server_port": "443",
+    "servicelevel": 0,
     "stepExecutionWait": "0.1",
     "timeOut": "1",
     "tls_security": "Low",
