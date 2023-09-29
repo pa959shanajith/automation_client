@@ -20,6 +20,7 @@ from constants import *
 from mobile_app_constants import *
 import logger, subprocess, socket, base64, platform, logging
 import device_keywords
+import web_keywords_MA
 from appium import webdriver
 log = logging.getLogger('android_scrapping.py')
 
@@ -49,6 +50,9 @@ class InstallAndLaunch():
 
     def __init__(self):
         self.desired_caps={}
+        self.exception_flag=''
+        self.action=None
+        self.sauce_conf = web_keywords_MA.Sauce_Config().get_sauceconf()
 
 
     def print_error(self,e):
@@ -201,7 +205,7 @@ class InstallAndLaunch():
         except Exception as e:
             err_msg = self.print_error("Not able to install or launch application")
             log.error(e,exc_info=True)    
-        return driver
+        return driver,status, result,err_msg,output
 
     def uninstallApplication_sl(self,objectname,input_val,*args):
         status = TEST_RESULT_FAIL
@@ -212,8 +216,8 @@ class InstallAndLaunch():
         output=OUTPUT_CONSTANT
         global device_keywords_object
         try:
-            local_mak.driver.remove_app('com.projects.sharath.materialvision')
-            log.info(local_mak.driver)
+            config = self.sauce_conf["mobile"]
+            driver.remove_app(config["appPackageName"])
             log.info("APP UNINSTALLED")
             status = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE

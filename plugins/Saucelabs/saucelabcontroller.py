@@ -165,26 +165,26 @@ class SaucelabWindow():
             data = response.data.decode('utf-8')
 
             # if response.status_code == 200:
-            if True:
+            # if True:
 
-                data = json.loads(data)
-                androidVersions = {}
-                iphoneVersions = {}
-                for detail in data:
-                    if detail['api_name'] == 'android':
-                        if detail['short_version'] not in androidVersions.keys():
-                            androidVersions[detail['short_version']] = []
-                        androidVersions[detail['short_version']].append(detail['long_name'])
-                    if detail['api_name'] == 'iphone':
-                        if detail['short_version'] not in iphoneVersions.keys():
-                            iphoneVersions[detail['short_version']] = []
-                        iphoneVersions[detail['short_version']].append(detail['long_name'])
+            data = json.loads(data)
+            androidVersions = {}
+            iphoneVersions = {}
+            for detail in data:
+                if detail['api_name'] == 'android':
+                    if detail['short_version'] not in androidVersions.keys():
+                        androidVersions[detail['short_version']] = []
+                    androidVersions[detail['short_version']].append(detail['long_name'])
+                if detail['api_name'] == 'iphone':
+                    if detail['short_version'] not in iphoneVersions.keys():
+                        iphoneVersions[detail['short_version']] = []
+                    iphoneVersions[detail['short_version']].append(detail['long_name'])
 
-                res = {}
-                res['emulator'] = {
-                        'android' : androidVersions,
-                        'iphone': iphoneVersions
-                    }
+            res = {}
+            res['emulator'] = {
+                    'android' : androidVersions,
+                    'iphone': iphoneVersions
+                }
 
             # response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers,timeout = 120)
             retry_limit1 = 10
