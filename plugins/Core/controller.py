@@ -1362,7 +1362,7 @@ class Controller():
                             execute_flag=False
                         execution_env = json_data.get('exec_env', 'default').lower()
 
-                         if execution_env == 'browserstack':
+                        if execution_env == 'browserstack':
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]

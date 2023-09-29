@@ -77,7 +77,7 @@ class BrowserstackWindow():
                     os_version = browser_version["os_version"]
                     browser_version_str = browser_version["browser_version"]
                     
-                    try:
+                    
                         browser_version_num = float(browser_version_str)
                         if (browser_name == 'Internet Explorer' or browser_name == 'safari') or (browser_name != 'ie' and browser_name != 'safari' and browser_version_num >= 75):
                             if browser_name not in browser:
@@ -88,8 +88,8 @@ class BrowserstackWindow():
                                 browser[browser_name][os_osversion_key] = []
                             
                             browser[browser_name][os_osversion_key].append(browser_version_str)
-                    except ValueError:
-                        continue
+                   
+                        
 
             res = {'os': final_sorted_os,'os_names': os_versions, 'browser': browser}
             socket.emit('browserstack_confresponse', res)
