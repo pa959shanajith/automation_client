@@ -163,6 +163,7 @@ class Controller():
                     core_utils.get_all_the_imports('Mobility/iris_mobile')
                 else:
                     core_utils.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Saucelabs')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -753,7 +754,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0],args[1])
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -997,8 +998,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -1390,7 +1391,7 @@ class Controller():
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                             import sauceclient
                             core_utils.get_all_the_imports('Saucelabs')
-                            import web_keywords,web_keywords_MW
+                            import web_keywords,web_keywords_MW,web_keywords_MA
                             s = ''
                             sauce_details = {
                                 'sauce_username': json_data['sauce_username'],
@@ -1401,6 +1402,9 @@ class Controller():
                                 s=web_keywords.Sauce_Config()
                                 sauce_details['version'] = json_data['browserVersion']
                                 sauce_details['platform'] = json_data['platform']
+                            elif json_data['apptype'] == 'MobileApp':
+                                s=web_keywords_MA.Sauce_Config()
+                                sauce_details['mobile'] = json_data['mobile']
                             else:
                                 s=web_keywords_MW.Sauce_Config()
                                 sauce_details['mobile'] = json_data['mobile']
