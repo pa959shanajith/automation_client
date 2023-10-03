@@ -20,6 +20,7 @@ from constants import *
 from mobile_app_constants import *
 import logger, subprocess, socket, base64, platform, logging
 import device_keywords
+import plistlib
 log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
@@ -124,6 +125,33 @@ class InstallAndLaunch():
                     self.desired_caps['log_level'] = False
                     self.desired_caps['app'] = apk_path
                     driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
+                    plist_path = os.path.join(apk_path, "info.plist")
+                    if os.path.exists(plist_path):
+                        with open(plist_path, 'rb') as fp:
+                            plist_data = fp.read()
+                            try:
+                                plist_content = plistlib.loads(plist_data)                                
+                                if isinstance(plist_content, dict):
+                                    bundleId = plist_content.get('CFBundleIdentifier')
+                                else:
+                                    log.error("Plist does not contain a dictionary.")
+                            except plistlib.InvalidFileException as e:
+                                log.error("Error parsing plist:", e)
+                    else:
+                        log.error("Plist file not found.")
+                    ios_caps = {
+                        "appium:platformVersion": platform_version,
+                        "appium:udid": udid,
+                        "bundleId": bundleId,
+                        "platformName": "ios",
+                        "appium:deviceName": "ios"
+                    }
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep + 'avoAssureClient_Mobile_MAC'
+                    file_name = 'ios_caps.json'
+                    file_path = os.path.join(folder_path, file_name)
+                    with open(file_path, 'w') as file:
+                        # Step 1: Write the JSON data to the file
+                        json.dump(ios_caps, file, indent=4)
                 else:
                     driver = None
                     return None
