@@ -521,6 +521,10 @@ Saucelab_ACTION_1 = 'sauceWebDetails'
 
 Saucelab_ACTION_2 = 'sauceMobileWebDetails'
 
+#BrowserstackActions
+
+Browserstack_ACTION_1 = 'webDetails'
+
 STATIC_NONE = "{#@#n_o_n_e#@#}"
 
 STATIC_DV_NAME = "{#@#n_u_m#@#}"
