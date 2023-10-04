@@ -95,6 +95,8 @@ class ScrapeDispatcher(wx.Frame):
             style = self.GetWindowStyle()
             self.SetWindowStyle( style|wx.STAY_ON_TOP )
             wx.Frame(self.panel, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+            screen_width, screen_height = wx.GetDisplaySize()
+            self.SetPosition((screen_width - self.GetSize()[0], screen_height - self.GetSize()[1]))
             scrape_pop_window=self.Show()
         else:
             self.socketIO.emit('scrape','wrongWindowName')
