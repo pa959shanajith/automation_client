@@ -9,6 +9,9 @@ import cv2
 import screeninfo
 from PIL import Image
 import pyautogui
+import core_utils
+core_utils.get_all_the_imports('IRIS')
+core_utils.get_all_the_imports('Core')
 from constants import *
 log = logging.getLogger('iris_operations.py')
 import os
@@ -19,6 +22,10 @@ import sys,math
 from uuid import uuid4
 import codecs
 import pandas as pd
+#import New_Coordinates
+import new_coordinates
+import coordinates_storage
+import client
 
 from encryption_utility import AESCipher
 if SYSTEM_OS == 'Windows' :
@@ -638,9 +645,9 @@ class IRISKeywords():
 
         hypo_x=math.ceil(hypo_x)
         hypo_y=math.ceil(hypo_y)
-        logger.print_on_console(theta)
-        logger.print_on_console(hypo_x)
-        logger.print_on_console(hypo_y)
+        # logger.print_on_console(theta)
+        # logger.print_on_console(hypo_x)
+        # logger.print_on_console(hypo_y)
 
         
         status = TEST_RESULT_FAIL
@@ -672,8 +679,23 @@ class IRISKeywords():
             # logger.print_on_console(res)
             # log.info( 'Relative image co-ordinates : ' + str(res) )
             res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
-            logger.print_on_console(res)
+            # logger.print_on_console(res)
+
+            # cord_old_x=int(res[0]*widthscale)
+            # cord_old_y=int(res[1]*heightscale)
+            # cord_old_x1=int(res[2]*widthscale)
+            # cord_old_y1=int(res[3]*heightscale)
+
+            # cord_old=[cord_old_x,cord_old_y,cord_old_x1,cord_old_y1]
+            
+            #cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+            #logger.print_on_console('old_cord',cord_old)
+
+
+
             # if con_condition =='dynamic':
+
+            
             x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))*widthscale
             y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))*heightscale
             x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))*widthscale
@@ -689,11 +711,11 @@ class IRISKeywords():
             #     height=abs(y_new-y_new1)
 
 
-            logger.print_on_console(x_new)
-            logger.print_on_console(y_new)
+            # logger.print_on_console(x_new)
+            # logger.print_on_console(y_new)
 
-            logger.print_on_console(x_new1)
-            logger.print_on_console(y_new1)
+            # logger.print_on_console(x_new1)
+            # logger.print_on_console(y_new1)
 
             #width = res[2] - res[0]
             #height = res[3] - res[1]
@@ -891,7 +913,7 @@ class IRISKeywords():
 
 
         log.info('Inside settextiris and No. of arguments passed are : '+str(len(args)))
-        logger.print_on_console(widthscale)
+        # logger.print_on_console(widthscale)
 
         status = TEST_RESULT_FAIL
         result = TEST_RESULT_FALSE
@@ -906,7 +928,7 @@ class IRISKeywords():
         height = None
         try:
             #if(len(args) == 3 and args[2]!='' and verifyFlag ):
-            log.info('IRIS element recognised as a relative element')
+            # log.info('IRIS element recognised as a relative element')
             elem_coordinates = element['coordinates']
             #logger.print_on_console(elem_coordinates)
             # const_coordintes = args[2]['coordinates']
@@ -1591,7 +1613,7 @@ class IRISKeywords():
             status  = TEST_RESULT_PASS
             result = TEST_RESULT_TRUE
             if vertical>0:
-                value = len(vertical)
+                value = vertical
                 #value = len(vertical)
             else:
                 value = 0
@@ -2412,101 +2434,217 @@ class IRISKeywords():
         im_b64=element['cord']
         im_norm_old=eval(im_b64)
         text_sentence='True'
+        verify_screen=args[0]
+
+        time.sleep(2)
+
+        im_new = PIL.ImageGrab.grab()
 
         im_bytes_old = base64.b64decode(im_norm_old)
         im_arr_old = np.frombuffer(im_bytes_old, dtype=np.uint8)  # im_arr is one-dim Numpy array
         img_old = cv2.imdecode(im_arr_old, flags=cv2.IMREAD_COLOR)
         width_old=img_old.shape[1]
         height_old=img_old.shape[0]
+        logger.print_on_console('screen----', verify_screen[0])
+        # logger.print_on_console('screen----', args)
+        # logger.print_on_console('screen----', verify_screen)
 
-        time.sleep(2)
-
-        im_new = PIL.ImageGrab.grab()
+        global relativeCoordinates
+        global verifyFlag
 
         width_new=im_new.size[0]
         height_new=im_new.size[1]
 
-        if width_new==width_old and height_new==height_old :
+        elem_coordinates = element['coordinates']
 
-            width_scale_factor=1
-            height_scale_factor=1
+        width_scale_factor=1
+        height_scale_factor=1
 
-        else:
-             width_scale_factor=round((width_new/width_old),2)
-             height_scale_factor=round((height_new/height_old),2)
+        # res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+        # cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+
+        # if width_new==width_old and height_new==height_old :
+
+        #     width_scale_factor=1
+        #     height_scale_factor=1
+
+        # else:
+        #      width_scale_factor=round((width_new/width_old),2)
+        #      height_scale_factor=round((height_new/height_old),2)
 
         # im_file_new = BytesIO()
         # im_new.save(im_file_new, format="png")
         # im_bytesencode_new = im_norm_new.getvalue()
         # im_sec_new = base64.b64encode(im_bytesencode_new)
+
+
+        try:    
+            # if width_new==width_old and height_new==height_old :
+            if  verify_screen[0].lower() =='constant' or verify_screen[0]=='':
+
+                res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+                cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3])]
+
+                theta,hypo_x,hypo_y=0,0,0
+
+                coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y,width_scale_factor,height_scale_factor).createtable()
+
+                #coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y).createtable()
+
+
+                x_new=int(res[0])
+                y_new=int(res[1])
+                x_new1=int(res[2])
+                y_new1=int(res[3])
+                width=abs(x_new-x_new1)
+                height=abs(y_new-y_new1)
+
+                status= TEST_RESULT_PASS
+                result = TEST_RESULT_TRUE
+
+            elif  verify_screen[0].lower() =='dynamic':
+
+                
+                text_response=client.api_request().extracttext(im_b64,text_sentence)
+
+                
+
+                res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+                cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+
+                logger.print_on_console('old_cord',cord_old)
+
+
+                new_text=client.api_request().newtextexecute_client(im_new)
+                #logger.print_on_console(new_text)
+
+                for tex_cor in new_text:
+                    if tex_cor[5].lower()==text_response[0][5].lower():
+                        logger.print_on_console(tex_cor)
+                        cord_new=tex_cor
+                        theta,hypo_x,hypo_y=new_coordinates.getting_new_coor(cord_old,cord_new)
+
+                        
+
+                        #coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y).createtable()
+
+                        coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y,width_scale_factor,height_scale_factor).createtable()
+
+
+                        status= TEST_RESULT_PASS
+                        result = TEST_RESULT_TRUE
+                        break
+
+                    else:
+                        status= TEST_RESULT_FAIL
+                        result = TEST_RESULT_FALSE
+
+                hypo_x=math.ceil(hypo_x)
+                hypo_y=math.ceil(hypo_y)
+
+                
+                x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))
+                y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))
+                x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))
+                y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))
+                width=abs(x_new-x_new1)
+                height=abs(y_new-y_new1)
+
+                
+
+
+            elif width_new!=width_old or height_new!=height_old : 
+
+
+                old_resolution=str(width_old) + '*' + str(height_old)
+
+                logger.print_on_console('use mentioned resolution for better results',old_resolution)
+
+            else:
+                pass
         
-        try:
-            import client
-            text_response=client.api_request().extracttext(im_b64,text_sentence)
-            elem_coordinates = element['coordinates']
-            res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
-            cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
-            logger.print_on_console('old_cord',cord_old)
+        # try:
+        #     import client
+        #     text_response=client.api_request().extracttext(im_b64,text_sentence)
+        #     elem_coordinates = element['coordinates']
+            
+        #     res=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+            
+        #     # cord_old_x=int(res[0]*width_scale_factor)
+        #     # cord_old_y=int(res[1]*height_scale_factor)
+        #     # cord_old_x1=int(res[2]*width_scale_factor)
+        #     # cord_old_y1=int(res[3]*height_scale_factor)
 
-            import core_utils
-            core_utils.get_all_the_imports('IRIS')
-            core_utils.get_all_the_imports('Core')
-            #import New_Coordinates
-            import new_coordinates
+        #     # cord_old=[cord_old_x,cord_old_y,cord_old_x1,cord_old_y1,text_response[0][5]]
+            
+        #     cord_old=[int(elem_coordinates[0]),int(elem_coordinates[1]),int(elem_coordinates[2]),int(elem_coordinates[3]),text_response[0][5]]
+        #     logger.print_on_console('old_cord',cord_old)
 
-            # text_response=client.extracttext(im_b64)
+        #     import core_utils
+        #     core_utils.get_all_the_imports('IRIS')
+        #     core_utils.get_all_the_imports('Core')
+        #     #import New_Coordinates
+        #     import new_coordinates
 
-            new_text=client.api_request().newtextexecute_client()
-            logger.print_on_console(new_text)
+        #     # text_response=client.extracttext(im_b64)
 
-            for tex_cor in new_text:
-                if tex_cor[5].lower()==text_response[0][5].lower():
-                    logger.print_on_console(tex_cor)
-                    cord_new=tex_cor
-                    theta,hypo_x,hypo_y=new_coordinates.getting_new_coor(cord_old,cord_new)
+        #     new_text=client.api_request().newtextexecute_client()
+        #     logger.print_on_console(new_text)
 
-                    import coordinates_storage
+        #     for tex_cor in new_text:
+        #         if tex_cor[5].lower()==text_response[0][5].lower():
+        #             logger.print_on_console(tex_cor)
+        #             cord_new=tex_cor
+        #             theta,hypo_x,hypo_y=new_coordinates.getting_new_coor(cord_old,cord_new)
 
-                    coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y,width_scale_factor,height_scale_factor).createtable()
+        #             import coordinates_storage
+
+        #             coordinates_storage.Sqlitecreatetable(theta,hypo_x,hypo_y,width_scale_factor,height_scale_factor).createtable()
 
 
-                    status= TEST_RESULT_PASS
-                    result = TEST_RESULT_TRUE
-                    break
+        #             status= TEST_RESULT_PASS
+        #             result = TEST_RESULT_TRUE
+        #             break
 
-                else:
-                    status= TEST_RESULT_FAIL
-                    result = TEST_RESULT_FALSE
+        #         else:
+        #             status= TEST_RESULT_FAIL
+        #             result = TEST_RESULT_FALSE
 
         
         
 
-        # logger.print_on_console('theta:',theta)
-        # logger.print_on_console('hypo_x:',hypo_x)
-        # logger.print_on_console('hypo_y:',hypo_y)
-        # db_path = os.path.join(os.getenv("AVO_ASSURE_HOME"), 'assets')
-        # logger.print_on_console('db_path:',db_path)
+        #     logger.print_on_console('theta:',theta)
+        #     logger.print_on_console('hypo_x:',hypo_x)
+        #     logger.print_on_console('hypo_y:',hypo_y)
+        # # db_path = os.path.join(os.getenv("AVO_ASSURE_HOME"), 'assets')
+        # # logger.print_on_console('db_path:',db_path)
 
-        #logger.print_on_console('hypo_y:',hypo_y)
+        # #logger.print_on_console('hypo_y:',hypo_y)
 
-            global relativeCoordinates
-            global verifyFlag
+        #     global relativeCoordinates
+        #     global verifyFlag
 
-            hypo_x=math.ceil(hypo_x)
-            hypo_y=math.ceil(hypo_y)
+        #     hypo_x=math.ceil(hypo_x)
+        #     hypo_y=math.ceil(hypo_y)
 
-            x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))*width_scale_factor
-            y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))*height_scale_factor
-            x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))*width_scale_factor
-            y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))*height_scale_factor
-            width=abs(x_new-x_new1)
-            height=abs(y_new-y_new1)
+        #     # x_new=cord_old_x
+        #     # y_new=cord_old_y
+        #     # x_new1=cord_old_x1
+        #     # y_new1=cord_old_y1
 
-            logger.print_on_console(x_new)
-            logger.print_on_console(y_new)
+        #     x_new=abs(math.ceil((math.cos(theta)*hypo_x)+res[0]))*width_scale_factor
+        #     y_new=abs(math.ceil((math.sin(theta)*hypo_y)+res[1]))*height_scale_factor
+        #     x_new1=abs(math.ceil((math.cos(theta)*hypo_x)+res[2]))*width_scale_factor
+        #     y_new1=abs(math.ceil((math.sin(theta)*hypo_y)+res[3]))*height_scale_factor
+            
+        #     width=abs(x_new-x_new1)
+        #     height=abs(y_new-y_new1)
 
-            logger.print_on_console(x_new1)
-            logger.print_on_console(y_new1)
+        #     logger.print_on_console(x_new)
+        #     logger.print_on_console(y_new)
+
+        #     logger.print_on_console(x_new1)
+        #     logger.print_on_console(y_new1)
 
             pyautogui.moveTo(x_new+ int(width/2),y_new + int(height/2))
 
@@ -2727,7 +2865,7 @@ class IRISKeywords():
             #     self.dragIrisPos['x'] = res[0] + int(width/2)
             #     self.dragIrisPos['y'] = res[1] + int(height/2)
             log.info('Moved the mouse cursor to the element that needs to be dragged')
-            log.info( 'Relative image co-ordinates : ' + str(res) )
+            # log.info( 'Relative image co-ordinates : ' + str(res) )
             # else:
             #     res, width, height = gotoobject(element)
             #     self.dragIrisPos['x'] = res[0] + int(width/2)
