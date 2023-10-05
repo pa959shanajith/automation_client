@@ -49,5 +49,6 @@
     "update_check": "No",
     "use_custom_debugport": "No",
     "verify_wait_time": "60",
-    "sap_object_indentification_order": "1"
+    "sap_object_indentification_order": "1",
+    "oebs_object_indentification_order": "1"
 }
