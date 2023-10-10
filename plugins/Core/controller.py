@@ -47,6 +47,7 @@ pause_flag=False
 iris_constant_step = -1
 socket_object = None
 saucelabs_count = 0
+browserstack_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -162,6 +163,7 @@ class Controller():
                     core_utils.get_all_the_imports('Mobility/iris_mobile')
                 else:
                     core_utils.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Saucelabs')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -196,6 +198,7 @@ class Controller():
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             core_utils.get_all_the_imports('Saucelabs')
+            core_utils.get_all_the_imports('Browserstack')
             core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
             import web_accessibility_testing
@@ -345,7 +348,7 @@ class Controller():
                 self.conthread.pause_cond.wait()
 
 
-    def methodinvocation(self,index,execution_env,datatables=[],*args):
+    def methodinvocation(self,index,execution_env,datatables=[],execute_result_data={},*args):
         global pause_flag
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
@@ -447,9 +450,12 @@ class Controller():
         if self.action==EXECUTE:
             # self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
-                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                # self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                #added value to store ids in reportitem collection
+                self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval,execute_result_data=execute_result_data)
             else:
-                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                # self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
+                self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval,execute_result_data=execute_result_data)
             if tsp.name.lower()=='verifyvalues' or tsp.name.lower()=='verifytextiris':
                 tsp.testcase_details=testcase_details_orig
 
@@ -751,7 +757,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0],args[1])
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -866,7 +872,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False,execute_result_data={}):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -903,7 +909,10 @@ class Controller():
                     index = i
                     # if(action != DEBUG):    
                     #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
-                    i = self.methodinvocation(i,execution_env,datatables)
+                    
+                    # Added data to insert ids in the reportitem collection
+                    # i = self.methodinvocation(i,execution_env,datatables)
+                    i = self.methodinvocation(i,execution_env,datatables,execute_result_data=execute_result_data)
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
@@ -995,8 +1004,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -1112,7 +1121,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
-        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
+        global terminate_flag, status_percentage, browserstack_count,saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1359,13 +1368,36 @@ class Controller():
                             sc_idx+=1
                             execute_flag=False
                         execution_env = json_data.get('exec_env', 'default').lower()
-                        if execution_env == 'saucelabs':
+
+                        if execution_env == 'browserstack':
+                            # self.__load_web()
+                            # import script_generator
+                            scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            core_utils.get_all_the_imports('Browserstack')
+                            import browserstack_web_keywords
+                            s = ''
+                            browserstack_details = {
+                                'browserstack_username': json_data['browserstack_username'],
+                                'browserstack_access_key': json_data['browserstack_access_key'],
+                            }
+                            if(json_data['apptype'] == 'Web'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['osVersion'] = json_data['osVersion']
+                                browserstack_details['os'] = json_data['os']
+                                browserstack_details['browserName'] = json_data['browserName']
+                                browserstack_details['browserVersion'] = json_data['browserVersion']
+
+                            s.save_browserstackconf(browserstack_details)
+                            execution_env = {'env': 'browserstack','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
+                            now=datetime.now()
+
+                        elif execution_env == 'saucelabs':
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                             import sauceclient
                             core_utils.get_all_the_imports('Saucelabs')
-                            import web_keywords,web_keywords_MW
+                            import web_keywords,web_keywords_MW,web_keywords_MA
                             s = ''
                             sauce_details = {
                                 'sauce_username': json_data['sauce_username'],
@@ -1376,6 +1408,9 @@ class Controller():
                                 s=web_keywords.Sauce_Config()
                                 sauce_details['version'] = json_data['browserVersion']
                                 sauce_details['platform'] = json_data['platform']
+                            elif json_data['apptype'] == 'MobileApp':
+                                s=web_keywords_MA.Sauce_Config()
+                                sauce_details['mobile'] = json_data['mobile']
                             else:
                                 s=web_keywords_MW.Sauce_Config()
                                 sauce_details['mobile'] = json_data['mobile']
@@ -1414,7 +1449,9 @@ class Controller():
                                 record_flag = str(configvalues['screen_rec']).lower()
                                 #start screen recording
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
+                                # Added data to get ids to store in report items collection
+                                # status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
+                                status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True,execute_result_data = execute_result_data)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
                                 print('=======================================================================================================')
@@ -1442,7 +1479,14 @@ class Controller():
                             if len(accessibility_reports) > 0:
                                 execute_result_data["accessibility_reports"] = accessibility_reports
                             execute_result_data['report_type'] = report_type
-                            if execution_env['env'] == 'saucelabs':
+                            if execution_env['env'] == 'browserstack':
+                                browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                self.__load_web()
+                                import browserstack_web_keywords
+                                self.obj = browserstack_web_keywords.Browserstack_config()
+                                self.obj.get_browserstackconf()
+                                time.sleep(5)
+                            elif execution_env['env'] == 'saucelabs':
                                 browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
                                 self.__load_web()
                                 import web_keywords

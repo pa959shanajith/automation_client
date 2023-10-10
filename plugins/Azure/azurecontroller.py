@@ -655,7 +655,8 @@ class AzureWindow():
                     "outcome":test_status,
                     "tester":{
                         "id":user_json['authenticatedUser']['id'],
-                        "displayName":user_json['authenticatedUser']['providerDisplayName']
+                        "displayName":user_json['authenticatedUser']['customDisplayName'] if 'customDisplayName' in user_json['authenticatedUser'] and user_json['authenticatedUser']['customDisplayName'] else user_json['authenticatedUser']['providerDisplayName']
+                        # "displayName":user_json['authenticatedUser']['customDisplayName']
                     }
                     }
             # Send request to API endpoint

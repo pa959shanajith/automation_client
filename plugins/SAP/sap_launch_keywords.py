@@ -524,7 +524,13 @@ class Launch_Keywords():
                                     ele = app.Edit3
 
                         ele.set_edit_text('')
-                        ele.type_keys(server, with_spaces = True)
+                        connection_string = ''
+                        for char in server:
+                            if char in ['(', ')', '{', '}', '%']:
+                                connection_string += '{' + str(char) + '}'
+                            else:
+                                connection_string += char
+                        ele.type_keys(connection_string, with_spaces = True)
                         time.sleep(0.4)#this delay is introduced as ServerConnect in SAP 7.70 upwards is very fast(would always select the first server connection)
 
                         """

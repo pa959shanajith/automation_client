@@ -20,6 +20,9 @@ from constants import *
 from mobile_app_constants import *
 import logger, subprocess, socket, base64, platform, logging
 import device_keywords
+import plistlib
+import web_keywords_MA
+from appium import webdriver
 log = logging.getLogger('android_scrapping.py')
 
 XpathList=[]
@@ -48,6 +51,9 @@ class InstallAndLaunch():
 
     def __init__(self):
         self.desired_caps={}
+        self.exception_flag=''
+        self.action=None
+        self.sauce_conf = web_keywords_MA.Sauce_Config().get_sauceconf()
 
 
     def print_error(self,e):
@@ -124,6 +130,33 @@ class InstallAndLaunch():
                     self.desired_caps['log_level'] = False
                     self.desired_caps['app'] = apk_path
                     driver = webdriver.Remote('http://0.0.0.0:4723/wd/hub', self.desired_caps)
+                    plist_path = os.path.join(apk_path, "info.plist")
+                    if os.path.exists(plist_path):
+                        with open(plist_path, 'rb') as fp:
+                            plist_data = fp.read()
+                            try:
+                                plist_content = plistlib.loads(plist_data)                                
+                                if isinstance(plist_content, dict):
+                                    bundleId = plist_content.get('CFBundleIdentifier')
+                                else:
+                                    log.error("Plist does not contain a dictionary.")
+                            except plistlib.InvalidFileException as e:
+                                log.error("Error parsing plist:", e)
+                    else:
+                        log.error("Plist file not found.")
+                    ios_caps = {
+                        "appium:platformVersion": platform_version,
+                        "appium:udid": udid,
+                        "bundleId": bundleId,
+                        "platformName": "ios",
+                        "appium:deviceName": "ios"
+                    }
+                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep + 'avoAssureClient_Mobile_MAC'
+                    file_name = 'ios_caps.json'
+                    file_path = os.path.join(folder_path, file_name)
+                    with open(file_path, 'w') as file:
+                        # Step 1: Write the JSON data to the file
+                        json.dump(ios_caps, file, indent=4)
                 else:
                     driver = None
                     return None
@@ -183,6 +216,43 @@ class InstallAndLaunch():
             driver = None
             device_id = None
         return driver
+    
+    def installApplication_sl(self, inputs_value, *args):
+        global driver
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
+            driver = webdriver.Remote(command_executor=url, desired_capabilities=args[0])
+            log.info(driver)
+            log.info("APP INSTALLED")
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = self.print_error("Not able to install or launch application")
+            log.error(e,exc_info=True)    
+        return driver,status, result,err_msg,output
+
+    def uninstallApplication_sl(self,objectname,input_val,*args):
+        status = TEST_RESULT_FAIL
+        output = OUTPUT_CONSTANT
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        driver_flag = False
+        output=OUTPUT_CONSTANT
+        global device_keywords_object
+        try:
+            config = self.sauce_conf["mobile"]
+            driver.remove_app(config["appPackageName"])
+            log.info("APP UNINSTALLED")
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = self.print_error("Not able to uninstall application")
+            log.error(e,exc_info=True)    
+        return status, result, output, err_msg
 
     def check_device_details(self,dv_name,platform_ver):
         res_1=TEST_RESULT_TRUE

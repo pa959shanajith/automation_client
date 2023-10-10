@@ -31,6 +31,7 @@ import time
 import re
 import readconfig
 import logging
+import browserstack_web_keywords
 import json
 from selenium import webdriver
 import threading
@@ -70,6 +71,9 @@ class Dispatcher:
         local_Wd.table_obj_sl = web_keywords.Table_Keywords()
         local_Wd.textbox_obj_sl = web_keywords.Textbox_Keywords()
         local_Wd.util_obj_sl = web_keywords.Util_Keywords()
+
+         # BrowserStack keywords
+        local_Wd.browser_obj_browserstack = browserstack_web_keywords.Browser_Keywords()
 
         local_Wd.webelement_map=OrderedDict()
         iris_object = iris_operations.IRISKeywords()
@@ -353,6 +357,118 @@ class Dispatcher:
             'getBrowserName': local_Wd.browser_object.getBrowserName
         }
 
+        self.browserstack_web_dict = {
+            # 'getobjectcount':local_Wd.custom_object.get_object_count,
+            # 'getobject':local_Wd.custom_object.get_object,
+            'click': local_Wd.button_link_object.click,
+            'press'  : local_Wd.button_link_object.press,
+            'doubleClick' : local_Wd.button_link_object.double_click,
+            'rightClick' : local_Wd.button_link_object.right_click,
+            # 'uploadFile'  : local_Wd.element_obj_sl.uploadFile,
+
+            'verifyButtonName' : local_Wd.button_link_object.verify_button_name,
+            'getButtonName': local_Wd.button_link_object.get_button_name,
+            'getLinkText'    : local_Wd.button_link_object.get_link_text,
+            'verifyLinkText' : local_Wd.button_link_object.verify_link_text,
+
+            'acceptPopUp' : local_Wd.popup_object.accept_popup,
+            'dismissPopUp': local_Wd.popup_object.dismiss_popup,
+            'getPopUpText': local_Wd.popup_object.get_popup_text,
+            'verifyPopUpText': local_Wd.popup_object.verify_popup_text,
+
+            'getStatus': local_Wd.radio_checkbox_object.get_status,
+            'selectRadioButton': local_Wd.radio_checkbox_object.select_radiobutton,
+            'selectCheckbox': local_Wd.radio_checkbox_object.select_checkbox,
+            'unselectCheckbox': local_Wd.radio_checkbox_object.unselect_checkbox,
+
+            'getRowCount' : local_Wd.table_object.getRowCount,
+            'getColumnCount' : local_Wd.table_object.getColoumnCount,
+            'getCellValue' : local_Wd.table_object.getCellValue,
+            'verifyCellValue' : local_Wd.table_object.verifyCellValue,
+            'cellClick' : local_Wd.table_object.cellClick,
+            'getRowNumByText' : local_Wd.table_object.getRowNumByText,
+            'getColNumByText' : local_Wd.table_object.getColNumByText,
+            'getInnerTable' : local_Wd.table_object.getInnerTable,
+            'getCellToolTip' : local_Wd.table_object.getCellToolTip,
+            'verifyCellToolTip' : local_Wd.table_object.verifyCellToolTip,
+
+            'getElementText' : local_Wd.element_object.get_element_text,
+            'verifyElementText' : local_Wd.element_object.verify_element_text,
+            'clickElement' : local_Wd.element_object.click_element,
+            'getToolTipText' : local_Wd.element_object.get_tooltip_text,
+            'verifyToolTipText' : local_Wd.element_object.verify_tooltip_text,
+            'drag': local_Wd.element_object.drag,
+            'drop': local_Wd.element_object.drop,
+            # 'dropFile': local_Wd.element_obj_sl.dropFile,
+
+            'setText': local_Wd.textbox_object.set_text,
+            'sendValue': local_Wd.textbox_object.send_value,
+            'getText': local_Wd.textbox_object.get_text,
+            'verifyText': local_Wd.textbox_object.verify_text,
+            'clearText': local_Wd.textbox_object.clear_text,
+            'getTextboxLength': local_Wd.textbox_object.gettextbox_length,
+            'verifyTextboxLength': local_Wd.textbox_object.verifytextbox_length,
+            'setSecureText': local_Wd.textbox_object.setsecuretext,
+            'sendSecureValue': local_Wd.textbox_object.sendSecureValue,
+
+            'selectValueByIndex': local_Wd.dropdown_list_object.selectValueByIndex,
+            'getCount': local_Wd.dropdown_list_object.getCount,
+            'selectValueByText': local_Wd.dropdown_list_object.selectValueByText,
+            'verifySelectedValues': local_Wd.dropdown_list_object.verifySelectedValues,
+            'verifySelectedValue': local_Wd.dropdown_list_object.verifySelectedValue,
+            'verifyCount': local_Wd.dropdown_list_object.verifyCount,
+            'selectAllValues': local_Wd.dropdown_list_object.selectAllValues,
+            'selectMultipleValuesByIndexes': local_Wd.dropdown_list_object.selectMultipleValuesByIndexes,
+            'getSelected': local_Wd.dropdown_list_object.getSelected,
+            'selectMultipleValuesByText': local_Wd.dropdown_list_object.selectMultipleValuesByText,
+            'getMultipleValuesByIndexes': local_Wd.dropdown_list_object.getMultipleValuesByIndexes,
+            'verifyAllValues': local_Wd.dropdown_list_object.verifyAllValues,
+            'selectByAbsoluteValue': local_Wd.dropdown_list_object.selectByAbsoluteValue,
+            'getAllValues': local_Wd.dropdown_list_object.getAllValues,
+            'getValueByIndex': local_Wd.dropdown_list_object.getValueByIndex,
+            'verifyValuesExists': local_Wd.dropdown_list_object.verifyValuesExists,
+            'deselectAll': local_Wd.dropdown_list_object.deselectAll,
+
+            'verifyVisible': local_Wd.util_object.verify_visible,
+            'verifyExists': local_Wd.util_object.verify_exists,
+            'verifyDoesNotExists': local_Wd.util_object.verify_doesnot_exists,
+            'verifyEnabled': local_Wd.util_object.verify_enabled,
+            'verifyDisabled': local_Wd.util_object.verify_disabled,
+            'verifyHidden': local_Wd.util_object.verify_hidden,
+            'verifyReadOnly': local_Wd.util_object.verify_readonly,
+            'tab': local_Wd.util_object.tab,
+            'sendFunctionKeys': local_Wd.util_object.sendfunction_keys,
+            'setFocus': local_Wd.util_object.setfocus,
+            'mouseHover': local_Wd.util_object.mouse_hover,
+            # 'rightclick':obj.rightclick,
+            # 'mouseclick': local_Wd.util_obj_sl.mouseClick,
+            # 'verifywebimages': local_Wd.util_obj_sl.verify_web_images,
+            # 'imagesimilaritypercentage': local_Wd.util_obj_sl.image_similarity_percentage,
+            'waitForElementVisible': local_Wd.element_object.waitforelement_visible,
+            'getElementTagValue': local_Wd.util_object.get_element_tag_value,
+            'getAttributeValue': local_Wd.util_object.get_attribute_value,
+            'verifyAttribute': local_Wd.util_object.verify_attribute,
+
+            'openBrowser': local_Wd.browser_obj_browserstack.openBrowser,
+            'navigateToURL': local_Wd.browser_object.navigateToURL,
+            'getPageTitle': local_Wd.browser_object.getPageTitle,
+            'getCurrentURL': local_Wd.browser_object.getCurrentURL,
+            'maximizeBrowser': local_Wd.browser_object.maximizeBrowser,
+            'refresh': local_Wd.browser_object.refresh,
+            'verifyCurrentURL': local_Wd.browser_object.verifyCurrentURL,
+            'closeBrowser': local_Wd.browser_obj_browserstack.closeBrowser,
+            'closeSubWindows': local_Wd.browser_object.closeSubWindows,
+            'switchToWindow': local_Wd.browser_object.switch_to_window,
+            'verifyTextExists': local_Wd.statict_text_object.verify_text_exists,
+            'verifyPageTitle': local_Wd.browser_object.verify_page_title,
+            'clearCache': local_Wd.browser_object.clear_cache,
+            'navigateWithAuthenticate': local_Wd.browser_object.navigate_with_authenticate,
+            'navigateBack': local_Wd.browser_object.navigate_back,
+            'openNewTab': local_Wd.browser_object.openNewTab,
+            'execute_js': local_Wd.browser_object.execute_js,
+            'getBrowserName': local_Wd.browser_object.getBrowserName
+        }
+
         self.browsers_sl={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
         self.sauce_conf = web_keywords.Sauce_Config().get_sauceconf()
         self.exception_flag=''
@@ -603,6 +719,7 @@ class Dispatcher:
                         self.browsers_sl[browser]["sauce:options"].update({"idleTimeout":90})
                         result = self.sauce_web_dict[teststepproperty.name](self.sauce_conf['remote_url'],self.browsers_sl[browser],execution_env['scenario'])
                         driver = web_keywords.local_wk.driver
+                        window_handles_count_begin=len(driver.window_handles)
                         browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                         find_browser_info(reporting_obj,mythread)
                     else:
@@ -616,6 +733,36 @@ class Dispatcher:
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
+                    return False
+            elif execution_env['env'] == 'browserstack' and teststepproperty.name in list(self.browserstack_web_dict.keys()):
+                if teststepproperty.custname == '@Browser' or teststepproperty.custname == '@BrowserPopUp':
+                    if (teststepproperty.name == "openBrowser"):
+                        browser = teststepproperty.inputval[0]
+                        self.browsers_browserstack[browser]["os"] = self.browserstack_conf["os"]
+                        self.browsers_browserstack[browser]["os_version"] = self.browserstack_conf["os_version"]
+                        self.browsers_browserstack[browser]["browser_version"] = self.browserstack_conf["browser_version"]
+                        self.browsers_browserstack[browser]["browser"] = self.browserstack_conf["browser"]
+                        if browser in ['7', '8'] and self.browserstack_conf["osversion"] != 'Windows 10':
+                            logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
+                            return 'Terminate'
+                        self.browsers_browserstack[browser]["browserstack:options"].update({"name": teststepproperty.testscript_name})
+                        self.browsers_browserstack[browser]["browserstack:options"].update({"idleTimeout": 90})
+                        result = self.browserstack_web_dict[teststepproperty.name](self.browserstack_conf['remote_url'], self.browsers_browserstack[browser], execution_env['scenario'])
+                        driver = browserstack_web_keywords.local_bwk.driver
+                        window_handles_count_begin = len(driver.window_handles)
+                        browser_Keywords.local_bk.driver_obj = browserstack_web_keywords.local_bwk.driver
+                        find_browser_info(reporting_obj, mythread)
+                    else:
+                        result = self.browserstack_web_dict[teststepproperty.name](webelement, input)
+                elif teststepproperty.name in self.browserstack_web_dict:
+                    xpath = teststepproperty.objectname.split(';')[0]
+                    if (teststepproperty.name == "waitForElementVisible"):
+                        input = xpath
+                    driver.switch_to.default_content()
+                    webelement = send_webelement_to_keyword(browserstack_web_keywords.local_bwk.driver, objectname, url)
+                    result = self.sauce_web_dict[teststepproperty.name](webelement, input)
+                else:
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
                     return False
             elif execution_env['env'] == 'default' and keyword in list(self.web_dict.keys()):
                 flag=False
@@ -737,15 +884,16 @@ class Dispatcher:
                     result=list(result)
                     headless_mode = str(configvalues['headless_mode'])=='Yes'
                     sauceFlag = execution_env['env'] == 'saucelabs'
+                    browserstackFlag = execution_env['env'] == 'browserstack'
                     screenShot_Flag = configvalues['screenShot_Flag'].lower()
                     browser_screenshots = configvalues['browser_screenshots'].lower() == 'yes'
                     screen_details=mythread.json_data['suitedetails'][0]
                     file_path=None
                     if ((screenShot_Flag == 'fail' and result[0].lower() == 'fail')
                       or screenShot_Flag == 'all'):
-                        if browser_screenshots or headless_mode or sauceFlag:
+                        if browser_screenshots or headless_mode or sauceFlag or browserstackFlag:
                             if local_Wd.popup_object.check_if_no_popup_exists():
-                                if sauceFlag:
+                                if sauceFlag or browserstackFlag:
                                     if keyword!='closebrowser':
                                         file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
                                 else:
@@ -775,7 +923,7 @@ class Dispatcher:
                                             file_path = screen_shot_obj.captureScreenshot(screen_details,web=True, driver=driver)
                                     except Exception as e:
                                         local_Wd.log.error(e,exc_info=True)
-                            elif not (headless_mode or sauceFlag):
+                            elif not (headless_mode or sauceFlag or browserstackFlag):
                                 local_Wd.log.debug("Pop up exists; Taking the screenshot using generic functions")
                                 file_path = screen_shot_obj.captureScreenshot(screen_details,web=False)
                         else:
