@@ -262,6 +262,8 @@ class Reporting:
         obj[PARENT_ID]=report_obj.parent_id
         obj[COMMENTS]=''
         obj[STEP_DESCRIPTION]=TEST_SCRIPT_NAME+': '+report_obj.testscript_name
+        obj['scenario_id']=report_obj.execute_result_data['scenarioId']
+        obj['execution_ids'] = report_obj.execute_result_data['executionId']
         self.report_string.append(obj)
         self.id_counter+=1
 
@@ -336,6 +338,14 @@ class Reporting:
         obj[COMMENTS]=report_obj.comments
         report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
+
+        # Added scenario_id and execution_ids in the step
+        report_obj.execute_result_data['scenarioId']=self.core_utilsobject.get_UTF_8(report_obj.execute_result_data['scenarioId'])
+        obj['scenario_id']=report_obj.execute_result_data['scenarioId']
+
+        report_obj.execute_result_data['executionId']=self.core_utilsobject.get_UTF_8(report_obj.execute_result_data['executionId'])
+        obj['execution_ids']=report_obj.execute_result_data['executionId']
+
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
         # if constants.SCREENSHOT_NFS_AVAILABLE: 
         obj[SCREENSHOT_PATH]= report_obj.screenshot_path
@@ -357,7 +367,7 @@ class Reporting:
         obj[TESTCASE_DETAILS]=report_obj.testcase_details
         self.report_string.append(obj)
 
-    def generate_report_step(self,tsp,status,con,ellapsedtime,keyword_flag,*args):
+    def generate_report_step(self,tsp,status,con,ellapsedtime,keyword_flag,*args,execute_result_data={}):
         """
         def : generate_report_step
         purpose : calls the method 'generate_keyword_step' to add each step to the report
@@ -430,7 +440,7 @@ class Reporting:
                 else:
                     screenshot_path = None
 
-        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path,remark,testcase_details)
+        reporting_pojo_obj=reporting_pojo.ReportingStep(self.id_counter,name,parent_id,status,str(step_num),comments,step_description,str(ellapsedtime),step_testcase_name,screenshot_path,remark,testcase_details,execute_result_data)
         self.generate_keyword_step(reporting_pojo_obj,tsp.testcase_num)
         self.id_counter+=1
 
