@@ -1122,7 +1122,7 @@ class ConnectionThread(threading.Thread):
             'iceaction': self.ice_action,
             'icetoken': root.ice_token,
             'data': random()*100000000000000,
-            'host':readconfig.configvalues['server_ip']
+            'host': configvalues['server_ip']
         }
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': json.dumps(root.icesession)}
