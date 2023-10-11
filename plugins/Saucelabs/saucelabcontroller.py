@@ -147,7 +147,8 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers)
+                    endpoint_url = 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver'
+                    response = http.request('GET', url=endpoint_url, headers=headers)
                     if response.status != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response.status)
@@ -193,7 +194,8 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
+                    endpoint_url = 'https://api.us-west-1.saucelabs.com/v1/rdc/devices'
+                    response_real_devices = requests.get(url=endpoint_url,headers=headers)
                     if response_real_devices.status_code != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response_real_devices.status_code)
@@ -242,8 +244,8 @@ class SaucelabWindow():
                         try:
                             # Send request to API endpoint
                             # respon = requests.post(endpoint_url, headers=headers, json=body)
-                            storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
-                            response = requests.get(storage_url, headers=headers)
+                            endpoint_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
+                            response = requests.get(url=endpoint_url, headers=headers)
                             if response.status_code != 200:
                                 log.info("Unable to connect to server retrying Status code is: %s",
                                     response.status_code)
