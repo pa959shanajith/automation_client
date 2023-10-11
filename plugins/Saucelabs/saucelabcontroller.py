@@ -147,12 +147,11 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    endpoint_url = 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver'
-                    response = http.request('GET', url=endpoint_url, headers=headers)
+                    response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers)
                     if response.status != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response.status)
-                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        logger.print_on_console("Connection error occurred in Fetching Emulator Device Details")
                         time.sleep(2)
                     else:
                         break
@@ -194,12 +193,11 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    endpoint_url = 'https://api.us-west-1.saucelabs.com/v1/rdc/devices'
-                    response_real_devices = requests.get(url=endpoint_url,headers=headers)
+                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
                     if response_real_devices.status_code != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response_real_devices.status_code)
-                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        logger.print_on_console("Connection error occurred in Fetching Real Device Details")
                         time.sleep(2)
                     else:
                         break
@@ -244,12 +242,12 @@ class SaucelabWindow():
                         try:
                             # Send request to API endpoint
                             # respon = requests.post(endpoint_url, headers=headers, json=body)
-                            endpoint_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
-                            response = requests.get(url=endpoint_url, headers=headers)
+                            storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
+                            response = requests.get(storage_url, headers=headers)
                             if response.status_code != 200:
                                 log.info("Unable to connect to server retrying Status code is: %s",
                                     response.status_code)
-                                logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                                logger.print_on_console("Error Ocuured while Fetch Mobile APK")
                                 time.sleep(2)
                             else:
                                 break
