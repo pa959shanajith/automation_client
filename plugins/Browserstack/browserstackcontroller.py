@@ -75,19 +75,17 @@ class BrowserstackWindow():
                         continue       
                     os_name = browser_version["os"]
                     os_version = browser_version["os_version"]
-                    browser_version_str = browser_version["browser_version"]
-                    
-                    
-                        browser_version_num = float(browser_version_str)
-                        if (browser_name == 'Internet Explorer' or browser_name == 'safari') or (browser_name != 'ie' and browser_name != 'safari' and browser_version_num >= 75):
-                            if browser_name not in browser:
-                                browser[browser_name] = {}
-                            
-                            os_osversion_key = os_name + ' ' + os_version
-                            if os_osversion_key not in browser[browser_name]:
-                                browser[browser_name][os_osversion_key] = []
-                            
-                            browser[browser_name][os_osversion_key].append(browser_version_str)
+                    browser_version_str = browser_version["browser_version"] 
+                    browser_version_num = float(browser_version_str)
+                    if (browser_name == 'Internet Explorer' or browser_name == 'safari') or (browser_name != 'ie' and browser_name != 'safari' and browser_version_num >= 75):
+                        if browser_name not in browser:
+                            browser[browser_name] = {}
+                        
+                        os_osversion_key = os_name + ' ' + os_version
+                        if os_osversion_key not in browser[browser_name]:
+                            browser[browser_name][os_osversion_key] = []
+                        
+                        browser[browser_name][os_osversion_key].append(browser_version_str)
                    
                         
 
