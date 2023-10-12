@@ -300,7 +300,7 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
                     highlightObj=desktop_highlight.highLight()
-                    highlightObj.highLiht_element(args[0],args[1])
+                    highlightObj.highlight_element(args[0],args[1])
                 elif appType==APPTYPE_SAP.lower():
                     core_utils.get_all_the_imports('SAP')
                     import sap_highlight

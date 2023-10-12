@@ -26,6 +26,7 @@ import desktop_launch_keywords
 import base64
 import logger
 import wx
+import desktop_highlight
 ctrldownflag = False
 stopumpingmsgs = False
 
@@ -51,6 +52,7 @@ class Scrape:
                         self.coordY = coordY
                         self.window_id = window_id
                         self._want_continue = 1
+                        self.desktop_highlight_obj = desktop_highlight.highLight()
                         self.start()
 
                     def run(self):
@@ -96,6 +98,7 @@ class Scrape:
                             global click_count
                             if ( actualelement not in actualobjects ):#------check to remove duplicate elements
                                 actualobjects.append(actualelement)
+                                self.desktop_highlight_obj.highlight_element(actualelement['xpath'], actualelement['url'])
                             else:
                                 click_count -= 1
 
