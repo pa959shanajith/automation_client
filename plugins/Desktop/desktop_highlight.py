@@ -67,7 +67,7 @@ class highLight():
             log.error( "Error occoured in highlight_desktop_element : ", e )
             logger.print_on_console( "Error occoured in highlight_desktop_element : " + str(e) )
 
-    def highLiht_element(self, objname, parent, *args):
+    def highlight_element(self, objname, parent, *args):
         try:
             obj = desktop_launch_keywords.Launch_Keywords()
             obj.set_to_foreground()
@@ -82,5 +82,5 @@ class highLight():
                 logger.print_on_console( 'Element highlight failed...' )
                 log.error( 'Element highlight failed...' )
         except Exception as e:
-            log.error( "Error occoured in highLiht_element : ", e )
+            log.error( "Error occoured in highlight_element : ", e )
             logger.print_on_console( 'Element highlight failed...' )
