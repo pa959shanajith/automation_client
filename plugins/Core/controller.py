@@ -2270,7 +2270,7 @@ def kill_process():
         try:
             import browser_Keywords_MW
             del browser_Keywords_MW.drivermap[:]
-            if hasattr(browser_Keywords_MW, 'driver_obj'):
+            if hasattr(browser_Keywords_MW, 'driver_obj') and hasattr(browser_Keywords_MW, 'device_id'):
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
                 s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
