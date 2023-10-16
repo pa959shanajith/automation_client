@@ -390,11 +390,11 @@ class JiraWindow():
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('auto_populate','Invalid Url')
+                socket.emit('Jira_details','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('auto_populate','Invalid Credentials')
+                socket.emit('Jira_details','Invalid Credentials')
             else:
-                socket.emit('auto_populate','Fail')
+                socket.emit('Jira_details','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
 
     def get_testcases(self,jira_input_dict,socket):
