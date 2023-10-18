@@ -122,7 +122,10 @@ class ButtonLinkKeyword():
                                 clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                                 uw = UtilWebKeywords()
                                 time.sleep(0.2)
-                                log_status = uw.check_user_activation(browser_Keywords.local_bk.driver_obj.get_log('browser'))
+                                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                                    log_status = True
+                                else:
+                                    log_status = uw.check_user_activation(browser_Keywords.local_bk.driver_obj.get_log('browser'))
                                 if log_status:
                                     status = webconstants.TEST_RESULT_PASS
                                     methodoutput = webconstants.TEST_RESULT_TRUE
