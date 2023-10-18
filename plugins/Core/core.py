@@ -516,6 +516,7 @@ class MainNamespace(BaseNamespace):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
             core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             global mobileScrapeObj
             mobileScrapeObj=mobile_app_scrape
