@@ -177,7 +177,7 @@ class InstallAndLaunch():
                             activityName = device_keywords_object.activity_name(apk_path)
                             packageName = device_keywords_object.package_name(apk_path)
                             logger.print_on_console("Connected device name:",device_name)
-                            logger.print_on_console("App package name:",packageName)
+                            # logger.print_on_console("App package name:",packageName)
                             self.desired_caps = {}
                             if platform_version is not None:
                                 self.desired_caps['platformVersion'] = platform_version
