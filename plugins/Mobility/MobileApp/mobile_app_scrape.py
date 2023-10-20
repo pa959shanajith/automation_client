@@ -211,7 +211,7 @@ class ScrapeWindow(wx.Frame):
                             if p[1] == 4723:
                                 log.info( 'Pid Found' )
                                 log.info(line.pid)
-                                os.system("TASKKILL /F /PID " + str(line.pid))
+                                subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                         self.socketIO.emit('scrape',d)
                     else:
                         self.print_error('Scraped data exceeds max. Limit.')
@@ -305,7 +305,7 @@ class ScrapeWindow(wx.Frame):
                                 if p[1] == 4723:
                                     log.info( 'Pid Found' )
                                     log.info(line.pid)
-                                    os.system("TASKKILL /F /PID " + str(line.pid))
+                                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                             self.socketIO.emit('scrape',capturedData)
                             # Step 1: Open the JSON file in write mode
                             with open(file_path, 'w') as file:
