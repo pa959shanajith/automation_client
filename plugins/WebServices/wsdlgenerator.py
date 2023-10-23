@@ -47,6 +47,7 @@ class WebservicesWSDL():
         try:
             self.wsdlURL = wsdlURL
             #list_method = Client(wsdlURL)
+            base_url=wsdlURL.replace("?WSDL", "?op=")
             list_method = Client(wsdlURL, doctor=ImportDoctor(imp))
             allmethodslist=[]
             import_wsdl_definition={}
@@ -70,7 +71,7 @@ class WebservicesWSDL():
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
                             # working
                             # import_wsdl_definition[str('SOAP1.2-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
-                            temp[str('SOAP1.2-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str('SOAP1.2-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             import_wsdl_definition['APIS'].append(temp)
                             # temp['requestHeader']=requestHeader
                             # temp['requestBody']=requestBody
@@ -84,7 +85,7 @@ class WebservicesWSDL():
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
                             # working
                             # import_wsdl_definition[str('SOAP1.1-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
-                            temp[str('SOAP1.1-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str('SOAP1.1-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             import_wsdl_definition['APIS'].append(temp)
                             # temp['requestHeader']=requestHeader
                             # temp['requestBody']=requestBody
@@ -98,7 +99,7 @@ class WebservicesWSDL():
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
                             # working
                             # import_wsdl_definition[str(obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
-                            temp[str(obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
+                            temp[str(obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             import_wsdl_definition['APIS'].append(temp)
                             # temp['requestHeader']=requestHeader
                             # temp['requestBody']=requestBody
