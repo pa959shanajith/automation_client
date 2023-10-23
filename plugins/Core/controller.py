@@ -2287,8 +2287,7 @@ def kill_process():
                 if p[1] == 4723:
                     log.info( 'Pid Found' )
                     log.info(line.pid)
-                    # os.system("TASKKILL /F /T /PID " + str(line.pid))
-                    subprocess.Popen("TASKKILL /F /IM adb.exe")
+                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
         except Exception as e:
             log.error(e)
 
