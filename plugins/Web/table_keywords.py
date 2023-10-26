@@ -1017,6 +1017,13 @@ class TableOperationKeywords():
                                                 #logger.print_on_console('click action performed successfully')
                                         else:
                                             try:
+                                                local_tk.log.info('Checking if there is a clickable element in the cell')
+                                                if len(cell.find_elements_by_xpath('.//a')):
+                                                    cell = cell.find_elements_by_xpath('.//a')[0]
+                                                    local_tk.log.info('Pointing to link.')
+                                                elif  len(cell.find_elements_by_xpath('.//input')):
+                                                    cell = cell.find_elements_by_xpath('.//input')[0]
+                                                    local_tk.log.info('Pointing to input.')
                                                 if self.__check_visibility_from_config():
                                                     local_tk.log.debug('performing java script click')
                                                     js = 'var evType; element=arguments[0]; if (document.createEvent) {     evType = "Click executed through part-1";     var evt = document.createEvent("MouseEvents");     evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);   	setTimeout(function() {     	element.dispatchEvent(evt);     }, 100); } else {     evType = "Click executed through part-2";   	setTimeout(function() {     element.click();   	}, 100); } return (evType);'
@@ -1060,7 +1067,7 @@ class TableOperationKeywords():
                             for member in element_list:
                                   js1='function getElementXPath(elt) {var path = "";for (; elt && elt.nodeType == 1; elt = elt.parentNode){idx = getElementIdx(elt);xname = elt.tagName;if (idx >= 1){xname += "[" + idx + "]";}path = "/" + xname + path;}return path;}function getElementIdx(elt){var count = 1;for (var sib = elt.previousSibling; sib ; sib = sib.previousSibling){if(sib.nodeType == 1 && sib.tagName == elt.tagName){count++;}}return count;}return getElementXPath(arguments[0]).toLowerCase();'
                                   xpath=browser_Keywords.local_bk.driver_obj.execute_script(js1,member)
-                                  cellChild = browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
+                                  cellChild = member#browser_Keywords.local_bk.driver_obj.find_element_by_xpath(xpath)
                                   tagName = cellChild.tag_name
                                   tagType = cellChild.get_attribute('type')
                                   xpath_elements=xpath.split('/')
@@ -1144,7 +1151,7 @@ class TableOperationKeywords():
                                                 counter+=1
                                   elif tag=='link':
                                     local_tk.log.debug('clicking on link')
-                                    if(tagName==('a')):
+                                    if(tagName==('a') or tagName==('input')):
                                         if index==childindex:
                                             eleStatus =True
                                         else:
