@@ -31,6 +31,21 @@ import logger
 from webscrape_utils import WebScrape_Utils
 
 class Fullscrape():
+    def remove_duplicate_elements(self, elements):
+        try:
+            unique_elements = []
+            temp = []
+            for scrape_ele in elements:
+                if scrape_ele['custname'] in temp:
+                    continue
+                else:
+                    unique_elements.append(scrape_ele)
+                    temp.append(scrape_ele['custname'])
+        except Exception as e:
+            log.error( 'Error occoured while performing remove duplicate elements : ', e )
+            logger.print_on_console( 'Error occoured while performing remove duplicate elements')
+        return unique_elements
+
     def fullscrape(self,scrape_option,window_handle_number,visiblity_status,tagfilter,xpathfilter,scenarioFlag):
         global currenthandle
         start_time = time.clock()
@@ -199,6 +214,8 @@ class Fullscrape():
                 data['scrapedurl'] = driver.current_url
 ##            log.info('FILE: fullscrape.py , DEF: fullscrape() , MSG: Maximizing the tool once full scrape is done ')
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MAXIMIZE)
+            unique_data = self.remove_duplicate_elements(data['view'])
+            data['view'] = unique_data
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
