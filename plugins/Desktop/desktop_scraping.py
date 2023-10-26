@@ -502,6 +502,21 @@ class Scrape:
             log.error( e )
         return ne
 
+    def remove_duplicate_elements(self, elements):
+        try:
+            unique_elements = []
+            temp = []
+            for scrape_ele in elements:
+                if scrape_ele['custname'] in temp:
+                    continue
+                else:
+                    unique_elements.append(scrape_ele)
+                    temp.append(scrape_ele['custname'])
+        except Exception as e:
+            log.error( 'Error occoured while performing remove duplicate elements : ', e )
+            logger.print_on_console( 'Error occoured while performing remove duplicate elements')
+        return unique_elements
+
     def full_scrape(self, wxobject):
         allobjects = {}
         try:
@@ -524,6 +539,7 @@ class Scrape:
             obj.bring_Window_Front()
             winrect = desktop_launch_keywords.win_rect;
             allobjects =  self.get_all_children(ch, ne, 0, '', win, winrect, str(wxobject.backend_process).strip())
+            allobjects = self.remove_duplicate_elements(allobjects)
         except Exception as e:
             log.error( 'Error occoured while performing full_scrape, Error Msg : ', e )
             logger.print_on_console( 'Error occoured while performing full_scrape' )
