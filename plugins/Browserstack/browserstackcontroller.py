@@ -76,6 +76,8 @@ class BrowserstackWindow():
                     os_name = browser_version["os"]
                     os_version = browser_version["os_version"]
                     browser_version_str = browser_version["browser_version"] 
+                    if 'beta' in browser_version_str:
+                        continue
                     browser_version_num = float(browser_version_str)
                     if (browser_name == 'Internet Explorer' or browser_name == 'safari') or (browser_name != 'ie' and browser_name != 'safari' and browser_version_num >= 75):
                         if browser_name not in browser:

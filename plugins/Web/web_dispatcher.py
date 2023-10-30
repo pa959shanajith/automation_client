@@ -470,7 +470,9 @@ class Dispatcher:
         }
 
         self.browsers_sl={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
+        self.browsers_browserstack = {'1':{'browserName': "chrome", 'browserstack:options':{}},'2':{'browserName': "firefox", 'browserstack:options':{}},'3':{'browserName': "internet explorer", 'browserstack:options':{}},'7':{'browserName': "MicrosoftEdge", 'browserstack:options':{}},'8':{'browserName': "MicrosoftEdge", 'browserstack:options':{}}}
         self.sauce_conf = web_keywords.Sauce_Config().get_sauceconf()
+        self.browserstack_conf = browserstack_web_keywords.Browserstack_config().get_browserstackconf() 
         self.exception_flag=''
         self.action=None
         self.wxObject=None
