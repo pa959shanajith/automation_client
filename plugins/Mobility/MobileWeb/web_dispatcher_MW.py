@@ -397,6 +397,7 @@ class Dispatcher:
         self.exception_flag=''
         self.action=None
         self.sauce_conf = web_keywords_MW.Sauce_Config().get_sauceconf()
+        self.browserstack_conf = browserstack_web_keywords.Browserstack_config().get_browserstackconf()
 
     def dispatcher(self,teststepproperty,input,reporting_obj,mythread,execution_env):
         global simple_debug_gwto, status_gwto
@@ -733,7 +734,7 @@ class Dispatcher:
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
                     return False  
-                    
+
             else:
                 err_msg=INVALID_KEYWORD
                 result=list(result)
