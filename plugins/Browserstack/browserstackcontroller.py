@@ -103,3 +103,46 @@ class BrowserstackWindow():
             else:
                 socket.emit('browserstack_confresponse', 'Fail')
             logger.print_on_console('Exception in fetching the browserstcak details')
+
+    def get_mobileconf_details(self, browserstack_data, socket):
+        try:
+            BROWSERSTACK_USERNAME = browserstack_data['Browserstack_uname']
+            BROWSERSTACK_ACCESS_KEY = browserstack_data['BrowserstackAccessKey']
+            DEVICES_API_URL = "https://api-cloud.browserstack.com/app-automate/devices.json"
+            APPS_API_URL = "https://api-cloud.browserstack.com/app-automate/recent_apps"
+            auth_string = f"{BROWSERSTACK_USERNAME}:{BROWSERSTACK_ACCESS_KEY}"
+            encoded_auth = base64.b64encode(auth_string.encode()).decode()
+            headers = {
+                "Authorization": f"Basic {encoded_auth}",
+            }
+ 
+            response_devices = requests.get(DEVICES_API_URL, headers=headers)
+            response_data = {'devices': {}, 'stored_files': {}}
+ 
+            if response_devices.status_code == 200:
+                recent_apps_data = response_devices.json()
+                devices = {}
+                if recent_apps_data:
+                    for item in recent_apps_data:
+                        os = item["os"]
+                        os_version = item["os_version"]
+                        device = item["device"]
+                        devices.setdefault(os, {}).setdefault(os_version, []).append(device)
+                    device_details = {os: {ver: devices[os][ver] for ver in devices[os]} for os in devices}
+                    response_data['devices'] = device_details
+ 
+            response_apks = requests.get(APPS_API_URL, headers=headers)
+            if response_apks.status_code == 200:
+                app_data = response_apks.json()
+                stored_files = {apps['app_name']: apps['app_id'] for apps in app_data}
+                response_data['stored_files'] = stored_files
+ 
+            socket.emit('browserstack_confresponse', response_data)
+ 
+        except requests.exceptions.RequestException as e:
+            socket.emit('browserstack_confresponse', 'Request to Browserstack API failed')
+        except KeyError as e:
+            socket.emit('browserstack_confresponse', 'Missing key in browserstack_data')
+        except Exception as e:
+            logging.error(e)
+            socket.emit('browserstack_confresponse', 'An error occurred while processing the request')
