@@ -145,9 +145,11 @@ class Controller():
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -1382,10 +1384,17 @@ class Controller():
                             }
                             if(json_data['apptype'] == 'Web'):
                                 s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
                                 browserstack_details['osVersion'] = json_data['osVersion']
                                 browserstack_details['os'] = json_data['os']
                                 browserstack_details['browserName'] = json_data['browserName']
                                 browserstack_details['browserVersion'] = json_data['browserVersion']
+                            elif(json_data['apptype'] == 'MobileWeb'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            else:
+                                logger.print_on_console("App type Not available")  
 
                             s.save_browserstackconf(browserstack_details)
                             execution_env = {'env': 'browserstack','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}

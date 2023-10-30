@@ -900,6 +900,10 @@ class MainNamespace(BaseNamespace):
             if args[0]['action'] == Browserstack_ACTION_1:
                 data = args[0]
                 obj.get_webconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_2:
+                data = args[0]
+                obj.get_mobileconf_details(data, socketIO)  
+
         except Exception as e:        
                 err_msg='Error in Browserstack operations'
                 log.error(err_msg)
