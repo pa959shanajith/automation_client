@@ -416,7 +416,7 @@ class Controller():
                             elif tsp != None and isinstance(tsp,for_step.For):
                                 index = tsp.invokeFor(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,getparam.GetParam):
-                                index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env,datatables,)
+                                index = tsp.performdataparam(inpval,self,self.reporting_obj,execution_env,datatables)
                             elif tsp != None and isinstance(tsp,jumpBy.JumpBy):
                                 index = tsp.invoke_jumpby(inpval,self.reporting_obj)
                             elif tsp != None and isinstance(tsp,jumpTo.JumpTo):
@@ -452,11 +452,8 @@ class Controller():
         if self.action==EXECUTE:
             # self.reporting_obj.generate_report_step(tsp,self.status,tsp.name+' EXECUTED and the result is  '+self.status,ellapsed_time,keyword_flag,result[3])
             if statusflag:
-                # self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
-                #added value to store ids in reportitem collection
                 self.reporting_obj.generate_report_step(tsp,'',self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             else:
-                # self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
                 self.reporting_obj.generate_report_step(tsp,self.status,self,ellapsed_time,keyword_flag,result,ignore_stat,inpval)
             if tsp.name.lower()=='verifyvalues' or tsp.name.lower()=='verifytextiris':
                 tsp.testcase_details=testcase_details_orig
@@ -911,9 +908,6 @@ class Controller():
                     index = i
                     # if(action != DEBUG):    
                     #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
-                    
-                    # Added data to insert ids in the reportitem collection
-                    # i = self.methodinvocation(i,execution_env,datatables)
                     i = self.methodinvocation(i,execution_env,datatables)
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
@@ -1458,8 +1452,6 @@ class Controller():
                                 record_flag = str(configvalues['screen_rec']).lower()
                                 #start screen recording
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': video_path = recorder_obj.record_execution(json_data['suitedetails'][0])
-                                # Added data to get ids to store in report items collection
-                                # status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 status,status_percentage,accessibility_reports = con.executor(tsplist,EXECUTE,last_tc_num,1,con.conthread,execution_env,video_path,datatables=datatables,accessibility_testing = True)
                                 #end video
                                 if (record_flag=='yes') and self.execution_mode == SERIAL and json_data['apptype'] == 'Web': recorder_obj.rec_status = False
