@@ -6,6 +6,7 @@ import logging
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+import readconfig
 log = logging.getLogger("browserstackcontroller.py")
 
 
@@ -21,7 +22,7 @@ class BrowserstackWindow():
                 'Authorization': 'Basic '+authorization
             }
             url = "https://api.browserstack.com/automate/browsers.json"
-            response = requests.get(url,headers=headers)
+            response = requests.get(url,headers=headers, verify = self.send_tls_security())
             data = response.json()
             sorted_os = {
                 "os": {}
@@ -116,7 +117,7 @@ class BrowserstackWindow():
                 "Authorization": f"Basic {encoded_auth}",
             }
  
-            response_devices = requests.get(DEVICES_API_URL, headers=headers)
+            response_devices = requests.get(DEVICES_API_URL, headers=headers, verify = self.send_tls_security())
             response_data = {'devices': {}, 'stored_files': {}}
  
             if response_devices.status_code == 200:
@@ -131,7 +132,7 @@ class BrowserstackWindow():
                     device_details = {os: {ver: devices[os][ver] for ver in devices[os]} for os in devices}
                     response_data['devices'] = device_details
  
-            response_apks = requests.get(APPS_API_URL, headers=headers)
+            response_apks = requests.get(APPS_API_URL, headers=headers, verify = self.send_tls_security())
             if response_apks.status_code == 200:
                 app_data = response_apks.json()
                 stored_files = {apps['app_name']: apps['app_id'] for apps in app_data}
@@ -146,3 +147,18 @@ class BrowserstackWindow():
         except Exception as e:
             logging.error(e)
             socket.emit('browserstack_confresponse', 'An error occurred while processing the request')
+
+    def send_tls_security(self):
+        try:
+            tls_security = readconfig.configvalues.get("tls_security")
+            if tls_security != None and tls_security.lower() == "low":
+                # Make a GET request without SSL certificate verification (not recommended)
+                return False
+            else:
+                # Make a GET request with SSL certificate verification
+                return True
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("ERROR:SSLverify flag as False. Disabled TLS Certificate and Hostname Verification.")
+            #by default sending false(if this fuction met exception).you can modify this default return and above logger message.
+            return False 
