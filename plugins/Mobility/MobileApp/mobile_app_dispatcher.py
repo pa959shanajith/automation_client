@@ -327,7 +327,6 @@ class MobileDispatcher:
                     else:
                         if teststepproperty.name.lower() == "installapplication":
                             config = self.browserstack_conf["Mobile"]
-                            # apkName = config['uploadedApk']
                             desired_caps = {}
                             desired_caps['os_version'] = config["platformVersion"]
                             desired_caps['device'] = config["deviceName"]
@@ -338,22 +337,10 @@ class MobileDispatcher:
                             desired_caps['browserstack.appium_version'] = "1.16.0"
                             desired_caps['browserstack.idleTimeout'] = "120"
                             desired_caps['browserstack.networkLogs'] = "true"
-                            # desired_caps = {
-                            #     "os_version": "9.0",
-                            #     "device": "Google Pixel 3",
-                            #     "app": "bs://9315c0eae18cf016b8aab5655e7591f4256af79b",
-                            #     "build": "1",
-                            #     "name": "codex_test",
-                            #     "browserstack.appium_version": "1.16.0",
-                            #     "browserstack.idleTimeout": "60",
-                            #     "browserstack.networkLogs": "true"
-                            # }
                             result=self.browserstack_mobile_app_dict[keyword](self.browserstack_conf['remote_url'], desired_caps)
-                            # driver = web_keywords_MA.local_mak.driver
                             driver = android_scrapping.driver
                             log.info(driver)
                         else:
-                            # element, xpath=self.getMobileElement(web_keywords_MA.local_mak.driver,objectname)
                             element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                             log.info(element)
                             log.info(xpath)
