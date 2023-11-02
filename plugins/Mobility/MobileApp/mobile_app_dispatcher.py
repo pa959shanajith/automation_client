@@ -331,9 +331,10 @@ class MobileDispatcher:
                             desired_caps = {}
                             desired_caps['os_version'] = config["platformVersion"]
                             desired_caps['device'] = config["deviceName"]
-                            desired_caps['app'] = "bs://9315c0eae18cf016b8aab5655e7591f4256af79b"
-                            desired_caps['build'] = "Build_Mobile_App_Test"
+                            desired_caps['app'] = config["uploadedApk"]
+                            desired_caps['build'] = "Mobile_App_Test"
                             desired_caps['name'] = 'Mobile_App_Test'
+                            desired_caps["interactiveDebugging"] = "true"
                             desired_caps['browserstack.appium_version'] = "1.16.0"
                             desired_caps['browserstack.idleTimeout'] = "120"
                             desired_caps['browserstack.networkLogs'] = "true"
