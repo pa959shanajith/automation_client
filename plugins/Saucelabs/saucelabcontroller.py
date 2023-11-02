@@ -44,7 +44,7 @@ class SaucelabWindow():
         """
         res = "invalidcredentials"
         try:
-           response = requests.get("https://app.saucelabs.com/rest/v1/info/platforms/webdriver/", verify=False)
+           response = requests.get("https://app.saucelabs.com/rest/v1/info/platforms/webdriver/")
            data = json.loads(response.text)
            # Create empty lists and dictionary to hold the options for each dropdown
            os_names = []
@@ -193,7 +193,7 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers, verify=False)
+                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
                     if response_real_devices.status_code != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response_real_devices.status_code)
@@ -243,7 +243,7 @@ class SaucelabWindow():
                             # Send request to API endpoint
                             # respon = requests.post(endpoint_url, headers=headers, json=body)
                             storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
-                            response = requests.get(storage_url, headers=headers, verify=False)
+                            response = requests.get(storage_url, headers=headers)
                             if response.status_code != 200:
                                 log.info("Unable to connect to server retrying Status code is: %s",
                                     response.status_code)
