@@ -21,7 +21,7 @@ class BrowserstackWindow():
                 'Authorization': 'Basic '+authorization
             }
             url = "https://api.browserstack.com/automate/browsers.json"
-            response = requests.get(url,headers=headers, verify = False)
+            response = requests.get(url,headers=headers)
             data = response.json()
             sorted_os = {
                 "os": {}
@@ -116,7 +116,7 @@ class BrowserstackWindow():
                 "Authorization": f"Basic {encoded_auth}",
             }
  
-            response_devices = requests.get(DEVICES_API_URL, headers=headers, verify = False)
+            response_devices = requests.get(DEVICES_API_URL, headers=headers)
             response_data = {'devices': {}, 'stored_files': {}}
  
             if response_devices.status_code == 200:
@@ -131,7 +131,7 @@ class BrowserstackWindow():
                     device_details = {os: {ver: devices[os][ver] for ver in devices[os]} for os in devices}
                     response_data['devices'] = device_details
  
-            response_apks = requests.get(APPS_API_URL, headers=headers, verify = False)
+            response_apks = requests.get(APPS_API_URL, headers=headers)
             if response_apks.status_code == 200:
                 app_data = response_apks.json()
                 stored_files = {apps['app_name']: apps['app_id'] for apps in app_data}
