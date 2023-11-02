@@ -214,8 +214,9 @@ class Fullscrape():
                 data['scrapedurl'] = driver.current_url
 ##            log.info('FILE: fullscrape.py , DEF: fullscrape() , MSG: Maximizing the tool once full scrape is done ')
 ##            win32gui.ShowWindow(toolwindow, win32con.SW_MAXIMIZE)
-            unique_data = self.remove_duplicate_elements(data['view'])
-            data['view'] = unique_data
+            if scenarioFlag == False:
+                unique_data = self.remove_duplicate_elements(data['view'])
+                data['view'] = unique_data
         except Exception as e:
             status = domconstants.STATUS_FAIL
             data = domconstants.STATUS_FAIL
