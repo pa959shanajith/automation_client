@@ -746,10 +746,10 @@ class Dispatcher:
                     screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                            file_path = screen_shot_obj.captureScreenshot(screen_details, web=True, driver=driver)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details)
+                        file_path = screen_shot_obj.captureScreenshot(screen_details, web=True, driver=driver)
                         result.append(file_path[2])
         except TypeError as e:
             log.error(e,exc_info=True)
