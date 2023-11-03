@@ -97,6 +97,13 @@ class Scrape:
                             global actualobjects
                             global click_count
                             if ( actualelement not in actualobjects ):#------check to remove duplicate elements
+                                element_name = []
+                                for element in actualobjects:
+                                    element_name.append(element['custname'])
+                                if actualelement['custname'] in element_name:
+                                    new_custname = actualelement['custname'].split('_')[0] + actualelement['xpath'].split(';')[0].split('[')[1][:-1]
+                                    new_custname = new_custname + '_' + '_'.join(map(str,actualelement['custname'].split('_')[1:]))
+                                    actualelement['custname'] = new_custname
                                 actualobjects.append(actualelement)
                                 self.desktop_highlight_obj.highlight_element(actualelement['xpath'], actualelement['url'])
                             else:
