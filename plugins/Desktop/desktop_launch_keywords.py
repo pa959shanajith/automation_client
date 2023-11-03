@@ -211,10 +211,11 @@ class Launch_Keywords():
         GetWindowText = ctypes.windll.user32.GetWindowTextW
         GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
         IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+        IsHungAppWindow = ctypes.windll.user32.IsHungAppWindow
 
         handles = []
         def foreach_window(hwnd, lParam):
-            if ( IsWindowVisible(hwnd) ):
+            if ( IsWindowVisible(hwnd) and not IsHungAppWindow(hwnd) ):
                 length = GetWindowTextLength(hwnd)
                 buff = ctypes.create_unicode_buffer(length + 1)
                 GetWindowText(hwnd, buff, length + 1)
@@ -440,15 +441,21 @@ class Launch_Keywords():
                             self.windowHandle = title_matched_windows[0]
                             app_win32 = Application(backend = 'win32').connect(process = window_pid)
                             app_uia = Application(backend = 'uia').connect(process = window_pid)
-                            app_win32.top_window().set_focus()
+                            """
+                                trying to focus on the window using win32 native API's if it fails briging the window to front using win32gui
+                            """
+                            try:
+                                app_win32.top_window().set_focus()
+                            except:
+                                self.bring_Window_Front()
 
-                            time.sleep(3)
-                            im = PIL.ImageGrab.grab()
+                            # time.sleep(3)
+                            # im = PIL.ImageGrab.grab()
 
-                            core_utils.get_all_the_imports('IRIS')
+                            # core_utils.get_all_the_imports('IRIS')
 
-                            import client
-                            message=client.api_request().image_save(im)
+                            # import client
+                            # message=client.api_request().image_save(im)
 
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE

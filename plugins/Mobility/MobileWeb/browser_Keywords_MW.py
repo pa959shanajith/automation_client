@@ -229,6 +229,39 @@ class BrowserKeywords():
             log.error(err_msg)
         return status, result, output, err_msg
 
+    def openBrowser_BrowserStack(self,url,inputs,*args):
+        global driver_obj, driver
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            desired_cap = inputs
+            driver = webdriver.Remote(url, desired_cap)
+            driver_obj = driver
+            status = TEST_RESULT_PASS            
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
+            log.error(e)
+
+        return status,result,output,err_msg    
+
+    def closeBrowser_BrowserStack(self, input, *args):
+        global driver_obj, driver
+        status = TEST_RESULT_FAIL
+        result = TEST_RESULT_FALSE
+        output = OUTPUT_CONSTANT
+        err_msg = None
+        try:
+            driver_obj.quit()
+            driver_obj =None
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            log.error(e)
+        return status,result,output,err_msg
+
     def check_browser_active(self, inputs):
         res=webconstants_MW.TEST_RESULT_FALSE
         dv_name=inputs[0]

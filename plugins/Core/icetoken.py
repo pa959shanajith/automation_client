@@ -151,7 +151,9 @@ class Token_window(wx.Frame):
             self.Bind(wx.EVT_CLOSE, self.close)
             wx.Frame(self.panel)
             # SN Adiga 07-Aug-2022: Show registration window if auto registration failure
-            if configvalues.get('isTrial'):
+            # A sreenivasulu , auto registration is required for servicelevel = 2(means trinee registration)
+            # licenectype = 1(means trial), 2(means trinee), 3(starter),4(enterprise)
+            if configvalues.get('isTrial') or configvalues.get("licensetype") == 2:
                 res = self.auto_registration()
                 if (res == False) or (res == None):
                     self.Show()
@@ -159,8 +161,6 @@ class Token_window(wx.Frame):
                 self.Show()
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.print_on_console("Error occured in Token Registration")
             log.error("Error occured in Token Registration. Err msg: " + str(e))
 

@@ -336,6 +336,7 @@ class Reporting:
         obj[COMMENTS]=report_obj.comments
         report_obj.step_description=self.core_utilsobject.get_UTF_8(report_obj.step_description)
         obj[STEP_DESCRIPTION]=report_obj.step_description
+
         report_obj.screenshot_path=self.core_utilsobject.get_UTF_8(report_obj.screenshot_path)
         # if constants.SCREENSHOT_NFS_AVAILABLE: 
         obj[SCREENSHOT_PATH]= report_obj.screenshot_path

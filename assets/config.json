@@ -31,6 +31,7 @@
     "incognito_private_mode": "No",
     "isTrial": 0,
     "kill_stale": "Yes",
+    "licensetype": 4,
     "logFile_Path": "./logs/Avoclient.log",
     "max_retries_app_launch": "20",
     "prediction_for_iris_objects": "No",
@@ -49,5 +50,6 @@
     "update_check": "No",
     "use_custom_debugport": "No",
     "verify_wait_time": "60",
-    "sap_object_indentification_order": "1"
+    "sap_object_indentification_order": "1",
+    "oebs_object_indentification_order": "1"
 }

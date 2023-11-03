@@ -1281,6 +1281,8 @@ class Config_window(wx.Frame):
         data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
         data['ai_server']=readconfig.configvalues['ai_server']
         data['sap_object_indentification_order']=readconfig.configvalues['sap_object_indentification_order']
+        data['licensetype']=readconfig.configvalues['licensetype']
+        data['oebs_object_indentification_order']=readconfig.configvalues['oebs_object_indentification_order']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
