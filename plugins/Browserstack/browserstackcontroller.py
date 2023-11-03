@@ -148,6 +148,46 @@ class BrowserstackWindow():
             logging.error(e)
             socket.emit('browserstack_confresponse', 'An error occurred while processing the request')
 
+    def uploadApk_bs(self, browserstack_data, socket):
+        try:
+            api_username = browserstack_data['Browserstack_uname']
+            api_key = browserstack_data['BrowserstackAccessKey']
+            apk_path = browserstack_data['BrowserstackUploadApk']['apkPath']
+            base_url = "https://api-cloud.browserstack.com/app-automate/upload"
+            auth_string = f"{api_username}:{api_key}"
+            encoded_auth = base64.b64encode(auth_string.encode()).decode()
+            headers = {
+                "Authorization": f"Basic {encoded_auth}",
+            }
+        
+            try:
+                with open(apk_path, "rb") as apk_file:
+                    files = {"file": apk_file}
+                    response = requests.post(base_url, headers=headers, files=files)
+        
+                    if response.status_code == 200:
+                        socket.emit('browserstack_confresponse','Apk Uploaded Successfully')
+                        json_response = response.json()
+                        app_url = json_response.get("app_url")
+                        if app_url:
+                            return app_url,None
+                        else:
+                            return None, "App URL not found in the response."
+                    else:
+                        return None, f"Failed to upload APK. Status code: {response.status_code}"
+        
+            except Exception as e:
+                return None, f"An error occurred: {str(e)}"
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('browserstack_confresponse','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('browserstack_confresponse','Invalid Credentials')
+            else:
+                socket.emit('browserstack_confresponse','Fail')
+            logger.print_on_console('Exception in fetching the sauce details')
+            
     def send_tls_security(self):
         try:
             tls_security = readconfig.configvalues.get("tls_security")
