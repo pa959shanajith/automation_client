@@ -621,7 +621,8 @@ class MainNamespace(BaseNamespace):
             import wsdlgenerator
             wsdlurl = str(args[0])
             wsdl_object = wsdlgenerator.WebservicesWSDL()
-            response = wsdl_object.listOfOperation(wsdlurl)
+            import_def=False
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
             response=str(response)
             log.debug(response)
             socketIO.emit('result_wsdl_listOfOperation',response)
@@ -678,6 +679,41 @@ class MainNamespace(BaseNamespace):
             socketIO.emit('result_wsdl_ServiceGenerator',response)
         except Exception as e:
             err_msg='Error while Fetching WSDL Response'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_WS_ImportDefinition(self, *args):
+        try:
+            if check_execution_lic("result_WS_ImportDefinition"): return None
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import wsdlgenerator
+            wsdlurl = str(args[0])
+            wsdl_object = wsdlgenerator.WebservicesWSDL()
+            import_def=True
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
+            log.debug(response)
+            socketIO.emit('result_WS_ImportDefinition',response)
+        except Exception as e:
+            err_msg='Error while Fetching WSDL Operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_ExecuteRequestTemplate(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import  webservices
+            wsdlurl = str(args[0])
+            ws_object = webservices.WSkeywords()
+            response = ws_object.executeRequestTemplate(wsdlurl)
+            response=str(response)
+            log.debug(response)
+            socketIO.emit('result_ExecuteRequestTemplate',response)
+        except Exception as e:
+            err_msg='Error while executing'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
