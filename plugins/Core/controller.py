@@ -559,7 +559,7 @@ class Controller():
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
-        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() in ['executerequest','simpleexecute']):
+        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() in ['executerequest','executerequesttemplate']):
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check

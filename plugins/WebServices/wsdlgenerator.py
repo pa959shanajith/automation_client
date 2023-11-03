@@ -58,9 +58,6 @@ class WebservicesWSDL():
                 import_wsdl_definition['CollectionName']=list_method.wsdl.services[0].name
                 obt_list_method = [method for method in list_method.wsdl.services[0].ports[portindex].methods]
                 for methodindex in range(0,len(obt_list_method)):
-                    # temp = {}
-                    # temp['requestHeader']=''
-                    # temp['requestBody']=''
                     if 'Soap12' in portname:
                         allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
                         if import_def:
@@ -69,12 +66,8 @@ class WebservicesWSDL():
                             requestHeader = wsdl_object.requestHeader()
                             requestBody = wsdl_object.requestBody()
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
-                            # working
-                            # import_wsdl_definition[str('SOAP1.2-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             temp[str('SOAP1.2-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
                             import_wsdl_definition['APIS'].append(temp)
-                            # temp['requestHeader']=requestHeader
-                            # temp['requestBody']=requestBody
                     elif 'Soap' in portname:
                         allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
                         if import_def:
@@ -83,12 +76,8 @@ class WebservicesWSDL():
                             requestHeader = wsdl_object.requestHeader()
                             requestBody = wsdl_object.requestBody()
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
-                            # working
-                            # import_wsdl_definition[str('SOAP1.1-'+obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             temp[str('SOAP1.1-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
                             import_wsdl_definition['APIS'].append(temp)
-                            # temp['requestHeader']=requestHeader
-                            # temp['requestBody']=requestBody
                     else:
                         allmethodslist.append(str(obt_list_method[methodindex]))
                         if import_def:
@@ -97,12 +86,8 @@ class WebservicesWSDL():
                             requestHeader = wsdl_object.requestHeader()
                             requestBody = wsdl_object.requestBody()
                             requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
-                            # working
-                            # import_wsdl_definition[str(obt_list_method[methodindex])]={'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST'}
                             temp[str(obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
                             import_wsdl_definition['APIS'].append(temp)
-                            # temp['requestHeader']=requestHeader
-                            # temp['requestBody']=requestBody
             ##print list_method.wsdl.services[0].ports[0].name
             ##    obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
             ##    obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]

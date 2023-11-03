@@ -1320,7 +1320,7 @@ class WSkeywords:
             logger.print_on_console("Error while setting the tag value")
         return json_obj
     
-    def SimpleExecute(self,*args):
+    def executeRequestTemplate(self,*args):
         testcasename = handler.local_handler.testcasename
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE

@@ -625,8 +625,6 @@ class MainNamespace(BaseNamespace):
             response = wsdl_object.listOfOperation(wsdlurl,import_def)
             response=str(response)
             log.debug(response)
-            import_def=True
-            # response = wsdl_object.listOfOperation(wsdlurl,import_def)
             socketIO.emit('result_wsdl_listOfOperation',response)
         except Exception as e:
             err_msg='Error while Fetching WSDL Operations'
@@ -695,7 +693,6 @@ class MainNamespace(BaseNamespace):
             wsdl_object = wsdlgenerator.WebservicesWSDL()
             import_def=True
             response = wsdl_object.listOfOperation(wsdlurl,import_def)
-            # response=str(response)
             log.debug(response)
             socketIO.emit('result_WS_ImportDefinition',response)
         except Exception as e:
@@ -704,18 +701,17 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
-    def omSimpleExecute(self, *args):
+    def on_ExecuteRequestTemplate(self, *args):
         try:
-            # if check_execution_lic("result_SimpleExecute"): return None
             wait_until_browsercheck()
             core_utils.get_all_the_imports('WebServices')
             import  webservices
             wsdlurl = str(args[0])
             ws_object = webservices.WSkeywords()
-            response = ws_object.SimpleExecute(wsdlurl)
+            response = ws_object.executeRequestTemplate(wsdlurl)
             response=str(response)
             log.debug(response)
-            socketIO.emit('result_SimpleExecute',response)
+            socketIO.emit('result_ExecuteRequestTemplate',response)
         except Exception as e:
             err_msg='Error while executing'
             log.error(err_msg)
