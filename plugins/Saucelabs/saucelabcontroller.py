@@ -148,7 +148,7 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers)
+                    response = http.request('GET', 'https://app.saucelabs.com/rest/v1/info/platforms/webdriver', headers=headers, verify=self.send_tls_security())
                     if response.status != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response.status)
