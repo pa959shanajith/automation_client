@@ -41,6 +41,7 @@ import platform
 import time
 import android_custom
 import web_keywords_MA
+import browserstack_web_keywords
 import threading
 driver_obj = None
 local_wk=threading.local()
@@ -67,6 +68,7 @@ class MobileDispatcher:
     seekBar_object=seekBar_Mobility.Seek_Bar_Keywords()
     custom_object=android_custom.custom()
     install_and_launch_object_sl = android_scrapping.InstallAndLaunch()
+    install_and_launch_object_bs = android_scrapping.InstallAndLaunch()
 
     mob_dict={
         'settext':textbox_keywords_object.set_text,
@@ -152,10 +154,96 @@ class MobileDispatcher:
         'verifytime':time_keywords_object.verify_time,
         'verifydate':date_keywords_object.verify_date
     }
+
+    browserstack_mobile_app_dict = {
+        'settext':textbox_keywords_object.set_text,
+        'cleartext' : textbox_keywords_object.clear_text,
+        'setsecuretext' : textbox_keywords_object.setsecuretext,
+        'sendvalue' : textbox_keywords_object.send_value,
+        'gettext' : textbox_keywords_object.get_text,
+        'verifytext' : textbox_keywords_object.verify_text,
+        'selectradiobutton' : radio_button_object.select_radio_button,
+        'getstatus' : radio_button_object.get_status,
+        'selectcheckbox' : radio_button_object.select_checkbox,
+        'unselectcheckbox' : radio_button_object.unselect_checkbox,
+        'press' : button_link_object.press,
+        'click' : button_link_object.click,
+        'longpress' : button_link_object.long_press,
+        'getbuttonname' : button_link_object.get_button_name,
+        'verifybuttonname' : button_link_object.verify_button_name,
+        'installapplication' : install_and_launch_object_bs.installApplication_browserStack,
+        'launchapplication' : install_and_launch_object_bs.installApplication_browserStack,
+        'uninstallapplication' : install_and_launch_object_bs.uninstallApplication_browserStack,
+        'closeapplication' : install_and_launch_object.closeApplication,
+        'swipeleft' : swipe_keywords_object.swipe_left,
+        'swiperight': swipe_keywords_object.swipe_right,
+        'swipeup': swipe_keywords_object.swipe_up,
+        'swipedown': swipe_keywords_object.swipe_down,
+        'toggleon' : toggle_keywords_object.toggle_on,
+        'toggleoff':toggle_keywords_object.toggle_off,
+        'verifyenabled' : slider_util_keywords_object.verify_enabled,
+        'verifydisabled' : slider_util_keywords_object.verify_disabled,
+        'verifyvisible' : slider_util_keywords_object.verify_visible,
+        'verifyhidden' : slider_util_keywords_object.verify_hidden,
+        'verifyexists' : slider_util_keywords_object.verify_exists,
+        'verifydoesnotexists': slider_util_keywords_object.verify_does_not_exists,
+        'getdevices' : device_keywords_object.get_device_list,
+        'invokedevice' : device_keywords_object.invoke_device,
+        'stopserver':install_and_launch_object.stop_server,
+        'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
+        'backpress':swipe_keywords_object.backPress,
+        'setslidevalue': slider_util_keywords_object.set_slide_value,
+        'getslidevalue': slider_util_keywords_object.get_slide_value,
+        'actionkey':action_keywords_object.action_key,
+        'waitforelementexists':slider_util_keywords_object.waitforelement_exists,
+        'getcount':spinner_keywords_object.get_count,
+        'verifycount':spinner_keywords_object.verify_count,
+        'selectvaluebyindex':spinner_keywords_object.select_value_by_index,
+        'selectvaluebytext':spinner_keywords_object.select_value_by_text,
+        'getmultiplevaluesbyindexes':spinner_keywords_object.get_multiple_values_by_indexes,
+        'getvaluebyindex':spinner_keywords_object.get_value_by_index,
+        'getallvalues':spinner_keywords_object.get_all_values,
+        'verifyallvalues':spinner_keywords_object.verify_all_values,
+        'getselectedvalue':spinner_keywords_object.get_selected_value,
+        'verifyselectedvalue':spinner_keywords_object.verify_selected_value,
+        'getlistcount':list_view_keywords_object.get_list_count,
+        'verifylistcount':list_view_keywords_object.verify_list_count,
+        'selectviewbyindex':list_view_keywords_object.select_view_by_index,
+        'selectviewbytext':list_view_keywords_object.select_view_by_text,
+        'getmultipleviewsbyindexes':list_view_keywords_object.get_multiple_views_by_indexes,
+        'getviewbyindex':list_view_keywords_object.get_list_view_by_index,
+        'getallviews':list_view_keywords_object.get_all_views,
+        'verifyallviews':list_view_keywords_object.verify_all_views,
+        'getselectedviews':list_view_keywords_object.get_selected_views,
+        'verifyselectedviews':list_view_keywords_object.verify_selected_views,
+        'selectmultipleviewsbyindexes':list_view_keywords_object.select_multiple_views_by_indexes,
+        'selectmultipleviewsbytext':list_view_keywords_object.select_multiple_views_by_text,
+        'setvalue': seekBar_object.Set_Mid_Value if (SYSTEM_OS != 'Darwin') else picker_wheel_keywords_object.set_value,
+        'getvalue': picker_wheel_keywords_object.get_value,
+        'getrowcount':table_keywords_object.get_row_count,
+        'verifyrowcount':table_keywords_object.verify_row_count,
+        'cellclick':table_keywords_object.cell_click,
+        'getcellvalue':table_keywords_object.get_cell_value,
+        'verifycellvalue':table_keywords_object.verify_cell_value,
+        'setdate' : date_keywords_object.Set_Date,
+        'getdate' : date_keywords_object.Get_Date,
+        'settime' : time_keywords_object.Set_Time,
+        'gettime' : time_keywords_object.Get_Time,
+        'setnumber':number_picker_object.Select_Number,
+        'getnumber':number_picker_object.Get_Selected_Number,
+        'verifynumber':number_picker_object.Verify_Selected_Number,
+        'setminvalue':seekBar_object.Set_Min_Value,
+        'setmidvalue':seekBar_object.Set_Mid_Value,
+        'setmaxvalue':seekBar_object.Set_Max_Value,
+        'verifytime':time_keywords_object.verify_time,
+        'verifydate':date_keywords_object.verify_date
+    }
+
     def __init__(self):
         self.exception_flag=''
         self.action=None
         self.sauce_conf = web_keywords_MA.Sauce_Config().get_sauceconf()
+        self.browserstack_conf = browserstack_web_keywords.Browserstack_config().get_browserstackconf()
 
     def dispatcher(self,teststepproperty,input,reporting_obj, mythread, execution_env):
         global apptypes,ip
@@ -219,6 +307,49 @@ class MobileDispatcher:
                     else:
                         element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
                         result=self.mob_dict[keyword](element,input,xpath)
+            elif execution_env['env'] == 'browserstack' and teststepproperty.name.lower() in list(self.browserstack_mobile_app_dict.keys()):
+                if teststepproperty.name.lower() in self.browserstack_mobile_app_dict:
+                    globalWait_to = int(readconfig.configvalues['globalWaitTimeOut'])
+                    if globalWait_to>0:
+                        element = xpath = None
+                        globalWait_to_delay = 0.25
+                        for _ in range(int(globalWait_to/globalWait_to_delay)+1):
+                            element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                            if element is not None:
+                                break
+                            time.sleep(globalWait_to_delay)
+                        if element is not None:
+                            msg1="Element found. Global Wait Timeout completed"
+                        else:
+                            msg1="Element not found. Global Wait Timeout exceeded"
+                        logger.print_on_console(msg1)
+                        log.info(msg1)
+                    else:
+                        if teststepproperty.name.lower() == "installapplication":
+                            config = self.browserstack_conf["Mobile"]
+                            desired_caps = {}
+                            desired_caps['os_version'] = config["platformVersion"]
+                            desired_caps['device'] = config["deviceName"]
+                            desired_caps['app'] = config["uploadedApk"]
+                            desired_caps['build'] = "Mobile_App_Test"
+                            desired_caps['name'] = 'Mobile_App_Test'
+                            desired_caps["interactiveDebugging"] = "true"
+                            desired_caps['browserstack.appium_version'] = "1.16.0"
+                            desired_caps['browserstack.idleTimeout'] = "120"
+                            desired_caps['browserstack.networkLogs'] = "true"
+                            desired_caps['browserstack.debug'] = "true"
+                            result=self.browserstack_mobile_app_dict[keyword](self.browserstack_conf['remote_url'], desired_caps)
+                            driver = android_scrapping.driver
+                            log.info(driver)
+                        else:
+                            element, xpath=self.getMobileElement(android_scrapping.driver,objectname)
+                            log.info(element)
+                            log.info(xpath)
+                            result=self.browserstack_mobile_app_dict[keyword](element,input,xpath,execution_env['env'])
+                else:
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
+                    return False
+
             elif execution_env['env'] == 'saucelabs' and teststepproperty.name.lower() in list(self.sauce_mobile_app_dict.keys()):
                 if teststepproperty.name.lower() in self.sauce_mobile_app_dict:
                     # result = self.sauce_mobile_app_dict[teststepproperty.name.lower()](objectname,input)
@@ -430,3 +561,5 @@ class MobileDispatcher:
         'verifytime':time_keywords_object.verify_time,
         'verifydate':date_keywords_object.verify_date
     }
+
+    

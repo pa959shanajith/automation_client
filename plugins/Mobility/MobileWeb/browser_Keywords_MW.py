@@ -244,7 +244,6 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             log.error(e)
-
         return status,result,output,err_msg    
 
     def closeBrowser_BrowserStack(self, input, *args):

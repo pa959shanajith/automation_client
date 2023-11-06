@@ -938,7 +938,12 @@ class MainNamespace(BaseNamespace):
                 obj.get_webconf_details(data, socketIO)
             elif args[0]['action'] == Browserstack_ACTION_2:
                 data = args[0]
-                obj.get_mobileconf_details(data, socketIO)  
+                obj.get_mobileconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_3:
+                data = args[0]
+                obj.uploadApk_bs(data, socketIO)
+            else:
+                logger.print_on_console("Not able to login to BrowserStack")  
 
         except Exception as e:        
                 err_msg='Error in Browserstack operations'

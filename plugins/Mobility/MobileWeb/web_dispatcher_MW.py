@@ -716,6 +716,7 @@ class Dispatcher:
                         desired_caps["browserstack.idleTimeout"] = "60"
                         desired_caps["browserstack.networkLogs"] = "true"
                         desired_caps["interactiveDebugging"] = "true"
+                        desired_caps['browserstack.debug'] = "true"
                         result = self.Browserstack_mobile_web_dict[teststepproperty.name](self.browserstack_conf['remote_url'],desired_caps)
                         # driver = web_keywords_MW.local_wk.driver
                         driver = browser_Keywords_MW.driver_obj
