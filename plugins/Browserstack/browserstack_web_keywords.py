@@ -83,6 +83,10 @@ class Browserstack_config():
             browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
             browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
             browserstack_constants.Mobile =  args[0]['Mobile']
+        elif args[0]['apptype'] == 'MobileApp':
+            browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
+            browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
+            browserstack_constants.Mobile =  args[0]['Mobile']
         else:
             logger.print_on_console("App type Not available")
         url = "https://{}:{}@hub.browserstack.com/wd/hub".format(browserstack_constants.Browserstack_Username,browserstack_constants.Browserstack_key)

@@ -163,9 +163,11 @@ class Controller():
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
                     core_utils.get_all_the_imports('Mobility/iris_mobile')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -1384,6 +1386,10 @@ class Controller():
                                 browserstack_details['browserName'] = json_data['browserName']
                                 browserstack_details['browserVersion'] = json_data['browserVersion']
                             elif(json_data['apptype'] == 'MobileWeb'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            elif(json_data['apptype'] == 'MobileApp'):
                                 s=browserstack_web_keywords.Browserstack_config()
                                 browserstack_details['apptype'] = json_data['apptype']
                                 browserstack_details['Mobile'] = json_data['mobile']
