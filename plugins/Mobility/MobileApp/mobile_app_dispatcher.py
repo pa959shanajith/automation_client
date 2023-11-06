@@ -337,6 +337,7 @@ class MobileDispatcher:
                             desired_caps['browserstack.appium_version'] = "1.16.0"
                             desired_caps['browserstack.idleTimeout'] = "120"
                             desired_caps['browserstack.networkLogs'] = "true"
+                            desired_caps['browserstack.debug'] = "true"
                             result=self.browserstack_mobile_app_dict[keyword](self.browserstack_conf['remote_url'], desired_caps)
                             driver = android_scrapping.driver
                             log.info(driver)
