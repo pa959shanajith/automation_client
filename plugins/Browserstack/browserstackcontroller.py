@@ -135,7 +135,7 @@ class BrowserstackWindow():
             response_apks = requests.get(APPS_API_URL, headers=headers, verify = self.send_tls_security())
             if response_apks.status_code == 200:
                 app_data = response_apks.json()
-                stored_files = {apps['app_name']: apps['app_id'] for apps in app_data}
+                stored_files = {apps['app_name']: apps['app_url'] for apps in app_data}
                 response_data['stored_files'] = stored_files
  
             socket.emit('browserstack_confresponse', response_data)
