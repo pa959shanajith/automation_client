@@ -163,7 +163,7 @@ class BrowserstackWindow():
             try:
                 with open(apk_path, "rb") as apk_file:
                     files = {"file": apk_file}
-                    response = requests.post(base_url, headers=headers, files=files)
+                    response = requests.post(base_url, headers=headers, files=files, verify = self.send_tls_security())
         
                     if response.status_code == 200:
                         socket.emit('browserstack_confresponse','Apk Uploaded Successfully')
