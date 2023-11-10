@@ -460,11 +460,11 @@ class Launch_Keywords():
                             status = desktop_constants.TEST_RESULT_PASS
                             result = desktop_constants.TEST_RESULT_TRUE
                             break
-                elif ( len(title_matched_windows) == 0 ):
-                    err_msg = 'The given window name is not found'
-                    log.info( err_msg )
-                    logger.print_on_console( err_msg )
-                    term = TERMINATE
+            elif ( len(title_matched_windows) == 0 ):
+                err_msg = 'The given window name is not found'
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+                term = TERMINATE
         except Exception as e:
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
             log.error( err_msg )
