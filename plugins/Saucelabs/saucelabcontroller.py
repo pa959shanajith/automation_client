@@ -309,6 +309,7 @@ class SaucelabWindow():
             auth = (username, access_key)
 
             response = requests.post(upload_url, files=files, auth=auth)
+            verification=response.status_code
             aapt_path=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\aapt.exe"
             try:
                 result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], capture_output=True, text=True, check=True)
@@ -326,7 +327,8 @@ class SaucelabWindow():
 
             data_to_server = {
                 "name": saucleb_input_dict['SauceLabUploadApk']['apkName'],
-                "activity": res
+                "activity": res,
+                "statusCode":verification
             }
 
 
