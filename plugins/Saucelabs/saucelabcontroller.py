@@ -309,8 +309,7 @@ class SaucelabWindow():
             auth = (username, access_key)
 
             response = requests.post(upload_url, files=files, auth=auth)
-            if response.status_code == 201:
-                verification=response.status_code
+            verification=response.status_code
             aapt_path=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\aapt.exe"
             try:
                 result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], capture_output=True, text=True, check=True)
