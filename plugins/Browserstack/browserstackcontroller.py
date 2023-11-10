@@ -128,15 +128,25 @@ class BrowserstackWindow():
                         os = item["os"]
                         os_version = item["os_version"]
                         device = item["device"]
+                        if 'beta' in os_version.lower():
+                            continue
                         devices.setdefault(os, {}).setdefault(os_version, []).append(device)
                     device_details = {os: {ver: devices[os][ver] for ver in devices[os]} for os in devices}
                     response_data['devices'] = device_details
  
             response_apks = requests.get(APPS_API_URL, headers=headers, verify = self.send_tls_security())
             if response_apks.status_code == 200:
-                app_data = response_apks.json()
-                stored_files = {apps['app_name']: apps['app_url'] for apps in app_data}
-                response_data['stored_files'] = stored_files
+                app_data = response_apks.json()               
+                if isinstance(app_data, list):
+                    # Handle the case where app_data is a list of dictionaries
+                    stored_files = {apps['app_name']: apps['app_url'] for apps in app_data}
+                    response_data['stored_files'] = stored_files
+                elif isinstance(app_data, dict) and 'message' in app_data and app_data['message'] == 'No results found':
+                    # Handle the case where app_data is a dictionary with a 'message' key
+                    response_data['stored_files'] = {}
+                    logger.print_on_console('Please Upload apk in Avo Assure Settings of BrowserStack')
+                else:
+                    logger.print_on_console('Please Upload apk in Avo Assure Settings of BrowserStack')
  
             socket.emit('browserstack_confresponse', response_data)
  
