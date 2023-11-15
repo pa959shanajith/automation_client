@@ -914,7 +914,7 @@ class Controller():
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
-                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
+                    if accessibility_testing and ((index + 1 >= len(tsplist) or (index == len(tsplist) - 2 and index < len(tsplist) - 1 and tsplist[index + 1].name == "closeBrowser")) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
