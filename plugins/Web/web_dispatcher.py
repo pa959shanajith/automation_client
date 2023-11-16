@@ -870,8 +870,8 @@ class Dispatcher:
         webElement = None
         try:
             index = 0
-            driver.switch_to.default_content()
             if identifiers_type == 'rxpath' or identifiers_type == 'xpath':
+                driver.switch_to.default_content()
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
                 if webElement==None:

@@ -539,7 +539,7 @@ class Handler():
                 #Currenlty implemented only for WEB and MobileWeb apptype
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
-                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)):
+                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)) and ('0i/' not in url):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
                         if(objectname.strip() != '' and not(objectname.startswith('@')) and len(objectname.split(';')) == 3):
