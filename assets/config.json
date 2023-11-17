@@ -31,24 +31,26 @@
     "incognito_private_mode": "No",
     "isTrial": 0,
     "kill_stale": "Yes",
-    "logFile_Path": "D:\\Network_Map\\logs\\Avoclient.log",
+    "licensetype": 4,
+    "logFile_Path": "./logs/Avoclient.log",
     "max_retries_app_launch": "20",
-    "network_data": "Yes",
+    "network_data": "No",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",
     "sample_application_urls": [
         "https://avotestlabnew.avoassure.ai/"
     ],
-    "sap_object_indentification_order": "1",
     "screenShot_Flag": "All",
     "screen_rec": "No",
-    "server_cert": "D:\\Network_Map\\assets\\CA_BUNDLE\\server.crt",
-    "server_ip": "assuretrial.avoautomation.com",
+    "server_cert": "./assets/CA_BUNDLE/server.crt",
+    "server_ip": "localhost",
     "server_port": "443",
     "stepExecutionWait": "0.1",
     "timeOut": "1",
     "tls_security": "Low",
     "update_check": "No",
     "use_custom_debugport": "No",
-    "verify_wait_time": "60"
+    "verify_wait_time": "60",
+    "sap_object_indentification_order": "1",
+    "oebs_object_indentification_order": "1"
 }
