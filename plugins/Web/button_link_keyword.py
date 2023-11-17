@@ -39,7 +39,7 @@ class ButtonLinkKeyword():
         local_blk.text_javascript = """function stext_content(f) {     var sfirstText = '';     var stextdisplay = '';     for (var z = 0; z < f.childNodes.length; z++) {         var scurNode = f.childNodes[z];         swhitespace = /^\s*$/;         if (scurNode.nodeName === '#text' && !(swhitespace.test(scurNode.nodeValue))) {             sfirstText = scurNode.nodeValue;             stextdisplay = stextdisplay + sfirstText;         }     }     return (stextdisplay); }; return stext_content(arguments[0])"""
         #self.copy_text=None
 
-    def click(self,webelement, socketIO,*args):
+    def click(self,webelement,*args):
         local_blk.log.debug('Got the driver object from browser keyword class')
         local_blk.log.debug(browser_Keywords.local_bk.driver_obj)
         status = webconstants.TEST_RESULT_FAIL
@@ -123,7 +123,10 @@ class ButtonLinkKeyword():
                                 clickinfo = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_JAVASCRIPT,webelement)
                                 uw = UtilWebKeywords()
                                 time.sleep(0.2)
-                                log_status = uw.check_user_activation(browser_Keywords.local_bk.driver_obj.get_log('browser'))
+                                if isinstance(browser_Keywords.local_bk.driver_obj,webdriver.Firefox):
+                                    log_status = True
+                                else:
+                                    log_status = uw.check_user_activation(browser_Keywords.local_bk.driver_obj.get_log('browser'))
                                 if log_status:
                                     status = webconstants.TEST_RESULT_PASS
                                     methodoutput = webconstants.TEST_RESULT_TRUE
@@ -155,8 +158,7 @@ class ButtonLinkKeyword():
             
         #Network Data Capture
         network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
-        network_operation.network_data()
-                
+        network_operation.network_data()        
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -430,8 +432,7 @@ class ButtonLinkKeyword():
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    err_msg = WEB_ELEMENT_DISABLED
-                    
+                    err_msg = WEB_ELEMENT_DISABLED    
                 #Network Data Capture
                 network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
                 network_operation.network_data()    
@@ -487,11 +488,9 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
-                
                 #Network Data Capture
                 network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
-                network_operation.network_data()    
-            
+                network_operation.network_data()
         except Exception as e:
             local_blk.log.error(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
