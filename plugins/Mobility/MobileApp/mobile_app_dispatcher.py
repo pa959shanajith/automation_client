@@ -189,7 +189,7 @@ class MobileDispatcher:
         'verifydoesnotexists': slider_util_keywords_object.verify_does_not_exists,
         'getdevices' : device_keywords_object.get_device_list,
         'invokedevice' : device_keywords_object.invoke_device,
-        'stopserver':install_and_launch_object.stop_server,
+        'stopserver':install_and_launch_object_bs.stopSession_browserStack,
         'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
         'backpress':swipe_keywords_object.backPress,
         'setslidevalue': slider_util_keywords_object.set_slide_value,
