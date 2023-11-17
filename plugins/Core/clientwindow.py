@@ -1115,7 +1115,6 @@ class Config_window(wx.Frame):
         else:
             self.rbox25.SetSelection(1)
         self.rbox25.SetToolTip(wx.ToolTip("Captures Network Data"))
-
         #Adding GridSizer which will show the radio buttons into grid of 12 rows and 2 colums it can be changed based on the requirements
         self.gs=wx.GridSizer(13,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
@@ -1292,8 +1291,8 @@ class Config_window(wx.Frame):
         data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
         data['ai_server']=readconfig.configvalues['ai_server']
         data['sap_object_indentification_order']=readconfig.configvalues['sap_object_indentification_order']
-        # data['network_data']=readconfig.configvalues['network_data']
-        
+        data['licensetype']=readconfig.configvalues['licensetype']
+        data['oebs_object_indentification_order']=readconfig.configvalues['oebs_object_indentification_order']
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and
