@@ -1107,9 +1107,17 @@ class Config_window(wx.Frame):
         else:
             self.rbox24.SetSelection(1)
         self.rbox24.SetToolTip(wx.ToolTip("Captures screenshots using Browser's driver instance"))
+        
+        self.rbox25 = wx.RadioBox(self.panel1, label = "Network Data", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['network_data'].title() == lblList[0]:
+            self.rbox25.SetSelection(0)
+        else:
+            self.rbox25.SetSelection(1)
+        self.rbox25.SetToolTip(wx.ToolTip("Captures Network Data"))
 
         #Adding GridSizer which will show the radio buttons into grid of 12 rows and 2 colums it can be changed based on the requirements
-        self.gs=wx.GridSizer(12,2,5,5)
+        self.gs=wx.GridSizer(13,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
@@ -1117,7 +1125,8 @@ class Config_window(wx.Frame):
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
             (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
             (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND),
-            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND), (self.rbox24,0,wx.EXPAND)])
+            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND), (self.rbox24,0,wx.EXPAND),
+            (self.rbox25,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1227,6 +1236,7 @@ class Config_window(wx.Frame):
         incognito_private_mode = self.rbox22.GetStringSelection()
         kill_stale = self.rbox23.GetStringSelection()
         browser_screenshots = self.rbox24.GetStringSelection()
+        network_data = self.rbox25.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1273,6 +1283,7 @@ class Config_window(wx.Frame):
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
+        data['network_data']=network_data.strip()
         data['file_server_ip']=readconfig.configvalues["file_server_ip"]
         data['ice_Token']=readconfig.configvalues['ice_Token']
         data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
@@ -1281,8 +1292,8 @@ class Config_window(wx.Frame):
         data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
         data['ai_server']=readconfig.configvalues['ai_server']
         data['sap_object_indentification_order']=readconfig.configvalues['sap_object_indentification_order']
-        data['licensetype']=readconfig.configvalues['licensetype']
-        data['oebs_object_indentification_order']=readconfig.configvalues['oebs_object_indentification_order']
+        # data['network_data']=readconfig.configvalues['network_data']
+        
         config_data=data
         if (data['server_ip']!='' and data['server_port']!='' and data['server_cert']!='' and
             data['chrome_path']!='' and data['queryTimeOut'] not in ['','sec'] and data['logFile_Path']!='' and

@@ -20,6 +20,8 @@ from constants import *
 import logging
 import core
 import platform
+import time
+from network_data import NetworkData
 if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
@@ -35,6 +37,7 @@ import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
 import cicd_core
+
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
@@ -294,12 +297,13 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
 
-    def navigateToURL(self, webelement, url, *args):
+    def navigateToURL(self, webelement, url, socketIO, *args):
         global local_bk
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
+        t = None
         try:
             url = url[0]
             if not (url is None and url.strip() is ''):
@@ -321,10 +325,15 @@ class BrowserKeywords():
                             local_bk.driver_obj.execute_script("""document.getElementById('details-button').click();document.getElementById('proceed-link').click();""")
                 except Exception as k:
                     logger.print_on_console('Exception while ignoring the certificate')
+                #Network Data Capture    
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
+        
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
                 result=webconstants.TEST_RESULT_TRUE
+                
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
@@ -459,7 +468,10 @@ class BrowserKeywords():
                         local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
                     local_bk.log.error(k)
-                    err_msg='Exception while ignoring the certificate'
+                    err_msg='Exception while ignoring the certificate'    
+                #Network Data Capture
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -484,6 +496,10 @@ class BrowserKeywords():
             local_bk.driver_obj.execute_script("window.history.go(-1)")
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
+            
+            #Network Data Capture
+            network_operation = NetworkData(local_bk.driver_obj)
+            network_operation.network_data()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -1276,7 +1292,7 @@ class BrowserKeywords():
         handle = hwnds[0] if (len(hwnds) > 0) else None
         return handle
 
-    def save_file(self,element,*args):
+    def save_file(self,element,args):
         """
         def : save_file
         purpose : Saving a file in windows
@@ -1291,9 +1307,8 @@ class BrowserKeywords():
             output=OUTPUT_CONSTANT
             local_bk.log.debug('Reading the inputs')
             brute_logic = False
-            input_val = args[0]
-            folder_path=str(input_val[0]) if len(input_val) > 0 else None
-            file_path=str(input_val[1]) if len(input_val) > 1 else None
+            folder_path=str(args[0]) if len(args) > 0 else None
+            file_path=str(args[1]) if len(args) > 1 else None
             local_bk.log.debug('Folder path is '+str(folder_path)+' and File is '+str(file_path))
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 local_bk.log.debug('Saving the file')
@@ -1314,8 +1329,8 @@ class BrowserKeywords():
 
                         maxTries = 10
                         time_sleep = 0.5
-                        if len(input_val) > 2:
-                            maxTries = int(int(input_val[2]) / time_sleep)
+                        if len(args) > 2:
+                            maxTries = int(int(args[2]) / time_sleep)
                         handle = __save_time_func(maxTries, time_sleep)
                         if handle is None: brute_logic = True
                         else:
