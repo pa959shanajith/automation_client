@@ -20,6 +20,8 @@ from constants import *
 import logging
 import core
 import platform
+import time
+from network_data import NetworkData
 if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
@@ -35,6 +37,7 @@ import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
 import cicd_core
+
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
@@ -321,10 +324,13 @@ class BrowserKeywords():
                             local_bk.driver_obj.execute_script("""document.getElementById('details-button').click();document.getElementById('proceed-link').click();""")
                 except Exception as k:
                     logger.print_on_console('Exception while ignoring the certificate')
+                #Network Data Capture    
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
+                result=webconstants.TEST_RESULT_TRUE    
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
@@ -459,7 +465,10 @@ class BrowserKeywords():
                         local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
                     local_bk.log.error(k)
-                    err_msg='Exception while ignoring the certificate'
+                    err_msg='Exception while ignoring the certificate'    
+                #Network Data Capture
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -484,6 +493,9 @@ class BrowserKeywords():
             local_bk.driver_obj.execute_script("window.history.go(-1)")
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
+            #Network Data Capture
+            network_operation = NetworkData(local_bk.driver_obj)
+            network_operation.network_data()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
