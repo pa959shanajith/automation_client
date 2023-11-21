@@ -70,6 +70,8 @@ class ScrapeWindow(wx.Frame):
         self.capture_button_img = wx.Image(IMAGES_PATH +"capture.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.start_img = wx.Image(IMAGES_PATH +"start.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.stop_img = wx.Image(IMAGES_PATH +"stop.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.startIRIS_img = wx.Image(IMAGES_PATH +"startIRIS.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.stopIRIS_img = wx.Image(IMAGES_PATH +"stopIRIS.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         obj = browserops.BrowserOperations()
 
         self.socketIO = socketIO
@@ -149,7 +151,7 @@ class ScrapeWindow(wx.Frame):
                         import cropandadd
                         global cropandaddobj
                         cropandaddobj = cropandadd.Cropandadd()
-                        self.cropbutton = wx.ToggleButton(self.panel, label="Start IRIS",pos=(290,160 ), size=(165, 30))
+                        self.cropbutton = wx.BitmapToggleButton(self.panel, label=self.startIRIS_img, pos=(290,160 ), size=(165, 30))
                         self.cropbutton.Bind(wx.EVT_TOGGLEBUTTON, self.cropandadd)
                         if(self.action == 'replace'): self.cropbutton.Disable()
 
@@ -490,7 +492,7 @@ class ScrapeWindow(wx.Frame):
             self.fullscrapedropdown.Disable()
             self.visibilityCheck.Disable()
             self.startbutton.Disable()
-            event.GetEventObject().SetLabel("Stop IRIS")
+            self.cropbutton.SetBitmapLabel(self.stopIRIS_img)
             status = cropandaddobj.startcropandadd(self)
         else:
             self.Hide()
