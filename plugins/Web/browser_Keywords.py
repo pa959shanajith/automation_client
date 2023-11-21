@@ -303,7 +303,6 @@ class BrowserKeywords():
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        t = None
         try:
             url = url[0]
             if not (url is None and url.strip() is ''):

@@ -355,7 +355,7 @@ class Reporting:
         obj[REMARKS]=report_obj.remarks
         report_obj.testcase_details=self.core_utilsobject.get_UTF_8(report_obj.testcase_details)
         obj[TESTCASE_DETAILS]=report_obj.testcase_details
-        from plugins.Core import constants
+        #Network Data Report
         networkpath = constants.AVO_ASSURE_HOME + "/network_data.json"
         if os.path.exists(networkpath):
             with open(networkpath, "r") as file:

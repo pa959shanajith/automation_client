@@ -8,19 +8,24 @@
 #-------------------------------------------------------------------------------
 import json
 import requests
+import logger
+import threading
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+local_bk = threading.local()
 class NetworkData:
     def __init__(self, driver):
         self.driver = driver
     def network_data(self):
         from plugins.Core import constants  
+        global local_bk
         config_path = constants.CONFIG_PATH
         check_key = "network_data"
         with open(config_path,"r") as file:
             configdata = json.load(file)
         if check_key in configdata and configdata[check_key] == "Yes":
-            print("Network Data Capture Selected")
+            local_bk.log.info('Network data capture selected')
+            logger.print_on_console('Capturing Network Data')
             network_logs = []
             timeout = 5 #reduce time
             entries = self.driver.execute_script("return window.performance.getEntries()")
@@ -106,4 +111,4 @@ class NetworkData:
                             json.dump(network_logs, json_file, indent=4)
                     # print(f"An exception occurred for {url}: {e}")
                     continue
-    
+            
