@@ -24,7 +24,6 @@ class NetworkData:
         with open(config_path,"r") as file:
             configdata = json.load(file)
         if check_key in configdata and configdata[check_key] == "Yes":
-            local_bk.log.info('Network data capture selected')
             logger.print_on_console('Capturing Network Data')
             network_logs = []
             timeout = 5 #reduce time
