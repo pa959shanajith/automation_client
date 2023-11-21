@@ -579,7 +579,6 @@ class Reporting:
         row_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
         row_obj[TESTCASE_DETAILS]=''
         row_obj[SCREENSHOT_PATH]=None
-        # from plugins.Core import constants
         networkpath = constants.AVO_ASSURE_HOME + "/network_data.json"
         with open(networkpath, "r") as file:
             data = file.read()
