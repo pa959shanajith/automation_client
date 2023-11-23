@@ -30,6 +30,7 @@ import pyautogui
 import psutil
 import readconfig
 from selenium.webdriver.common.by import By
+from network_data import NetworkData
 local_blk = threading.local()
 
 class ButtonLinkKeyword():
@@ -148,13 +149,16 @@ class ButtonLinkKeyword():
                             methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     local_blk.log.info(WEB_ELEMENT_DISABLED)
-                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']       
         except Exception as e:
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']
             local_blk.log.error(e)
             local_blk.log.error(err_msg)
             logger.print_on_console(err_msg)
             
+        #Network Data Capture
+        network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
+        network_operation.network_data()        
         local_blk.log.info(RETURN_RESULT)
         return status,methodoutput,output,err_msg
 
@@ -428,7 +432,10 @@ class ButtonLinkKeyword():
                         status = webconstants.TEST_RESULT_PASS
                         methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
-                    err_msg = WEB_ELEMENT_DISABLED
+                    err_msg = WEB_ELEMENT_DISABLED    
+                #Network Data Capture
+                network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
+                network_operation.network_data()    
         except Exception as e:
             try:
                 local_blk.log.info(e)
@@ -481,6 +488,9 @@ class ButtonLinkKeyword():
                     methodoutput = webconstants.TEST_RESULT_TRUE
                 else:
                     err_msg = WEB_ELEMENT_DISABLED
+                #Network Data Capture
+                network_operation = NetworkData(browser_Keywords.local_bk.driver_obj)
+                network_operation.network_data()
         except Exception as e:
             local_blk.log.error(e)
             err_msg=ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION']

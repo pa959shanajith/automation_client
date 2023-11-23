@@ -30,6 +30,10 @@ class ReportingStep:
         self.screenshot_path= screenshot_path
         self.remarks=remark
         self.testcase_details=testcase_details
+        # self.execute_result_data = execute_result_data
+        # self.configureKey = configureKey
+        # self.profilename = profilename
+        # self.executionListId = executionListId
 
 
 

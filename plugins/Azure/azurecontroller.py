@@ -173,7 +173,8 @@ class AzureWindow():
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
                     if details['name'] == 'State':
-                        details['allowedValues'] = ['New']
+                        details['allowedValues'] = []
+                        details['allowedValues'].append(details['defaultValue'])
                     required_comp[details['name']] = details
                 required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
                 required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
@@ -228,11 +229,11 @@ class AzureWindow():
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('auto_populate','Invalid Url')
+                socket.emit('Azure_details','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('auto_populate','Invalid Credentials')
+                socket.emit('Azure_details','Invalid Credentials')
             else:
-                socket.emit('auto_populate','Fail')
+                socket.emit('Azure_details','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
 
     def get_userstories(self,azure_input_dict,socket):
@@ -655,7 +656,8 @@ class AzureWindow():
                     "outcome":test_status,
                     "tester":{
                         "id":user_json['authenticatedUser']['id'],
-                        "displayName":user_json['authenticatedUser']['providerDisplayName']
+                        "displayName":user_json['authenticatedUser']['customDisplayName'] if 'customDisplayName' in user_json['authenticatedUser'] and user_json['authenticatedUser']['customDisplayName'] else user_json['authenticatedUser']['providerDisplayName']
+                        # "displayName":user_json['authenticatedUser']['customDisplayName']
                     }
                     }
             # Send request to API endpoint

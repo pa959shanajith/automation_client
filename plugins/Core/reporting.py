@@ -355,6 +355,13 @@ class Reporting:
         obj[REMARKS]=report_obj.remarks
         report_obj.testcase_details=self.core_utilsobject.get_UTF_8(report_obj.testcase_details)
         obj[TESTCASE_DETAILS]=report_obj.testcase_details
+        #Network Data Report
+        networkpath = constants.AVO_ASSURE_HOME + "/network_data.json"
+        if os.path.exists(networkpath):
+            with open(networkpath, "r") as file:
+                data = file.read()
+                obj["Network_Data"] = json.loads(data)
+            os.remove(networkpath)
         self.report_string.append(obj)
 
     def generate_report_step(self,tsp,status,con,ellapsedtime,keyword_flag,*args):
@@ -572,6 +579,10 @@ class Reporting:
         row_obj[ELLAPSED_TIME]=str(datetime.now() - datetime.now())
         row_obj[TESTCASE_DETAILS]=''
         row_obj[SCREENSHOT_PATH]=None
+        networkpath = constants.AVO_ASSURE_HOME + "/network_data.json"
+        with open(networkpath, "r") as file:
+            data = file.read()
+            row_obj["Network_Data"] = data
         row_array.append(row_obj)
         self.report_json['rows']=row_array
         comments_Length=[]

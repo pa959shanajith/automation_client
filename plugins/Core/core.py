@@ -300,7 +300,7 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
                     highlightObj=desktop_highlight.highLight()
-                    highlightObj.highLiht_element(args[0],args[1])
+                    highlightObj.highlight_element(args[0],args[1])
                 elif appType==APPTYPE_SAP.lower():
                     core_utils.get_all_the_imports('SAP')
                     import sap_highlight
@@ -516,6 +516,7 @@ class MainNamespace(BaseNamespace):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
             core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             global mobileScrapeObj
             mobileScrapeObj=mobile_app_scrape
@@ -620,7 +621,8 @@ class MainNamespace(BaseNamespace):
             import wsdlgenerator
             wsdlurl = str(args[0])
             wsdl_object = wsdlgenerator.WebservicesWSDL()
-            response = wsdl_object.listOfOperation(wsdlurl)
+            import_def=False
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
             response=str(response)
             log.debug(response)
             socketIO.emit('result_wsdl_listOfOperation',response)
@@ -677,6 +679,41 @@ class MainNamespace(BaseNamespace):
             socketIO.emit('result_wsdl_ServiceGenerator',response)
         except Exception as e:
             err_msg='Error while Fetching WSDL Response'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_WS_ImportDefinition(self, *args):
+        try:
+            if check_execution_lic("result_WS_ImportDefinition"): return None
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import wsdlgenerator
+            wsdlurl = str(args[0])
+            wsdl_object = wsdlgenerator.WebservicesWSDL()
+            import_def=True
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
+            log.debug(response)
+            socketIO.emit('result_WS_ImportDefinition',response)
+        except Exception as e:
+            err_msg='Error while Fetching WSDL Operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_ExecuteRequestTemplate(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import  webservices
+            wsdlurl = str(args[0])
+            ws_object = webservices.WSkeywords()
+            response = ws_object.executeRequestTemplate(wsdlurl)
+            response=str(response)
+            log.debug(response)
+            socketIO.emit('result_ExecuteRequestTemplate',response)
+        except Exception as e:
+            err_msg='Error while executing'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
@@ -881,11 +918,38 @@ class MainNamespace(BaseNamespace):
             elif args[0]['action'] == Saucelab_ACTION_2:
                 data = args[0]
                 obj.get_mobileconf_details(data,socketIO)
+            elif args[0]['action'] == Saucelab_ACTION_3:
+                data = args[0]
+                obj.update_mobile_details(data,socketIO)
         except Exception as e:
             err_msg='Error in Saucelab operations'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
+
+    def on_logintobrowserstack(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('Browserstack')
+            import browserstackcontroller
+            obj = browserstackcontroller.BrowserstackWindow()
+            if args[0]['action'] == Browserstack_ACTION_1:
+                data = args[0]
+                obj.get_webconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_2:
+                data = args[0]
+                obj.get_mobileconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_3:
+                data = args[0]
+                obj.uploadApk_bs(data, socketIO)
+            else:
+                logger.print_on_console("Not able to login to BrowserStack")  
+
+        except Exception as e:        
+                err_msg='Error in Browserstack operations'
+                log.error(err_msg)
+                logger.print_on_console(err_msg)
+                log.error(e,exc_info=True)
 
     def on_update_screenshot_path(self,*args):
         if root.gui: benchmark.init(args[1], socketIO)
@@ -1062,6 +1126,7 @@ class MainNamespace(BaseNamespace):
         try:
             wait_until_browsercheck()
             core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             obj = mobile_app_scrape.MobileWindow()
             obj.run_adb_devices(socketIO)
@@ -1727,15 +1792,15 @@ class Main():
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Desktop-Element Identification",filePath = browsername,socketIO = socketIO)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SAP-Element Identification",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
                 oebsScrapeFlag=False
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Oebs-Element Identification",filePath = browsername,socketIO = socketIO)
             elif pdfScrapeFlag==True:
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
@@ -1749,10 +1814,10 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
+                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification > To <Web-Element Identification>
                     # changed  on Date:08/07/2022
                     # Author : sreenivasulu
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="AvoAssure Object Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Web-Element Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation

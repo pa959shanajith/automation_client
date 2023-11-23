@@ -34,6 +34,7 @@ import requests
 import readconfig
 import re
 import web_keywords_MW
+import browserstack_web_keywords
 from selenium import webdriver  
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -41,6 +42,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 
 import logging
+local_wk=threading.local()
 
 log = logging.getLogger('web_dispatcher_MW.py')
 
@@ -291,10 +293,111 @@ class Dispatcher:
         'navigateWithAuthenticate': browser_object.navigate_with_authenticate,
     }
 
+    Browserstack_mobile_web_dict = {
+
+        'click': button_link_object.click,
+        'press': button_link_object.press,
+        'doubleClick': button_link_object.double_click,
+        'rightClick': button_link_object.right_click,
+        'verifyButtonName': button_link_object.verify_button_name,
+        'getButtonName': button_link_object.get_button_name,
+        'getLinkText': button_link_object.get_link_text,
+        'verifyLinkText': button_link_object.verify_link_text,
+        'uploadfile': button_link_object.upload_file,
+
+        'acceptPopUp':  popup_object.accept_popup,
+        'dismissPopUp': popup_object.dismiss_popup,
+        'getPopUpText': popup_object.get_popup_text,
+        'verifyPopUpText': popup_object.verify_popup_text,
+
+        'getStatus':  radio_checkbox_object.get_status,
+        'selectRadioButton': radio_checkbox_object.select_radiobutton,
+        'selectCheckbox': radio_checkbox_object.select_checkbox,
+        'unselectCheckbox': radio_checkbox_object.unselect_checkbox,
+
+        'getRowCount': table_object.getRowCount,
+        'getColumnCount': table_object.getColoumnCount,
+        'getCellValue': table_object.getCellValue,
+        'verifyCellValue': table_object.verifyCellValue,
+        'cellClick': table_object.cellClick,
+        'getRowNumByText': table_object.getRowNumByText,
+        'getColNumByText': table_object.getColNumByText,
+        'getInnerTable': table_object.getInnerTable,
+        'verifyCellToolTip': table_object.verifyCellToolTip,
+
+        'getElementText':  element_object.get_element_text,
+        'verifyElementText': element_object.verify_element_text,
+        'clickElement': element_object.click_element,
+        'getToolTipText': element_object.get_tooltip_text,
+        'verifyToolTipText': element_object.verify_tooltip_text,
+        'setText': textbox_object.set_text,
+        'sendValue': textbox_object.send_value,
+        'getText': textbox_object.get_text,
+
+        'verifyText': textbox_object.verify_text,
+        'clearText': textbox_object.clear_text,
+
+        'getTextboxLength': textbox_object.gettextbox_length,
+        'verifyTextboxLength': textbox_object.verifytextbox_length,
+        'setSecureText': textbox_object.setsecuretext,
+        'sendSecureValue': textbox_object.sendSecureValue,
+        'selectValueByIndex': dropdown_list_object.selectValueByIndex,
+        'getCount': dropdown_list_object.getCount,
+        'selectValueByText': dropdown_list_object.selectValueByText,
+        'verifySelectedValues': dropdown_list_object.verifySelectedValues,
+        'verifySelectedValue': dropdown_list_object.verifySelectedValue,
+        'verifyCount': dropdown_list_object.verifyCount,
+        'selectAllValues': dropdown_list_object.selectAllValues,
+        'selectMultipleValuesByIndexes': dropdown_list_object.selectMultipleValuesByIndexes,
+        'getSelected': dropdown_list_object.getSelected,
+        'selectMultipleValuesByText': dropdown_list_object.selectMultipleValuesByText,
+        'getMultipleValuesByIndexes': dropdown_list_object.getMultipleValuesByIndexes,
+        'verifyAllValues': dropdown_list_object.verifyAllValues,
+        'selectByAbsoluteValue': dropdown_list_object.selectByAbsoluteValue,
+        'getAllValues': dropdown_list_object.getAllValues,
+        'getValueByIndex': dropdown_list_object.getValueByIndex,
+        'verifyValuesExists': dropdown_list_object.verifyValuesExists,
+        'deselectAll': dropdown_list_object.deselectAll,
+        'actionkey': action_keyowrds_object.action_key,
+ 
+        'drag': element_object.drag,
+        'drop': element_object.drop,
+        'verifyVisible': util_object.verify_visible,
+        'verifyExists': util_object.verify_exists,
+        'verifyDoesNotExists': util_object.verify_doesnot_exists,
+        'verifyEnabled': util_object.verify_enabled,
+        'verifyDisabled': util_object.verify_disabled,
+        'verifyHidden': util_object.verify_hidden,
+        'verifyReadOnly': util_object.verify_readonly,
+        'tab': util_object.tab,
+        'waitForElementVisible': element_object.waitforelement_visible,
+        'setFocus': util_object.setfocus,
+        'getElementTagValue':  util_object.get_element_tag_value,
+        'getAttributeValue':  util_object.get_attribute_value,
+        'verifyAttribute': util_object.verify_attribute,
+ 
+        'openBrowser': browser_object.openBrowser_BrowserStack,
+        'openNewTab': browser_object.openNewTab,
+        'navigateToURL': browser_object.navigateToURL,
+        'getPageTitle': browser_object.getPageTitle,
+        'getCurrentURL': browser_object.getCurrentURL,
+        'refresh': browser_object.refresh,
+        'verifyCurrentURL': browser_object.verifyCurrentURL,
+        'closeBrowser': browser_object.closeBrowser_BrowserStack,
+        'closeSubWindows': browser_object.closeSubWindows,
+        'switchToWindow': browser_object.switch_to_window,
+        'verifyTextExists': statict_text_object.verify_text_exists,
+        'verifyPageTitle': browser_object.verify_page_title,
+        'clearCache': browser_object.clear_cache,
+        'navigateBack': browser_object.navigate_back,
+        'navigateWithAuthenticate': browser_object.navigate_with_authenticate,
+    }
+
     def __init__(self):
         self.exception_flag=''
         self.action=None
         self.sauce_conf = web_keywords_MW.Sauce_Config().get_sauceconf()
+        self.browserstack_conf = browserstack_web_keywords.Browserstack_config().get_browserstackconf()
 
     def dispatcher(self,teststepproperty,input,reporting_obj,mythread,execution_env):
         global simple_debug_gwto, status_gwto
@@ -600,7 +703,39 @@ class Dispatcher:
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
                     return False
-            
+            elif execution_env['env'] == 'browserstack' and teststepproperty.name in list(self.Browserstack_mobile_web_dict.keys()):
+                if teststepproperty.custname=='@Browser' or teststepproperty.custname=='@BrowserPopUp':
+                    if(teststepproperty.name=="openBrowser"):
+                        config = self.browserstack_conf["Mobile"]
+                        desired_caps = {}
+                        desired_caps["os_version"] = config["platformVersion"]
+                        desired_caps["device"] = config["deviceName"]
+                        desired_caps["build"] = "Mobile_Web"
+                        desired_caps["name"] = teststepproperty.testscript_name
+                        desired_caps["browserstack.appium_version"] = "1.16.0"
+                        desired_caps["browserstack.idleTimeout"] = "60"
+                        desired_caps["browserstack.networkLogs"] = "true"
+                        desired_caps["interactiveDebugging"] = "true"
+                        desired_caps['browserstack.debug'] = "true"
+                        result = self.Browserstack_mobile_web_dict[teststepproperty.name](self.browserstack_conf['remote_url'],desired_caps)
+                        # driver = web_keywords_MW.local_wk.driver
+                        driver = browser_Keywords_MW.driver_obj
+                        browser_Keywords_MW.driver_obj = driver
+                        find_browser_info(reporting_obj,mythread)
+                    else:
+                        result = self.Browserstack_mobile_web_dict[teststepproperty.name](webelement,input)
+                elif teststepproperty.name in self.Browserstack_mobile_web_dict:
+                    xpath=teststepproperty.objectname.split(';')[0]
+                    if(teststepproperty.name=="waitForElementVisible"):
+                        input=xpath
+                    driver.switch_to.default_content()
+                    # webelement=send_webelement_to_keyword(web_keywords_MW.driver,objectname,url)
+                    webelement=send_webelement_to_keyword(browser_Keywords_MW.driver_obj,objectname,url)
+                    result = self.Browserstack_mobile_web_dict[teststepproperty.name](webelement,input)
+                else:
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
+                    return False  
+
             else:
                 err_msg=INVALID_KEYWORD
                 result=list(result)
@@ -612,10 +747,10 @@ class Dispatcher:
                     screen_details=mythread.json_data['suitedetails'][0]
                     if configvalues['screenShot_Flag'].lower() == 'fail':
                         if result[0].lower() == 'fail':
-                            file_path = screen_shot_obj.captureScreenshot(screen_details)
+                            file_path = screen_shot_obj.captureScreenshot(screen_details, web=True, driver=driver)
                             result.append(file_path[2])
                     elif configvalues['screenShot_Flag'].lower() == 'all':
-                        file_path = screen_shot_obj.captureScreenshot(screen_details)
+                        file_path = screen_shot_obj.captureScreenshot(screen_details, web=True, driver=driver)
                         result.append(file_path[2])
         except TypeError as e:
             log.error(e,exc_info=True)
