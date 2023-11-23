@@ -1082,7 +1082,7 @@ class BrowserKeywords():
         local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
             inputval=input[0]
-            #OEBS Web Configurator Fix(Parent Window Attach)
+            #OEBS Web Configurator Fix(Parent Window Attach )
             if inputval == "URL":
                 url = input[1]
                 exec_path = webconstants.CHROME_DRIVER_PATH
