@@ -182,7 +182,7 @@ class ElementKeywords:
                         if text is not None and text.find('\n') != -1:
                             local_eo.log.debug("\\n detected. Fetching text using element.text method")
                             text = webelement.text
-                        if text:
+                        if text and text == input:
                             break
                         else:
                             time.sleep(1)

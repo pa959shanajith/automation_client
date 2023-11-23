@@ -47,6 +47,7 @@ pause_flag=False
 iris_constant_step = -1
 socket_object = None
 saucelabs_count = 0
+browserstack_count = 0
 # test_case_number = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
@@ -144,9 +145,11 @@ class Controller():
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -160,8 +163,11 @@ class Controller():
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
                     core_utils.get_all_the_imports('Mobility/iris_mobile')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
+                    core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -196,6 +202,7 @@ class Controller():
             core_utils.get_all_the_imports('WebScrape')
             core_utils.get_all_the_imports('Web')
             core_utils.get_all_the_imports('Saucelabs')
+            core_utils.get_all_the_imports('Browserstack')
             core_utils.get_all_the_imports('IRIS')
             import web_dispatcher
             import web_accessibility_testing
@@ -554,7 +561,7 @@ class Controller():
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
-        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() == 'executerequest'):
+        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() in ['executerequest','executerequesttemplate']):
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
@@ -751,7 +758,7 @@ class Controller():
                     #MobileApp apptype module call
                     if self.mobile_app_dispatcher_obj==None:
                         self.__load_mobile_app()
-                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0])
+                    result = self.invokemobileappkeyword(teststepproperty,self.mobile_app_dispatcher_obj,inpval,args[0],args[1])
                 elif teststepproperty.apptype.lower() == APPTYPE_WEBSERVICE:
                     #Webservice apptype module call
                     if self.webservice_dispatcher_obj == None:
@@ -907,7 +914,7 @@ class Controller():
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
-                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
+                    if accessibility_testing and ((index + 1 >= len(tsplist) or (index == len(tsplist) - 2 and index < len(tsplist) - 1 and tsplist[index + 1].name == "closeBrowser")) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
@@ -995,8 +1002,8 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
-    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj):
-        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread)
+    def invokemobileappkeyword(self,teststepproperty,dispatcher_obj,inputval,reporting_obj,execution_env):
+        res = dispatcher_obj.dispatcher(teststepproperty,inputval,self.reporting_obj,self.conthread,execution_env)
         return res
 
     def invokeDesktopkeyword(self,teststepproperty,dispatcher_obj,inputval):
@@ -1112,7 +1119,7 @@ class Controller():
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
-        global terminate_flag, status_percentage, saucelabs_count, screen_testcase_map
+        global terminate_flag, status_percentage, browserstack_count,saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
         qc_username=''
@@ -1359,13 +1366,47 @@ class Controller():
                             sc_idx+=1
                             execute_flag=False
                         execution_env = json_data.get('exec_env', 'default').lower()
-                        if execution_env == 'saucelabs':
+
+                        if execution_env == 'browserstack':
+                            # self.__load_web()
+                            # import script_generator
+                            scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
+                            core_utils.get_all_the_imports('Browserstack')
+                            import browserstack_web_keywords
+                            s = ''
+                            browserstack_details = {
+                                'browserstack_username': json_data['browserstack_username'],
+                                'browserstack_access_key': json_data['browserstack_access_key'],
+                            }
+                            if(json_data['apptype'] == 'Web'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['osVersion'] = json_data['osVersion']
+                                browserstack_details['os'] = json_data['os']
+                                browserstack_details['browserName'] = json_data['browserName']
+                                browserstack_details['browserVersion'] = json_data['browserVersion']
+                            elif(json_data['apptype'] == 'MobileWeb'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            elif(json_data['apptype'] == 'MobileApp'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            else:
+                                logger.print_on_console("App type Not available")  
+
+                            s.save_browserstackconf(browserstack_details)
+                            execution_env = {'env': 'browserstack','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
+                            now=datetime.now()
+
+                        elif execution_env == 'saucelabs':
                             # self.__load_web()
                             # import script_generator
                             scenario_name=json_data['suitedetails'][suite_idx-1]["scenarioNames"][sc_idx]
                             import sauceclient
                             core_utils.get_all_the_imports('Saucelabs')
-                            import web_keywords,web_keywords_MW
+                            import web_keywords,web_keywords_MW,web_keywords_MA
                             s = ''
                             sauce_details = {
                                 'sauce_username': json_data['sauce_username'],
@@ -1376,6 +1417,9 @@ class Controller():
                                 s=web_keywords.Sauce_Config()
                                 sauce_details['version'] = json_data['browserVersion']
                                 sauce_details['platform'] = json_data['platform']
+                            elif json_data['apptype'] == 'MobileApp':
+                                s=web_keywords_MA.Sauce_Config()
+                                sauce_details['mobile'] = json_data['mobile']
                             else:
                                 s=web_keywords_MW.Sauce_Config()
                                 sauce_details['mobile'] = json_data['mobile']
@@ -1442,7 +1486,14 @@ class Controller():
                             if len(accessibility_reports) > 0:
                                 execute_result_data["accessibility_reports"] = accessibility_reports
                             execute_result_data['report_type'] = report_type
-                            if execution_env['env'] == 'saucelabs':
+                            if execution_env['env'] == 'browserstack':
+                                browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
+                                self.__load_web()
+                                import browserstack_web_keywords
+                                self.obj = browserstack_web_keywords.Browserstack_config()
+                                self.obj.get_browserstackconf()
+                                time.sleep(5)
+                            elif execution_env['env'] == 'saucelabs':
                                 browser_num={'1':'googlechrome','2':'firefox','3':'iexplore','7':'microsoftedge','8':'microsoftedge'}
                                 self.__load_web()
                                 import web_keywords
@@ -2226,7 +2277,7 @@ def kill_process():
         try:
             import browser_Keywords_MW
             del browser_Keywords_MW.drivermap[:]
-            if hasattr(browser_Keywords_MW, 'driver_obj'):
+            if hasattr(browser_Keywords_MW, 'driver_obj') and hasattr(browser_Keywords_MW, 'device_id'):
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
                 s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
@@ -2243,7 +2294,7 @@ def kill_process():
                 if p[1] == 4723:
                     log.info( 'Pid Found' )
                     log.info(line.pid)
-                    os.system("TASKKILL /F /T /PID " + str(line.pid))
+                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
         except Exception as e:
             log.error(e)
 

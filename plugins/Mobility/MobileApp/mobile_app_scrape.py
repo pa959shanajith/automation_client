@@ -25,6 +25,7 @@ import json
 img=None
 from queue import Queue
 import concurrent.futures
+import psutil
 
 class ScrapeWindow(wx.Frame):
 
@@ -204,6 +205,13 @@ class ScrapeWindow(wx.Frame):
 
                         # Update the 'view' list in the JSON data
                         d['view'] = sorted_view_list
+                        processes = psutil.net_connections()
+                        for line in processes:
+                            p =  line.laddr
+                            if p[1] == 4723:
+                                log.info( 'Pid Found' )
+                                log.info(line.pid)
+                                subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                         self.socketIO.emit('scrape',d)
                     else:
                         self.print_error('Scraped data exceeds max. Limit.')
@@ -257,7 +265,10 @@ class ScrapeWindow(wx.Frame):
             self.startbutton.SetLabel("Stop Capture")        
             try:
                 if(self.selected_choice.lower()=="full"):
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    if (SYSTEM_OS == 'Darwin'):
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile_MAC'
+                    else:
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     command = "npm start"
                     self.process = subprocess.Popen(command, shell=True, cwd=folder_path)
                 else:
@@ -271,8 +282,14 @@ class ScrapeWindow(wx.Frame):
             try:
                 if(self.selected_choice.lower()=="full"):
                     if self.process.poll() is None:
+                        if (SYSTEM_OS == 'Darwin'):
+                            subprocess.call(["kill", "-15", str(self.process.pid)])
+                        else:
                             subprocess.call(["taskkill", "/F", "/T", "/PID", str(self.process.pid)])
-                    folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
+                    if (SYSTEM_OS == 'Darwin'):
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile_MAC'
+                    else:
+                        folder_path = os.environ["AVO_ASSURE_HOME"] + os.sep +'avoAssureClient_Mobile'
                     file_name = 'scraped_data.json'
                     file_path = folder_path + os.sep + file_name
 
@@ -282,6 +299,13 @@ class ScrapeWindow(wx.Frame):
                     # 10 is the limit of MB set as per Avo Assure standards
                     if capturedData is not None:
                         if self.core_utilsobject.getdatasize(str(capturedData),'mb') < 10:
+                            processes = psutil.net_connections()
+                            for line in processes:
+                                p =  line.laddr
+                                if p[1] == 4723:
+                                    log.info( 'Pid Found' )
+                                    log.info(line.pid)
+                                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                             self.socketIO.emit('scrape',capturedData)
                             # Step 1: Open the JSON file in write mode
                             with open(file_path, 'w') as file:

@@ -376,10 +376,13 @@ class ZephyrWindow():
                         scheduleid = result[0]["id"]
                         # testerid = result[0]["testerId"]
                         relative_path_update = "/execution/bulk?scheduleids="+str(scheduleid)+"&status="+str(status_tc)+"&testerid="+str(testerid)+"&tcrCatalogTreeId=&allExecutions=&includeanyoneuser="
+                        
+                        execution_path_update = self.baseURL + "/flex/services/rest/v3/execution/" + str(scheduleid) + "?status="+str(status_tc)+"&testerid="+str(testerid)+"&allExecutions=false&includeanyoneuser=true"
                         ids = []
                         ids.append(scheduleid)
                         data1 = {"ids":ids, "selectedAll":1, "serachView": "false", "teststepUpdate": "false"}
-                        response = requests.put(self.zephyrURL+relative_path_update , headers = self.headers, json = data1 ,proxies = readconfig.proxies, verify = self.send_tls_security())
+                        # response = requests.put(self.zephyrURL+relative_path_update , headers = self.headers, json = data1 ,proxies = readconfig.proxies, verify = self.send_tls_security())
+                        response = requests.put(execution_path_update , headers = self.headers, json = data1 ,proxies = readconfig.proxies, verify = self.send_tls_security())
                         if response.status_code == 200:
                             status = True
         except Exception as e:
