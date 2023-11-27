@@ -40,12 +40,11 @@
     "sample_application_urls": [
         "https://avotestlabnew.avoassure.ai/"
     ],
-    "sap_object_indentification_order": "1",
     "screenShot_Flag": "All",
     "screen_rec": "No",
-    "server_cert": "D:\\setup\\ICE_AI\\ICE\\assets\\CA_BUNDLE\\server.crt",
+    "server_cert": "./assets/CA_BUNDLE/server.crt",
     "server_ip": "localhost",
-    "server_port": "8443",
+    "server_port": "443",
     "stepExecutionWait": "0.1",
     "timeOut": "1",
     "tls_security": "Low",
