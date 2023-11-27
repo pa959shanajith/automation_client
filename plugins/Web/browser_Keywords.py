@@ -20,6 +20,8 @@ from constants import *
 import logging
 import core
 import platform
+import time
+from network_data import NetworkData
 if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
@@ -35,6 +37,7 @@ import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
 import cicd_core
+
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
@@ -321,10 +324,13 @@ class BrowserKeywords():
                             local_bk.driver_obj.execute_script("""document.getElementById('details-button').click();document.getElementById('proceed-link').click();""")
                 except Exception as k:
                     logger.print_on_console('Exception while ignoring the certificate')
+                #Network Data Capture    
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
+                result=webconstants.TEST_RESULT_TRUE    
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
@@ -459,7 +465,10 @@ class BrowserKeywords():
                         local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
                     local_bk.log.error(k)
-                    err_msg='Exception while ignoring the certificate'
+                    err_msg='Exception while ignoring the certificate'    
+                #Network Data Capture
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -484,6 +493,9 @@ class BrowserKeywords():
             local_bk.driver_obj.execute_script("window.history.go(-1)")
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
+            #Network Data Capture
+            network_operation = NetworkData(local_bk.driver_obj)
+            network_operation.network_data()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -1069,20 +1081,37 @@ class BrowserKeywords():
         err_msg=None
         local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            input=input[0]
+            inputval=input[0]
+            #OEBS Web Configurator Fix(Parent Window Attach )
+            if inputval == "URL":
+                url = input[1]
+                exec_path = webconstants.CHROME_DRIVER_PATH
+                chrome_options = webdriver.ChromeOptions()
+                chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+                driver = webdriver.Chrome(executable_path=exec_path, options=chrome_options)
+                local_bk.log.info("Driver control gained")
+                for window_handle in driver.window_handles:
+                    driver.switch_to.window(window_handle)
+                    if url in driver.current_url:
+                        local_bk.driver_obj = driver
+                        local_bk.log.info("Assigned to existing driver and breaking")
+                        break
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                return status,methodoutput,output,err_msg
             try:
-                to_window=int(input)
+                to_window=int(inputval)
             except Exception as e:
                 to_window = -1
-            if not(input is None or input is '' or to_window <0):
-                logger.print_on_console(INPUT_IS+input)
+            if not(inputval is None or inputval is '' or to_window <0):
+                logger.print_on_console(INPUT_IS+inputval)
                 local_bk.log.info('Switching to the window ')
                 local_bk.log.info(to_window)
                 self.update_window_handles()
                 window_handles=self.__get_window_handles()
                 ## Issue #190 Driver control won't switch back to parent window
                 if to_window>len(window_handles):
-                    err_msg='Window '+input+' not found'
+                    err_msg='Window '+inputval+' not found'
                     logger.print_on_console(err_msg)
                     local_bk.log.error(err_msg)
                 else:
@@ -1116,7 +1145,7 @@ class BrowserKeywords():
                         err_msg='Current window handle not found'
                         logger.print_on_console(err_msg)
                         local_bk.log.error(err_msg)
-            elif (input is None or input is ''):
+            elif (inputval is None or inputval is ''):
                 window_handles=self.__get_window_handles()
                 local_bk.log.info('Current window handles are ')
                 local_bk.log.info(window_handles)
@@ -1276,7 +1305,7 @@ class BrowserKeywords():
         handle = hwnds[0] if (len(hwnds) > 0) else None
         return handle
 
-    def save_file(self,element,args):
+    def save_file(self,element,*args):
         """
         def : save_file
         purpose : Saving a file in windows
@@ -1291,8 +1320,9 @@ class BrowserKeywords():
             output=OUTPUT_CONSTANT
             local_bk.log.debug('Reading the inputs')
             brute_logic = False
-            folder_path=str(args[0]) if len(args) > 0 else None
-            file_path=str(args[1]) if len(args) > 1 else None
+            input_val = args[0]
+            folder_path=str(input_val[0]) if len(input_val) > 0 else None
+            file_path=str(input_val[1]) if len(input_val) > 1 else None
             local_bk.log.debug('Folder path is '+str(folder_path)+' and File is '+str(file_path))
             if (not(folder_path is None or folder_path == '' or file_path is None or file_path == '') and os.path.exists(folder_path)):
                 local_bk.log.debug('Saving the file')
@@ -1313,8 +1343,8 @@ class BrowserKeywords():
 
                         maxTries = 10
                         time_sleep = 0.5
-                        if len(args) > 2:
-                            maxTries = int(int(args[2]) / time_sleep)
+                        if len(input_val) > 2:
+                            maxTries = int(int(input_val[2]) / time_sleep)
                         handle = __save_time_func(maxTries, time_sleep)
                         if handle is None: brute_logic = True
                         else:

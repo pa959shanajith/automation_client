@@ -26,6 +26,7 @@ import desktop_launch_keywords
 import base64
 import logger
 import wx
+import desktop_highlight
 ctrldownflag = False
 stopumpingmsgs = False
 
@@ -51,6 +52,7 @@ class Scrape:
                         self.coordY = coordY
                         self.window_id = window_id
                         self._want_continue = 1
+                        self.desktop_highlight_obj = desktop_highlight.highLight()
                         self.start()
 
                     def run(self):
@@ -95,7 +97,15 @@ class Scrape:
                             global actualobjects
                             global click_count
                             if ( actualelement not in actualobjects ):#------check to remove duplicate elements
+                                element_name = []
+                                for element in actualobjects:
+                                    element_name.append(element['custname'])
+                                if actualelement['custname'] in element_name:
+                                    new_custname = actualelement['custname'].split('_')[0] + actualelement['xpath'].split(';')[0].split('[')[1][:-1]
+                                    new_custname = new_custname + '_' + '_'.join(map(str,actualelement['custname'].split('_')[1:]))
+                                    actualelement['custname'] = new_custname
                                 actualobjects.append(actualelement)
+                                self.desktop_highlight_obj.highlight_element(actualelement['xpath'], actualelement['url'])
                             else:
                                 click_count -= 1
 
@@ -499,6 +509,21 @@ class Scrape:
             log.error( e )
         return ne
 
+    def remove_duplicate_elements(self, elements):
+        try:
+            unique_elements = []
+            temp = []
+            for scrape_ele in elements:
+                if scrape_ele['custname'] in temp:
+                    continue
+                else:
+                    unique_elements.append(scrape_ele)
+                    temp.append(scrape_ele['custname'])
+        except Exception as e:
+            log.error( 'Error occoured while performing remove duplicate elements : ', e )
+            logger.print_on_console( 'Error occoured while performing remove duplicate elements')
+        return unique_elements
+
     def full_scrape(self, wxobject):
         allobjects = {}
         try:
@@ -521,6 +546,7 @@ class Scrape:
             obj.bring_Window_Front()
             winrect = desktop_launch_keywords.win_rect;
             allobjects =  self.get_all_children(ch, ne, 0, '', win, winrect, str(wxobject.backend_process).strip())
+            allobjects = self.remove_duplicate_elements(allobjects)
         except Exception as e:
             log.error( 'Error occoured while performing full_scrape, Error Msg : ', e )
             logger.print_on_console( 'Error occoured while performing full_scrape' )

@@ -47,6 +47,7 @@ class AzureWindow():
         data['projects'] = []
         data['issuetype'] = []
         azure = None
+        res = "invalidcredentials"
 
         try:
             #Azure changes
@@ -95,7 +96,6 @@ class AzureWindow():
         modified_data = []
         for item in input_data:
             current_name = f"{parent_name}/{item['name']}" if parent_name else item['name']
-            print(item["id"],current_name)
             modified_data.append({"id": item["id"], "name": current_name})
 
             if item["hasChildren"] and "children" in item and len(item["children"])>0 :
@@ -145,6 +145,8 @@ class AzureWindow():
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
                         child_data = self.modify_data(node["children"], grandparent_name)
                         area_paths.extend(child_data)
+                elif 'id' in data_area and 'name' in data_area:
+                    area_paths.append({'id':data_area['id'],'name':data_area['name']})         
 
             response_iteration = requests.get(iteration_url, headers=headers)
             if response_iteration.status_code == 200:
@@ -156,7 +158,9 @@ class AzureWindow():
                     iteration_paths.append({'id':node['id'],'name':grandparent_name})    
                     if node['hasChildren'] and "children" in node and len(node["children"])>0 :
                         child_data = self.modify_data(node["children"], grandparent_name)
-                        iteration_paths.extend(child_data)     
+                        iteration_paths.extend(child_data)
+                elif 'id' in data_iteration and 'name' in data_iteration:
+                    iteration_paths.append({'id':data_iteration['id'],'name':data_iteration['name']})             
 
 
             endpoint_url = f'{org_url}/{project_name}/_apis/wit/workitemtypes/{issue_type}/fields?$expand=all&api-version=7.0'
@@ -170,7 +174,8 @@ class AzureWindow():
                 JsonObject = respon.json()
                 for details in JsonObject['value']:
                     if details['name'] == 'State':
-                        details['allowedValues'] = ['New']
+                        details['allowedValues'] = []
+                        details['allowedValues'].append(details['defaultValue'])
                     required_comp[details['name']] = details
                 required_comp['Area_Paths'] = {'name':data_area['name'] or '','child':area_paths}
                 required_comp['Iteration_Paths'] = {'name':data_iteration['name'] or '','child':iteration_paths}
@@ -225,11 +230,11 @@ class AzureWindow():
         except Exception as e:
             log.error(e)
             if 'Invalid URL' in str(e):
-                socket.emit('auto_populate','Invalid Url')
+                socket.emit('Azure_details','Invalid Url')
             elif 'Unauthorized' in str(e):
-                socket.emit('auto_populate','Invalid Credentials')
+                socket.emit('Azure_details','Invalid Credentials')
             else:
-                socket.emit('auto_populate','Fail')
+                socket.emit('Azure_details','Fail')
             logger.print_on_console('Exception in login and auto populating projects')
 
     def get_userstories(self,azure_input_dict,socket):
@@ -555,25 +560,29 @@ class AzureWindow():
                 data = ""
                 if isinstance(value['data'], dict):
                     data = value['data']['text']
-                elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
+                elif 'name' in value and (value['name'] == 'Area Path' or value['name'] == 'Iteration Path'):
                     convert_str = value['data'].replace("/","\\")
                     # if(project_name != convert_str):
                     #    data = f'{project_name}\\' + convert_str
                     # else:
                     data = convert_str   
+                elif 'name' in value and value['name'] == "Failed Retest" and value['data'].isdigit():
+                    convert_num = int(value['data'])
+                    data =  convert_num      
                 else:
                     data = value['data']
 
-                if value['name'] == 'Repro Steps':
+                if 'name' in value and value['name'] == 'Repro Steps':
                     data = azure_input_dict['info']['reproSteps']['value']
-                patch_document.append(
-                     {
-                        "op": "add",
-                        # "path": "/fields/System.Title",
-                        "path": "/fields" + value['url'].split('fields',1)[1],
-                        "value": data
-                    }
-                )
+                if 'url' in value:        
+                    patch_document.append(
+                        {
+                            "op": "add",
+                            # "path": "/fields/System.Title",
+                            "path": "/fields" + value['url'].split('fields',1)[1],
+                            "value": data
+                        }
+                    )
             if 'mappedId' in azure_input_dict:
                 patch_document.append(
                         {

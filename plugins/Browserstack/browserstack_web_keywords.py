@@ -62,21 +62,33 @@ class Browserstack_config():
         # self.access_key = args[0]["sauce_access_key"]
         # self.platform = args["platform"]
         # self.url = args[0]["remote_url"]
-        if args[0]['browserName'] == 'Google Chrome':
-            args[0]['browserName'] = 'Chrome'
-        if args[0]['browserName'] == 'Microsoft Edge':
-            args[0]['browserName'] = 'edge'
-        if args[0]['browserName'] == 'Firefox':
-            args[0]['browserName'] = 'firefox'
-        if args[0]['browserName'] == 'Internet Explorer':
-            args[0]['browserName'] = 'ie'
+        if args[0]['apptype'] == 'Web':
+            if args[0]['browserName'] == 'Google Chrome':
+                args[0]['browserName'] = 'Chrome'
+            if args[0]['browserName'] == 'Microsoft Edge':
+                args[0]['browserName'] = 'edge'
+            if args[0]['browserName'] == 'Firefox':
+                args[0]['browserName'] = 'firefox'
+            if args[0]['browserName'] == 'Internet Explorer':
+                args[0]['browserName'] = 'ie'
             
-        browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
-        browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
-        browserstack_constants.os = args[0]['os']
-        browserstack_constants.osVersion = args[0]['osVersion']
-        browserstack_constants.browserVersion = args[0]['browserVersion']
-        browserstack_constants.browserName = args[0]['browserName']
+            browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
+            browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
+            browserstack_constants.os = args[0]['os']
+            browserstack_constants.osVersion = args[0]['osVersion']
+            browserstack_constants.browserVersion = args[0]['browserVersion']
+            browserstack_constants.browserName = args[0]['browserName']
+
+        elif args[0]['apptype'] == 'MobileWeb':
+            browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
+            browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
+            browserstack_constants.Mobile =  args[0]['Mobile']
+        elif args[0]['apptype'] == 'MobileApp':
+            browserstack_constants.Browserstack_Username = args[0]["browserstack_username"]
+            browserstack_constants.Browserstack_key = args[0]["browserstack_access_key"]
+            browserstack_constants.Mobile =  args[0]['Mobile']
+        else:
+            logger.print_on_console("App type Not available")
         url = "https://{}:{}@hub.browserstack.com/wd/hub".format(browserstack_constants.Browserstack_Username,browserstack_constants.Browserstack_key)
         browserstack_constants.remote_url = url
 
@@ -90,10 +102,12 @@ class Browserstack_config():
            'browser':browserstack_constants.browserName,
            'browserstack_username': browserstack_constants.Browserstack_Username,
            'browserstack_access_key': browserstack_constants.Browserstack_key,
-           'remote_url': browserstack_constants.remote_url
+           'remote_url': browserstack_constants.remote_url,
+           'Mobile': browserstack_constants.Mobile,
         }
         self.username = conf["browserstack_username"]
         self.access_key = conf["browserstack_access_key"]
         self.remote_url = conf["remote_url"]
         self.os = conf["os"]
+        self.os = conf["Mobile"]
         return conf

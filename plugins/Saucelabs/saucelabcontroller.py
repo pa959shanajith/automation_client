@@ -22,6 +22,7 @@ import base64
 import time
 import subprocess
 import re
+import readconfig
 
 class SaucelabWindow():
     # jira = None
@@ -44,7 +45,7 @@ class SaucelabWindow():
         """
         res = "invalidcredentials"
         try:
-           response = requests.get("https://app.saucelabs.com/rest/v1/info/platforms/webdriver/")
+           response = requests.get("https://app.saucelabs.com/rest/v1/info/platforms/webdriver/", verify=self.send_tls_security())
            data = json.loads(response.text)
            # Create empty lists and dictionary to hold the options for each dropdown
            os_names = []
@@ -151,7 +152,7 @@ class SaucelabWindow():
                     if response.status != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response.status)
-                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        logger.print_on_console("Connection error occurred in Fetching Emulator Device Details")
                         time.sleep(2)
                     else:
                         break
@@ -193,11 +194,11 @@ class SaucelabWindow():
                 try:
                     # Send request to API endpoint
                     # respon = requests.post(endpoint_url, headers=headers, json=body)
-                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers)
+                    response_real_devices = requests.get('https://api.us-west-1.saucelabs.com/v1/rdc/devices',headers=headers, verify=self.send_tls_security())
                     if response_real_devices.status_code != 200:
                         log.info("Unable to connect to server retrying Status code is: %s",
                             response_real_devices.status_code)
-                        logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                        logger.print_on_console("Connection error occurred in Fetching Real Device Details")
                         time.sleep(2)
                     else:
                         break
@@ -243,11 +244,11 @@ class SaucelabWindow():
                             # Send request to API endpoint
                             # respon = requests.post(endpoint_url, headers=headers, json=body)
                             storage_url = 'https://api.us-west-1.saucelabs.com/v1/storage/files'
-                            response = requests.get(storage_url, headers=headers)
+                            response = requests.get(storage_url, headers=headers, verify=self.send_tls_security())
                             if response.status_code != 200:
                                 log.info("Unable to connect to server retrying Status code is: %s",
                                     response.status_code)
-                                logger.print_on_console("Connection error occurred with:"+ endpoint_url)
+                                logger.print_on_console("Error Ocuured while Fetch Mobile APK")
                                 time.sleep(2)
                             else:
                                 break
@@ -308,6 +309,7 @@ class SaucelabWindow():
             auth = (username, access_key)
 
             response = requests.post(upload_url, files=files, auth=auth)
+            verification=response.status_code
             aapt_path=os.environ['ANDROID_HOME']+"\\build-tools\\33.0.1\\aapt.exe"
             try:
                 result = subprocess.run([aapt_path, 'dump', 'badging', apk_path], capture_output=True, text=True, check=True)
@@ -325,7 +327,8 @@ class SaucelabWindow():
 
             data_to_server = {
                 "name": saucleb_input_dict['SauceLabUploadApk']['apkName'],
-                "activity": res
+                "activity": res,
+                "statusCode":verification
             }
 
 
@@ -339,4 +342,18 @@ class SaucelabWindow():
             else:
                 socket.emit('sauceconfresponse','Fail')
             logger.print_on_console('Exception in fetching the sauce details')
-        
+
+    def send_tls_security(self):
+        try:
+            tls_security = readconfig.configvalues.get("tls_security")
+            if tls_security != None and tls_security.lower() == "low":
+                # Make a GET request without SSL certificate verification (not recommended)
+                return False
+            else:
+                # Make a GET request with SSL certificate verification
+                return True
+        except Exception as e:
+            log.error(e)
+            logger.print_on_console("ERROR:SSLverify flag as False. Disabled TLS Certificate and Hostname Verification.")
+            #by default sending false(if this fuction met exception).you can modify this default return and above logger message.
+            return False    

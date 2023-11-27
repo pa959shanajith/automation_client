@@ -35,6 +35,7 @@ except ImportError:
 global server_certs
 auth_set= False
 log = logging.getLogger('wsdlgenerator.py')
+from zeep.transports import Transport
 
 ## This class will have the methods to generate request header and body of WSDL
 class WebservicesWSDL():
@@ -43,22 +44,51 @@ class WebservicesWSDL():
     1. WSDL url
     returns the operations present in WSDL
     """
-    def listOfOperation(self,wsdlURL):
+    def listOfOperation(self,wsdlURL,import_def):
         try:
             self.wsdlURL = wsdlURL
             #list_method = Client(wsdlURL)
+            base_url=wsdlURL.replace("?WSDL", "?op=")
             list_method = Client(wsdlURL, doctor=ImportDoctor(imp))
             allmethodslist=[]
+            import_wsdl_definition={}
+            import_wsdl_definition['CollectionName']=''
+            import_wsdl_definition['APIS']=[]
             for portindex in range(0,len(list_method.wsdl.services[0].ports)):
                 portname=list_method.wsdl.services[0].ports[portindex].name
+                import_wsdl_definition['CollectionName']=list_method.wsdl.services[0].name
                 obt_list_method = [method for method in list_method.wsdl.services[0].ports[portindex].methods]
                 for methodindex in range(0,len(obt_list_method)):
                     if 'Soap12' in portname:
                         allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'1','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            temp[str('SOAP1.2-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
+                            import_wsdl_definition['APIS'].append(temp)
                     elif 'Soap' in portname:
                         allmethodslist.append(str('SOAP1.1-'+obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'0','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            temp[str('SOAP1.1-'+obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
+                            import_wsdl_definition['APIS'].append(temp)
                     else:
                         allmethodslist.append(str(obt_list_method[methodindex]))
+                        if import_def:
+                            temp={}
+                            wsdl_object = BodyGenarator(self.wsdlURL,obt_list_method[methodindex],'2','','','','')
+                            requestHeader = wsdl_object.requestHeader()
+                            requestBody = wsdl_object.requestBody()
+                            requestBody, requestHeader=self.beautify_req_header(requestHeader,requestBody)
+                            temp[str(obt_list_method[methodindex])]={'endPointURL':base_url+obt_list_method[methodindex],'requestHeader':requestHeader, 'requestBody':requestBody, 'HTTPmethod':'POST', 'operation':obt_list_method[methodindex]}
+                            import_wsdl_definition['APIS'].append(temp)
             ##print list_method.wsdl.services[0].ports[0].name
             ##    obt_list_method = [method for method in list_method.wsdl.services[0].ports[0].methods]
             ##    obt_list_method1 = [method for method in list_method.wsdl.services[0].ports[1].methods]
@@ -70,14 +100,33 @@ class WebservicesWSDL():
             ##    for methodindex in range(0,len(obt_list_method1)):
             ##       allmethodslist.append(str('SOAP1.2-'+obt_list_method[methodindex]))
             ##    log.info(allmethodslist)
-            log.info("List Of Operations:")
-            log.info(allmethodslist)
-            logger.print_on_console('List Of Operations:::::',allmethodslist)
-            return allmethodslist
+            if import_def:
+                log.info("List Of Operations:")
+                log.info(import_wsdl_definition)
+                # logger.print_on_console('List Of Operations:::::',import_wsdl_definition)
+                return import_wsdl_definition
+            else:
+                log.info("List Of Operations:")
+                log.info(allmethodslist)
+                logger.print_on_console('List Of Operations:::::',allmethodslist)
+                return allmethodslist
         except Exception as e:
             logger.print_on_console('Invalid end point URl')
             log.error(e)
             return "fail"
+        
+    def beautify_req_header(self,requestHeader,requestBody):
+        from bs4 import BeautifulSoup
+        requestBody = BeautifulSoup(requestBody, "xml").prettify()
+        stringHeader=''
+        if(requestHeader != None):
+            for key in requestHeader:
+                # logger.print_on_console(key,'==========',requestHeader[key])
+                log.info(key)
+                log.info(requestHeader[key])
+                stringHeader = stringHeader + str(key) + ": " + str (requestHeader[key]) + "##"
+        requestHeader = stringHeader
+        return requestBody, requestHeader
 
 
 class BodyGenarator():
@@ -92,7 +141,7 @@ class BodyGenarator():
         self.wsdl = str(wsdl)
         self.operation_name=str(operation_name)
         self.soap_type = int(soap_type)
-        self.client_obj = zeep.Client(self.wsdl)
+        self.client_obj = zeep.Client(self.wsdl,transport = Transport(verify=False))
         self.client_obj.soaptype = None
         if not(serverCertificate=='' or serverCertificate==None or serverCerificate_pass=='' or serverCerificate_pass==None ) and  not(auth_uname=='' or auth_uname==None or auth_pass=='' or auth_pass==None):
             server_certs = self.server_certs(wsdl,operation_name,soap_type,serverCertificate,serverCerificate_pass,auth_uname,auth_pass)

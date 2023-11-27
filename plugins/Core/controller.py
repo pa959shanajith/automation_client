@@ -145,9 +145,11 @@ class Controller():
                 if SYSTEM_OS == 'Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileWeb')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import web_dispatcher_MW
                 self.mobile_web_dispatcher_obj = web_dispatcher_MW.Dispatcher()
                 self.mobile_web_dispatcher_obj.action=self.action
@@ -161,9 +163,11 @@ class Controller():
                 if SYSTEM_OS=='Darwin':
                     core_utils.get_all_the_imports('Mobility/MobileApp')
                     core_utils.get_all_the_imports('Mobility/iris_mobile')
+                    core_utils.get_all_the_imports('Browserstack')
                 else:
                     core_utils.get_all_the_imports('Mobility')
                     core_utils.get_all_the_imports('Saucelabs')
+                    core_utils.get_all_the_imports('Browserstack')
                 import mobile_app_dispatcher
                 self.mobile_app_dispatcher_obj = mobile_app_dispatcher.MobileDispatcher()
                 self.mobile_app_dispatcher_obj.action=self.action
@@ -557,7 +561,7 @@ class Controller():
         if tsp.name.lower() in DATABASE_KEYWORDS:
             if keyword_response != []:
                 display_keyword_response='DB data fetched'
-        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() == 'executerequest'):
+        if(tsp.apptype.lower() == 'webservice' and tsp.name.lower() in ['executerequest','executerequesttemplate']):
             if len(display_keyword_response) == 2:
                 logger.print_on_console('Response Header: \n',display_keyword_response[0])
                 #data size check
@@ -910,7 +914,7 @@ class Controller():
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
-                    if accessibility_testing and (index + 1 >= len(tsplist) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
+                    if accessibility_testing and ((index + 1 >= len(tsplist) or (index == len(tsplist) - 2 and index < len(tsplist) - 1 and tsplist[index + 1].name == "closeBrowser")) or (tsplist[index].testscript_name != tsplist[index + 1].testscript_name and screen_testcase_map[tsplist[index].testscript_name]['screenid'] != screen_testcase_map[tsplist[index + 1].testscript_name]['screenid'])):
                         if local_cont.accessibility_testing_obj is None: self.__load_web()
                         import browser_Keywords
                         script_info =  screen_testcase_map[tsplist[index].testscript_name]
@@ -1376,10 +1380,21 @@ class Controller():
                             }
                             if(json_data['apptype'] == 'Web'):
                                 s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
                                 browserstack_details['osVersion'] = json_data['osVersion']
                                 browserstack_details['os'] = json_data['os']
                                 browserstack_details['browserName'] = json_data['browserName']
                                 browserstack_details['browserVersion'] = json_data['browserVersion']
+                            elif(json_data['apptype'] == 'MobileWeb'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            elif(json_data['apptype'] == 'MobileApp'):
+                                s=browserstack_web_keywords.Browserstack_config()
+                                browserstack_details['apptype'] = json_data['apptype']
+                                browserstack_details['Mobile'] = json_data['mobile']
+                            else:
+                                logger.print_on_console("App type Not available")  
 
                             s.save_browserstackconf(browserstack_details)
                             execution_env = {'env': 'browserstack','browser':browser,'scenario': scenario_name,'scenario_id':scenario_id,'handlerno': handlerno}
@@ -2262,7 +2277,7 @@ def kill_process():
         try:
             import browser_Keywords_MW
             del browser_Keywords_MW.drivermap[:]
-            if hasattr(browser_Keywords_MW, 'driver_obj'):
+            if hasattr(browser_Keywords_MW, 'driver_obj') and hasattr(browser_Keywords_MW, 'device_id'):
                 adb=os.environ['ANDROID_HOME']+"\\platform-tools\\adb.exe"
                 cmd = adb + ' -s '+ browser_Keywords_MW.device_id +' shell pm clear com.android.chrome '
                 s = subprocess.check_output(cmd.split(),universal_newlines=True).strip()
@@ -2279,7 +2294,7 @@ def kill_process():
                 if p[1] == 4723:
                     log.info( 'Pid Found' )
                     log.info(line.pid)
-                    os.system("TASKKILL /F /T /PID " + str(line.pid))
+                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
         except Exception as e:
             log.error(e)
 

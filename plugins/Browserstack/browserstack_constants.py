@@ -6,3 +6,9 @@ osVersion= ""
 browserVersion=""
 browserName=""
 remote_url=""
+Mobile = {
+        "platformName": "Android",
+        "browserName": "Chrome",
+        "deviceName": "<>",
+        "platformVersion": "<>"
+    }

@@ -25,6 +25,7 @@ import json
 img=None
 from queue import Queue
 import concurrent.futures
+import psutil
 
 class ScrapeWindow(wx.Frame):
 
@@ -204,6 +205,13 @@ class ScrapeWindow(wx.Frame):
 
                         # Update the 'view' list in the JSON data
                         d['view'] = sorted_view_list
+                        processes = psutil.net_connections()
+                        for line in processes:
+                            p =  line.laddr
+                            if p[1] == 4723:
+                                log.info( 'Pid Found' )
+                                log.info(line.pid)
+                                subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                         self.socketIO.emit('scrape',d)
                     else:
                         self.print_error('Scraped data exceeds max. Limit.')
@@ -291,6 +299,13 @@ class ScrapeWindow(wx.Frame):
                     # 10 is the limit of MB set as per Avo Assure standards
                     if capturedData is not None:
                         if self.core_utilsobject.getdatasize(str(capturedData),'mb') < 10:
+                            processes = psutil.net_connections()
+                            for line in processes:
+                                p =  line.laddr
+                                if p[1] == 4723:
+                                    log.info( 'Pid Found' )
+                                    log.info(line.pid)
+                                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(line.pid)], creationflags=subprocess.CREATE_NO_WINDOW)
                             self.socketIO.emit('scrape',capturedData)
                             # Step 1: Open the JSON file in write mode
                             with open(file_path, 'w') as file:

@@ -300,7 +300,7 @@ class MainNamespace(BaseNamespace):
                     core_utils.get_all_the_imports('Desktop')
                     import desktop_highlight
                     highlightObj=desktop_highlight.highLight()
-                    highlightObj.highLiht_element(args[0],args[1])
+                    highlightObj.highlight_element(args[0],args[1])
                 elif appType==APPTYPE_SAP.lower():
                     core_utils.get_all_the_imports('SAP')
                     import sap_highlight
@@ -516,6 +516,7 @@ class MainNamespace(BaseNamespace):
                 browsername = args[0] + ";" + args[2] + ";" + args[3]+";" + args[4]
             """
             core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             global mobileScrapeObj
             mobileScrapeObj=mobile_app_scrape
@@ -620,7 +621,8 @@ class MainNamespace(BaseNamespace):
             import wsdlgenerator
             wsdlurl = str(args[0])
             wsdl_object = wsdlgenerator.WebservicesWSDL()
-            response = wsdl_object.listOfOperation(wsdlurl)
+            import_def=False
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
             response=str(response)
             log.debug(response)
             socketIO.emit('result_wsdl_listOfOperation',response)
@@ -677,6 +679,41 @@ class MainNamespace(BaseNamespace):
             socketIO.emit('result_wsdl_ServiceGenerator',response)
         except Exception as e:
             err_msg='Error while Fetching WSDL Response'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_WS_ImportDefinition(self, *args):
+        try:
+            if check_execution_lic("result_WS_ImportDefinition"): return None
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import wsdlgenerator
+            wsdlurl = str(args[0])
+            wsdl_object = wsdlgenerator.WebservicesWSDL()
+            import_def=True
+            response = wsdl_object.listOfOperation(wsdlurl,import_def)
+            log.debug(response)
+            socketIO.emit('result_WS_ImportDefinition',response)
+        except Exception as e:
+            err_msg='Error while Fetching WSDL Operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
+    def on_ExecuteRequestTemplate(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import  webservices
+            wsdlurl = str(args[0])
+            ws_object = webservices.WSkeywords()
+            response = ws_object.executeRequestTemplate(wsdlurl)
+            response=str(response)
+            log.debug(response)
+            socketIO.emit('result_ExecuteRequestTemplate',response)
+        except Exception as e:
+            err_msg='Error while executing'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
@@ -904,6 +941,15 @@ class MainNamespace(BaseNamespace):
             if args[0]['action'] == Browserstack_ACTION_1:
                 data = args[0]
                 obj.get_webconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_2:
+                data = args[0]
+                obj.get_mobileconf_details(data, socketIO)
+            elif args[0]['action'] == Browserstack_ACTION_3:
+                data = args[0]
+                obj.uploadApk_bs(data, socketIO)
+            else:
+                logger.print_on_console("Not able to login to BrowserStack")  
+
         except Exception as e:        
                 err_msg='Error in Browserstack operations'
                 log.error(err_msg)
@@ -1085,6 +1131,7 @@ class MainNamespace(BaseNamespace):
         try:
             wait_until_browsercheck()
             core_utils.get_all_the_imports('Mobility')
+            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             obj = mobile_app_scrape.MobileWindow()
             obj.run_adb_devices(socketIO)
@@ -1144,7 +1191,7 @@ class ConnectionThread(threading.Thread):
             'iceaction': self.ice_action,
             'icetoken': root.ice_token,
             'data': random()*100000000000000,
-            'host':readconfig.configvalues['server_ip']
+            'host': configvalues['server_ip']
         }
         params={'username': username, 'icename': root.ice_token["icename"],
             'ice_action': self.ice_action, 'icesession': json.dumps(root.icesession)}
@@ -1750,15 +1797,15 @@ class Main():
                 cw.scrapewindow = mobileWebScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Mobile Scrapper",browser = browsername,socketIO = socketIO,action=action,data=data)
                 mobileWebScrapeFlag=False
             elif desktopScrapeFlag==True:
-                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - Desktop Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = desktopScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Desktop-Element Identification",filePath = browsername,socketIO = socketIO)
                 desktopScrapeFlag=False
                 browsername = ''
             elif sapScrapeFlag==True:
-                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="Avo Assure - SAP Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = sapScrapeObj.ScrapeWindow(parent = cw,id = -1, title="SAP-Element Identification",filePath = browsername,socketIO = socketIO)
                 sapScrapeFlag=False
             elif oebsScrapeFlag==True:
                 oebsScrapeFlag=False
-                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - Oebs Scrapper",filePath = browsername,socketIO = socketIO)
+                cw.scrapewindow = oebsScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Oebs-Element Identification",filePath = browsername,socketIO = socketIO)
             elif pdfScrapeFlag==True:
                 cw.scrapewindow = pdfScrapeObj.ScrapeDispatcher(parent = cw,id = -1, title="Avo Assure - PDF Scrapper",filePath = browsername,socketIO = socketIO)
                 pdfScrapeFlag=False
@@ -1772,10 +1819,10 @@ class Main():
                     core_utils.get_all_the_imports('WebScrape')
                     sys.coinit_flags = 2
                     import web_scrape
-                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification >
+                    # scrapewindow title is changed < Avo Assure - Web Scrapper > to < AvoAssure Object Identification > To <Web-Element Identification>
                     # changed  on Date:08/07/2022
                     # Author : sreenivasulu
-                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="AvoAssure Object Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
+                    cw.scrapewindow = web_scrape.ScrapeWindow(parent = cw,id = -1, title="Web-Element Identification",browser = browsername,socketIO = socketIO,action=action,data=data)
                     browsername = ''
                 else:
                     import pause_display_operation
@@ -2005,6 +2052,7 @@ def check_browser():
         if SYSTEM_OS == 'Windows':
             if CHROME_VERSION != -1:
                 chromeFlag = False
+                counter = 0
                 if os.path.exists(CHROME_DRIVER_PATH):
                     p = subprocess.Popen('"' + CHROME_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1, shell=True)
                     a = p.stdout.readline()
@@ -2013,69 +2061,74 @@ def check_browser():
                     CHROME_VERSION = CHROME_VERSION.split('.')[0]
                     if str(a) == CHROME_VERSION:
                         chromeFlag = True
-                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+CHROME_VERSION+".exe"
-                        if proxies:
-                            fileObj = requests.get(URL,verify=False,proxies=proxies)
-                            if(fileObj.status_code == 200):
-                                open(CHROME_DRIVER_PATH, 'wb').write(fileObj.content)
-                        else:
-                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
-                        chromeFlag = True
-                    except:
-                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
-                        chromeFlag = False
-                if chromeFlag == False:
-                    # using lower version of driver present
-                    chromeFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")    
+                while not chromeFlag and counter < 2:
+                    if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                        DRIVER_VERSION = str(int(CHROME_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/chromedriver"+DRIVER_VERSION+".exe"
+                            if proxies:
+                                fileObj = requests.get(URL,verify=False,proxies=proxies)
+                                if(fileObj.status_code == 200):
+                                    open(CHROME_DRIVER_PATH, 'wb').write(fileObj.content)
+                            else:
+                                request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                            chromeFlag = True
+                        except:
+                            logger.print_on_console(f"Unable to download compatible chrome driver version {DRIVER_VERSION} from AvoAssure server")
+                            chromeFlag = False
+                        counter += 1
+                    if chromeFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Chrome version {CHROME_VERSION}")   
 
         elif SYSTEM_OS == 'Darwin':
             if CHROME_VERSION != -1:
                 chromeFlag = False
+                counter = 0
                 if os.path.exists(CHROME_DRIVER_PATH):
                     p = os.popen('"' + CHROME_DRIVER_PATH + '" --version')
                     a = p.read()
                     a=a.split(' ')[1].split('.')[0]
                     if str(a) == CHROME_VERSION:
                         chromeFlag = True
-                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/chromedriver"+CHROME_VERSION
-                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
-                        chromeFlag = True
-                    except:
-                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
-                        chromeFlag = False 
-                if chromeFlag == False:
-                    # using lower version of driver present
-                    chromeFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")
+                while not chromeFlag and counter < 2:
+                    if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                        DRIVER_VERSION = str(int(CHROME_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/chromedriver"+DRIVER_VERSION
+                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                            chromeFlag = True
+                        except:
+                            logger.print_on_console(f"Unable to download compatible chrome driver version {DRIVER_VERSION} from AvoAssure server")
+                            chromeFlag = False
+                        counter += 1 
+                    if chromeFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Chrome version {CHROME_VERSION}")
         elif SYSTEM_OS == 'Linux':
             if CHROME_VERSION != -1:
                 chromeFlag = False
+                counter = 0
                 if os.path.exists(CHROME_DRIVER_PATH):
                     p = os.popen('"' + CHROME_DRIVER_PATH + '" --version')
                     a = p.read()
                     a=a.split(' ')[1].split('.')[0]
                     if str(a) == CHROME_VERSION:
                         chromeFlag = True
-                if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/chromedriver"+CHROME_VERSION
-                        request.urlretrieve(URL,CHROME_DRIVER_PATH)
-                        chromeFlag = True
-                        os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
-                    except Exception as e:
-                        logger.print_on_console(f"Unable to download compatible chrome driver version {CHROME_VERSION} from AvoAssure server")
-                        log.debug("Error in chrome driver download")
-                        log.error(e)
-                        chromeFlag = False 
-                if chromeFlag == False:
-                    # using lower version of driver present
-                    chromeFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Chrome version {CHROME_VERSION}")
+                while not chromeFlag and counter < 2:
+                    if not os.path.exists(CHROME_DRIVER_PATH) or chromeFlag == False:
+                        DRIVER_VERSION = str(int(CHROME_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/chromedriver"+DRIVER_VERSION
+                            request.urlretrieve(URL,CHROME_DRIVER_PATH)
+                            chromeFlag = True
+                            os.chmod(CHROME_DRIVER_PATH,stat.S_IEXEC | os.stat(CHROME_DRIVER_PATH).st_mode)
+                        except Exception as e:
+                            logger.print_on_console(f"Unable to download compatible chrome driver version {DRIVER_VERSION} from AvoAssure server")
+                            log.debug("Error in chrome driver download")
+                            log.error(e)
+                            chromeFlag = False 
+                        counter += 1 
+                    if chromeFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Chrome version {CHROME_VERSION}")       
         
         #checking browser for firefox
         if SYSTEM_OS == 'Windows':
@@ -2178,6 +2231,7 @@ def check_browser():
         if SYSTEM_OS == 'Windows':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
+                counter = 0
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                     p = subprocess.Popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version', stdout=subprocess.PIPE, bufsize=1,cwd=DRIVERS_PATH,shell=True)
                     a = p.stdout.readline()
@@ -2187,72 +2241,76 @@ def check_browser():
                     else:
                         a = a[1]    
                     a=a.split('.')[0]
-                    if str(a) == CHROMIUM_VERSION.split('.')[0]:
+                    CHROMIUM_VERSION = CHROMIUM_VERSION.split('.')[0]
+                    if str(a) == CHROMIUM_VERSION:
                         chromiumFlag = True
-                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+CHROMIUM_VERSION.split('.')[0]+".exe"
-                        if proxies:
-                            fileObj = requests.get(URL,verify=False,proxies=proxies)
-                            if(fileObj.status_code == 200):
-                                open(EDGE_CHROMIUM_DRIVER_PATH, 'wb').write(fileObj.content)
-                        else:
-                            request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
-                        chromiumFlag = True
-                    except:
-                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION.split('.')[0]} from AvoAssure server")
-                        chromiumFlag = False
-
-                if chromiumFlag == False:
-                    # using lower version of driver present
-                    chromiumFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION.split('.')[0]}")      
+                while not chromiumFlag and counter < 2:
+                    if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                        DRIVER_VERSION = str(int(CHROMIUM_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/msedgedriver"+DRIVER_VERSION+".exe"
+                            if proxies:
+                                fileObj = requests.get(URL,verify=False,proxies=proxies)
+                                if(fileObj.status_code == 200):
+                                    open(EDGE_CHROMIUM_DRIVER_PATH, 'wb').write(fileObj.content)
+                            else:
+                                request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                            chromiumFlag = True
+                        except:
+                            logger.print_on_console(f"Unable to download compatible Edge Chromium driver {DRIVER_VERSION} from AvoAssure server")
+                            chromiumFlag = False
+                        counter += 1
+                    if chromiumFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Edge version {CHROMIUM_VERSION.split('.')[0]}")      
         elif SYSTEM_OS == 'Darwin':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
+                counter = 0
                 # if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                 #     p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
                 #     a = p.read()
                 #     a=a.split(' ')[1].split('.')[0]
                 #     if str(a) == CHROMIUM_VERSION:
                 #         chromiumFlag = True
-                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/msedgedriver"+CHROMIUM_VERSION
-                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
-                        chromiumFlag = True
-                    except:
-                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION} from AvoAssure server")
-                        chromiumFlag = False
-
-                if chromiumFlag == False:
-                    # using lower version of driver present
-                    chromiumFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION}")
+                while not chromiumFlag and counter < 2:
+                    if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                        DRIVER_VERSION = str(int(CHROMIUM_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/Mac"+"/msedgedriver"+DRIVER_VERSION
+                            request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                            chromiumFlag = True
+                        except:
+                            logger.print_on_console(f"Unable to download compatible Edge Chromium driver {DRIVER_VERSION} from AvoAssure server")
+                            chromiumFlag = False
+                        counter += 1
+                    if chromiumFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Edge version {CHROMIUM_VERSION}")
         elif SYSTEM_OS == 'Linux':
             if CHROMIUM_VERSION != -1:
                 chromiumFlag = False
+                counter = 0
                 if os.path.exists(EDGE_CHROMIUM_DRIVER_PATH):
                     p = os.popen('"' + EDGE_CHROMIUM_DRIVER_PATH + '" --version')
                     a = p.read()
                     a=a.split(' ')[3].split('.')[0]
                     if str(a) == CHROMIUM_VERSION:
                         chromiumFlag = True
-                if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
-                    try:
-                        URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/msedgedriver"+CHROMIUM_VERSION
-                        request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
-                        chromiumFlag = True
-                        os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
-                    except Exception as e:
-                        logger.print_on_console(f"Unable to download compatible Edge Chromium driver {CHROMIUM_VERSION} from AvoAssure server")
-                        log.debug("Error in edge-chromium driver download")
-                        log.error(e)
-                        chromiumFlag = False
-                if chromiumFlag == False:
-                    # using lower version of driver present
-                    chromiumFlag = True
-                    logger.print_on_console(f"Using lower version {a} of Driver for latest Edge version {CHROMIUM_VERSION}")
+                while not chromiumFlag and counter < 2:
+                    if not os.path.exists(EDGE_CHROMIUM_DRIVER_PATH) or chromiumFlag == False:
+                        DRIVER_VERSION = str(int(CHROMIUM_VERSION) - counter)
+                        try:
+                            URL=readconfig.configvalues["file_server_ip"]+"/"+SYSTEM_OS.lower()+"/"+platform.machine().lower()+"/msedgedriver"+DRIVER_VERSION
+                            request.urlretrieve(URL,EDGE_CHROMIUM_DRIVER_PATH)
+                            chromiumFlag = True
+                            os.chmod(EDGE_CHROMIUM_DRIVER_PATH,stat.S_IEXEC | os.stat(EDGE_CHROMIUM_DRIVER_PATH).st_mode)
+                        except Exception as e:
+                            logger.print_on_console(f"Unable to download compatible Edge Chromium driver {DRIVER_VERSION} from AvoAssure server")
+                            log.debug("Error in edge-chromium driver download")
+                            log.error(e)
+                            chromiumFlag = False
+                        counter += 1
+                    if chromiumFlag == True and counter > 1:
+                        logger.print_on_console(f"Using lower version {DRIVER_VERSION} of Driver for latest Edge version {CHROMIUM_VERSION}")
 
         if chromeFlag == True and firefoxFlag == True and edgeFlag == True and chromiumFlag == True:
             logger.print_on_console('Current version of browsers are supported')
@@ -2266,7 +2324,7 @@ def check_browser():
     finally:
         logger.print_on_console('Browser compatibility check completed')
         browsercheck_inprogress = False
-    return browsercheckFlag 
+    return browsercheckFlag  
 
 def wait_until_browsercheck():
     if browsercheck_inprogress:

@@ -470,7 +470,9 @@ class Dispatcher:
         }
 
         self.browsers_sl={'1':{'browserName': "chrome", 'sauce:options':{}},'2':{'browserName': "firefox", 'sauce:options':{}},'3':{'browserName': "internet explorer", 'sauce:options':{}},'7':{'browserName': "MicrosoftEdge", 'sauce:options':{}},'8':{'browserName': "MicrosoftEdge", 'sauce:options':{}}}
+        self.browsers_browserstack = {'1':{'browserName': "chrome", 'browserstack:options':{}},'2':{'browserName': "firefox", 'browserstack:options':{}},'3':{'browserName': "internet explorer", 'browserstack:options':{}},'7':{'browserName': "MicrosoftEdge", 'browserstack:options':{}},'8':{'browserName': "MicrosoftEdge", 'browserstack:options':{}}}
         self.sauce_conf = web_keywords.Sauce_Config().get_sauceconf()
+        self.browserstack_conf = browserstack_web_keywords.Browserstack_config().get_browserstackconf() 
         self.exception_flag=''
         self.action=None
         self.wxObject=None
@@ -734,8 +736,8 @@ class Dispatcher:
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
                     return False
-                elif execution_env['env'] == 'browserstack' and teststepproperty.name in list(self.browserstack_web_dict.keys()):
-                    if teststepproperty.custname == '@Browser' or teststepproperty.custname == '@BrowserPopUp':
+            elif execution_env['env'] == 'browserstack' and teststepproperty.name in list(self.browserstack_web_dict.keys()):
+                if teststepproperty.custname == '@Browser' or teststepproperty.custname == '@BrowserPopUp':
                     if (teststepproperty.name == "openBrowser"):
                         browser = teststepproperty.inputval[0]
                         self.browsers_browserstack[browser]["os"] = self.browserstack_conf["os"]
@@ -743,34 +745,26 @@ class Dispatcher:
                         self.browsers_browserstack[browser]["browser_version"] = self.browserstack_conf["browser_version"]
                         self.browsers_browserstack[browser]["browser"] = self.browserstack_conf["browser"]
                         if browser in ['7', '8'] and self.browserstack_conf["osversion"] != 'Windows 10':
-                            logger.print_on_console(
-                                'Microsoft Edge browser is supported only in Windows 10')
+                            logger.print_on_console('Microsoft Edge browser is supported only in Windows 10')
                             return 'Terminate'
-                        self.browsers_browserstack[browser]["browserstack:options"].update(
-                            {"name": teststepproperty.testscript_name})
-                        self.browsers_browserstack[browser]["browserstack:options"].update({
-                                                                                           "idleTimeout": 90})
-                        result = self.browserstack_web_dict[teststepproperty.name](
-                            self.browserstack_conf['remote_url'], self.browsers_browserstack[browser], execution_env['scenario'])
+                        self.browsers_browserstack[browser]["browserstack:options"].update({"name": teststepproperty.testscript_name})
+                        self.browsers_browserstack[browser]["browserstack:options"].update({"idleTimeout": 90})
+                        result = self.browserstack_web_dict[teststepproperty.name](self.browserstack_conf['remote_url'], self.browsers_browserstack[browser], execution_env['scenario'])
                         driver = browserstack_web_keywords.local_bwk.driver
                         window_handles_count_begin = len(driver.window_handles)
                         browser_Keywords.local_bk.driver_obj = browserstack_web_keywords.local_bwk.driver
                         find_browser_info(reporting_obj, mythread)
                     else:
-                        result = self.browserstack_web_dict[teststepproperty.name](
-                            webelement, input)
+                        result = self.browserstack_web_dict[teststepproperty.name](webelement, input)
                 elif teststepproperty.name in self.browserstack_web_dict:
                     xpath = teststepproperty.objectname.split(';')[0]
                     if (teststepproperty.name == "waitForElementVisible"):
                         input = xpath
                     driver.switch_to.default_content()
-                    webelement = send_webelement_to_keyword(
-                        browserstack_web_keywords.local_bwk.driver, objectname, url)
-                    result = self.sauce_web_dict[teststepproperty.name](
-                        webelement, input)
+                    webelement = send_webelement_to_keyword(browserstack_web_keywords.local_bwk.driver, objectname, url)
+                    result = self.sauce_web_dict[teststepproperty.name](webelement, input)
                 else:
-                    logger.print_on_console(
-                        teststepproperty.name+" keyword is not supported in browserstack execution.")
+                    logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
                     return False
             elif execution_env['env'] == 'default' and keyword in list(self.web_dict.keys()):
                 flag=False
@@ -1026,8 +1020,8 @@ class Dispatcher:
         webElement = None
         try:
             index = 0
-            driver.switch_to.default_content()
             if identifiers_type == 'rxpath' or identifiers_type == 'xpath':
+                driver.switch_to.default_content()
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
                 if webElement==None:
