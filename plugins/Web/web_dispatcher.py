@@ -29,7 +29,7 @@ from constants import *
 import requests
 import time
 import re
-import readconfig
+import readconfig, controller
 import logging
 import browserstack_web_keywords
 import json
@@ -846,6 +846,13 @@ class Dispatcher:
                             if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
+                        if controller.get_browser_to_foreground == False and keyword != 'getbrowsertoforeground':
+                            try:
+                                spam_result = self.web_dict['getbrowsertoforeground'](None, [''], '')
+                                if spam_result[1] != 'False':
+                                    controller.get_browser_to_foreground = True
+                            except:
+                                pass
                         #sending identifier that found webelement in keywords
                         result= self.web_dict[keyword](webelement,input,finalIdentifier)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
