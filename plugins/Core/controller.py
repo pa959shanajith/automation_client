@@ -53,6 +53,7 @@ log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
 screen_testcase_map= {}
+get_browser_to_foreground = False
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -1023,6 +1024,8 @@ class Controller():
         return res
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
+        #the flag 'get_browser_to_foreground'for: To bring the browser to foreground , and only for debugging
+        global get_browser_to_foreground
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
@@ -1116,6 +1119,8 @@ class Controller():
         obj.clear_dyn_variables()
         #clearing dynamic variables at the end of execution to support constant variable at the scenario level
         obj.clear_const_variables()
+        # making this flag as False, after complete debugging
+        get_browser_to_foreground = False
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
