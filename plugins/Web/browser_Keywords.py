@@ -41,6 +41,7 @@ import cicd_core
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
+browser_number = None
 local_bk = threading.local()
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -79,12 +80,13 @@ class BrowserKeywords():
         return err_msg
 
     def openBrowser(self,webelement,browser_num,*args):
-        global local_bk, driver_pre, drivermap,linux_drivermap
+        global local_bk, driver_pre, drivermap,linux_drivermap, browser_number
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        self.browser_num=browser_num[0]
+        self.browser_num = browser_num[0]
+        browser_number = browser_num[0]
         configvalues = readconfig.configvalues
         try:
             obj = Singleton_DriverUtil()
@@ -1199,6 +1201,7 @@ class BrowserKeywords():
         err_msg=None        
         verb = None 
         flag_firefox = False
+        self.browser_num = browser_number
         try:
             if SYSTEM_OS != 'Darwin':
                 if (self.browser_num == '1'):
