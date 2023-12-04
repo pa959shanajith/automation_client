@@ -146,7 +146,7 @@ class Handler():
         browser_type=[]
         datatables=[]
         extract_path = None
-        if(data_param_path is not None and data_param_path != ''):
+        if(data_param_path is not None and data_param_path.strip() != ''):
             data_param_path_temp = str(data_param_path)
             extract_path = [data_param_path_temp]
         #Iterating through json array
