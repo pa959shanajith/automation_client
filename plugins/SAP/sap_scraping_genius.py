@@ -197,7 +197,7 @@ class Scrape:
     #         logger.print_on_console( 'Error occured in getBaseWindow' )
     #     return window_to_scrape
 
-    def clickandadd(self, operation, socket):
+    def clickandadd(self, operation, socket, user_name):
         """
         name: clickandadd
         purpose : To recursively obtain all the elements/objects in the window and filter out the ones clicked by the user
@@ -305,7 +305,8 @@ class Scrape:
                                         'operation': keywordOperation,
                                         'window_name': wnd_title,
                                         'tooltip': elem.__getattr__("ToolTip") if hasattr(elem, "ToolTip") else "",
-                                        'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else ""
+                                        'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else "",
+                                        'user_name': user_name
                                     }
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 logger.print_on_console(dict)
@@ -476,9 +477,10 @@ class Scrape:
                                 'width': '',
                                 'tooltip': '',
                                 'defaulttooltip': '',
-                                'operation': '@sendFunctionKey',
-                                'window_name': '',
-                                'data_sent': "true"
+                                'operation': 'sendFunctionKeys',
+                                'window_name': view[len(view) - 1]['window_name'],
+                                'data_sent': "true",
+                                'user_name': user_name
                             }
                             self.socket.emit("sap_scrape_data", data)
 

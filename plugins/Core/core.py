@@ -1188,7 +1188,7 @@ class MainNamespace(BaseNamespace):
             core_utils.get_all_the_imports('SAP')
             import sap_scraping_genius
             sap_scraping_obj = sap_scraping_genius.Scrape()
-            sap_scraping_obj.clickandadd('STARTCLICKANDADD', socketIO)
+            sap_scraping_obj.clickandadd('STARTCLICKANDADD', socketIO, args[1])
             sapScrapeFlag=True
         except Exception as error:
             err_msg='Error while Scraping SAP application through Genius'
@@ -1207,7 +1207,7 @@ class MainNamespace(BaseNamespace):
             core_utils.get_all_the_imports('SAP')
             import sap_scraping_genius
             sap_scraping_obj = sap_scraping_genius.Scrape()
-            sap_scraping_obj.clickandadd('STOPCLICKANDADD', socketIO)
+            sap_scraping_obj.clickandadd('STOPCLICKANDADD', socketIO, args[1])
             sapScrapeFlag=True
         except Exception as error:
             err_msg='Error while Scraping SAP application through Genius'
