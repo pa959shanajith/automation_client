@@ -2578,112 +2578,85 @@ return (temp);"""
 
     """Method to take screenshot of the current web page, returns the image as a base64 string"""
     def fullpage_screenshot(self,driver, screen_shot_path):
-        log.info("Performing full page screenshot")
-        screen = None
-        #If you have an approach to get full screenshot without cropping all sides, remove the try and execute block of code.
         try:
-            if not os.path.exists(os.path.dirname(screen_shot_path)):
-                os.makedirs(os.path.dirname(screen_shot_path))
-            from selenium import webdriver
-            from selenium.webdriver.chrome.options import Options
-            import webconstants
-            options = Options()
-            options.add_argument("--window-size=1920,1080")
-            options.add_argument("--start-maximized")
-            options.add_argument("--headless")  # Use headless mode for running in the background
-            options.add_argument("--disable-gpu")
-            exec_path = webconstants.CHROME_DRIVER_PATH
-            log.debug("Performing full page screenshot in headless mode")
-            driver_headless = webdriver.Chrome(executable_path = exec_path, options = options) # Using by default chrome driver
-            driver_headless.maximize_window()
-            driver_headless.get(driver.current_url)
-            total_width = driver_headless.execute_script("return Math.max( document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth );")
-            total_height = driver_headless.execute_script("return Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );")
-            if total_width > 0 and total_height > 0:
-                # Set the window size to match the entire webpage
-                driver_headless.set_window_size(total_width, total_height)
-                driver_headless.save_screenshot(f"{screen_shot_path}")
-                driver_headless.quit()
+            log.info("Performing full page screenshot")
+            total_width = driver.execute_script("return document.body.offsetWidth")
+            total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+            viewport_width = driver.execute_script("return window.innerWidth")
+            viewport_height = driver.execute_script("return window.innerHeight")
+            driver.execute_script("window.scrollTo({0}, {1})".format(0, total_height))
+            time.sleep(1)
+            total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
+            #scroll to the top of the page
+            driver.execute_script("window.scrollTo(0,0)")
+            rectangles = []
+            screen = None
+            if total_width == 0:
+                total_width = driver.execute_script("return document.documentElement.offsetWidth")
+
+            if total_height < viewport_height:
+                total_height = viewport_height
+
+            if total_width < viewport_width:
+                total_width = viewport_width
+
+            if total_width > 0 and total_height > 0 and viewport_width > 0 and viewport_height > 0:
+
+                i = 0
+                while i < total_height:
+                    ii = 0
+                    top_height = i + viewport_height
+
+                    if top_height > total_height:
+                        top_height = total_height
+
+                    while ii < total_width:
+                        top_width = ii + viewport_width
+
+                        if top_width > total_width:
+                            top_width = total_width
+
+                        rectangles.append((ii, i, top_width, top_height))
+
+                        ii = ii + viewport_width
+
+                    i = i + viewport_height
+
+                stitched_image = Image.new('RGB', (total_width, total_height))
+                previous = None
+                part = 0
+                for rectangle in rectangles:
+                    if not previous is None:
+                        driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                        time.sleep(0.2)
+                    file_name = "part_{0}.png".format(part)
+                    driver.get_screenshot_as_file(file_name)
+                    screenshot = Image.open(file_name)
+                    if rectangle[1] + viewport_height > total_height:
+                        offset = (rectangle[0], total_height - viewport_height)
+                    else:
+                        offset = (rectangle[0], rectangle[1])
+                    stitched_image.paste(screenshot, offset)
+                    del screenshot
+                    os.remove(file_name)
+                    part = part + 1
+                    previous = rectangle
+                    driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
+                    code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
+                    driver.execute_script(code)
+                if not os.path.exists(os.path.dirname(screen_shot_path)):
+                    os.makedirs(os.path.dirname(screen_shot_path))
+                stitched_image.save(screen_shot_path)
                 with open(screen_shot_path, "rb") as f:
                     b64_screen = base64.b64encode(f.read())
                     screen=codecs.decode(b64_screen)
-        except:
-            try:
-                total_width = driver.execute_script("return document.body.offsetWidth")
-                total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
-                viewport_width = driver.execute_script("return window.innerWidth")
-                viewport_height = driver.execute_script("return window.innerHeight")
-                driver.execute_script("window.scrollTo({0}, {1})".format(0, total_height))
-                time.sleep(1)
-                total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
-                #scroll to the top of the page
-                driver.execute_script("window.scrollTo(0,0)")
-                rectangles = []
-                if total_width == 0:
-                    total_width = driver.execute_script("return document.documentElement.offsetWidth")
-
-                if total_height < viewport_height:
-                    total_height = viewport_height
-
-                if total_width < viewport_width:
-                    total_width = viewport_width
-
-                if total_width > 0 and total_height > 0 and viewport_width > 0 and viewport_height > 0:
-
-                    i = 0
-                    while i < total_height:
-                        ii = 0
-                        top_height = i + viewport_height
-
-                        if top_height > total_height:
-                            top_height = total_height
-
-                        while ii < total_width:
-                            top_width = ii + viewport_width
-
-                            if top_width > total_width:
-                                top_width = total_width
-
-                            rectangles.append((ii, i, top_width, top_height))
-
-                            ii = ii + viewport_width
-
-                        i = i + viewport_height
-
-                    stitched_image = Image.new('RGB', (total_width, total_height))
-                    previous = None
-                    part = 0
-                    for rectangle in rectangles:
-                        if not previous is None:
-                            driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
-                            time.sleep(0.2)
-                        file_name = "part_{0}.png".format(part)
-                        driver.get_screenshot_as_file(file_name)
-                        screenshot = Image.open(file_name)
-                        if rectangle[1] + viewport_height > total_height:
-                            offset = (rectangle[0], total_height - viewport_height)
-                        else:
-                            offset = (rectangle[0], rectangle[1])
-                        stitched_image.paste(screenshot, offset)
-                        del screenshot
-                        os.remove(file_name)
-                        part = part + 1
-                        previous = rectangle
-                        driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
-                        code = '''var elems = document.body.getElementsByTagName("*"); var len = elems.length; document.body.style.removeProperty('max-width'); document.body.style.removeProperty('overflow-x'); for (var i=0;i<len;i++) { 	if (window.getComputedStyle(elems[i],null).getPropertyValue('position') == 'fixed') { 		elems[i].style.removeProperty('opacity'); 	} }'''
-                        driver.execute_script(code)
-                    stitched_image.save(screen_shot_path)
-                    with open(screen_shot_path, "rb") as f:
-                        b64_screen = base64.b64encode(f.read())
-                        screen=codecs.decode(b64_screen)
-                else:
-                    screen = driver.get_screenshot_as_base64()
-            except Exception as e:
-                log.debug("Error while performing full page screenshot")
-                log.debug(e,exc_info=True)
+            else:
                 screen = driver.get_screenshot_as_base64()
-        finally:
-            return screen, total_width, total_height
+        except Exception as e:
+            log.debug("Error while performing full page screenshot")
+            log.debug(e,exc_info=True)
+            screen = driver.get_screenshot_as_base64()
+        return screen, total_width, total_height
 
     """Method to switch into frames and iframes"""
     def switchtoframe_webscrape(self,driver,currenthandle,mypath):
