@@ -203,6 +203,7 @@ class InstallAndLaunch():
                             device_id = device_name
                         else:
                             driver = None
+                            device_id = None
                             return None    
                     else:
                         driver = None
