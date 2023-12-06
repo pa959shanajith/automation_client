@@ -10,14 +10,14 @@ import json
 import requests
 import logger
 import threading
+import constants
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 local_bk = threading.local()
 class NetworkData:
     def __init__(self, driver):
         self.driver = driver
-    def network_data(self):
-        from plugins.Core import constants  
+    def network_data(self):  
         global local_bk
         config_path = constants.CONFIG_PATH
         check_key = "network_data"
