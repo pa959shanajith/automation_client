@@ -1205,6 +1205,7 @@ class Controller():
                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                 # #send response through API
             else:
+                log.info("DL------>base_execute_data in return_status_executeTestSuite {}".format(base_execute_data))
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "started",
                     'startTime': datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             execute_result_data = dict({'scenarioId': None, 'reportData': None}, **base_execute_data)
@@ -1532,6 +1533,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                             else:
+                                log.info("DL------>execute_result_data in result_executeTestSuite {}".format(execute_result_data))
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1568,6 +1570,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)  
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
                             else:
+                                log.info("DL------>execute_result_data in result_executeTestSuite {}".format(execute_result_data))
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1793,6 +1796,7 @@ class Controller():
                             # res = requests.post(server_url,json=data_dict, verify=False)
                             res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                         else:
+                            log.info("DL------>execute_result_data in result_executeTestSuite {}".format(execute_result_data))
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
                         sc_idx += 1
@@ -1831,6 +1835,7 @@ class Controller():
                         # res = requests.post(server_url,json=data_dict, verify=False)
                         res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                     else:
+                        log.info("DL------>execute_result_data in result_executeTestSuite {}".format(execute_result_data))
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
                     sc_idx += 1
@@ -1866,6 +1871,7 @@ class Controller():
                 # res = requests.post(server_url,json=data_dict, verify=False)
                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
             else:
+                log.info("DL------>base_execute_data in return_status_executeTestSuite {}".format(base_execute_data))
                 socketIO.emit("return_status_executeTestSuite", dict({"status": "finished", "executionStatus": exc_pass,
                     "endTime": datetime.now().strftime(TIME_FORMAT)}, **base_execute_data))
             if not exc_pass:
@@ -1962,6 +1968,7 @@ class Controller():
                 obj_reporting.save_report_json(filename,json_data,status_percentage)
                 execute_result_data["scenarioId"]=aws_scenario[sc_idx]
                 execute_result_data["reportData"] = obj_reporting.report_json
+                log.info("DL------>execute_result_data in result_executeTestSuite {}".format(execute_result_data))
                 socketIO.emit('result_executeTestSuite', execute_result_data)
                 sc_idx+=1
                 idx_t+=1

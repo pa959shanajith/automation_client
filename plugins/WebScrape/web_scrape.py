@@ -308,8 +308,10 @@ class ScrapeWindow(wx.Frame):
             if self.core_utilsobject.getdatasize(str(d),'mb') < self.webscrape_utils_obj.SCRAPE_DATA_LIMIT:
                 if  isinstance(d,str):
                     if d.lower() == 'fail':
+                        log.info("DL------>perform_clickandadd in webscrape {}".format(d))
                         self.socketIO.emit('scrape',d)
                 else:
+                    log.info("DL------>perform_clickandadd in webscrape {}".format(d))
                     self.socketIO.emit('scrape',d)
             else:
                 logger.print_on_console('Scraped data exceeds max. Limit.')
