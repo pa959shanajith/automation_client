@@ -1090,7 +1090,12 @@ class MainNamespace(BaseNamespace):
 
     def on_disconnect(self, *args):
         if not allow_connect: return
-        log.info('Disconnect triggered')
+        log.info('DL------>Disconnect triggered')
+        log.info(root.icesession)
+        logger.print_on_console('DL------>Disconnect triggered')
+        logger.print_on_console(root.icesession)
+        log.info("socketIO is not None "+ socketIO is not None)
+        logger.print_on_console("DL------>socketIO is not None "+ socketIO is not None)
         stop_ping_thread()
         if socketIO is not None:
             root.icesession['connect_time'] = str(datetime.now())
@@ -2431,6 +2436,8 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     else:
         result['mode'] = False
     result["host"] = readconfig.configvalues['server_ip']
+    log.info("DL------>set ICE status "+ result['host'])
+    logger.print_on_console("DL------>set ICE status "+ result['host'])
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 
