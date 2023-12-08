@@ -236,12 +236,14 @@ class ScrapeWindow(wx.Frame):
                     self.fullscrapedropdown.Disable()
                     self.visibilityCheck.Disable()
                     self.startbutton.Disable()
+                    self.navigateurl.Disable()
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Disable()
                     if len(self.driver.window_handles) > 1 and not self.window_selected:
                         self.fullscrapebutton.Hide()
                         self.visibilityCheck.Hide()
                         self.startbutton.Hide()
+                        self.startbutton_label.Hide()
                         if checkWebPackage['isWebPackage'] == "False":
                             self.cropbutton.Hide()
                         self.fullscrapedropdown.Hide()
@@ -270,12 +272,14 @@ class ScrapeWindow(wx.Frame):
                 self.fullscrapedropdown.Disable()
                 self.visibilityCheck.Disable()
                 self.startbutton.Disable()
+                self.navigateurl.Disable()
                 if checkWebPackage['isWebPackage'] == "False":
                     self.cropbutton.Disable()
                 if len(self.driver.window_handles) > 1 and not self.window_selected:
                     self.fullscrapebutton.Hide()
                     self.visibilityCheck.Hide()
                     self.startbutton.Hide()
+                    self.startbutton_label.Hide()
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Hide()
                     self.fullscrapedropdown.Hide()
