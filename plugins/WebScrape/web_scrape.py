@@ -45,7 +45,9 @@ class ScrapeWindow(wx.Frame):
                 "visibilityCheck":[(120,120), (86, 20)],
                 "cropbutton_field":[(290,160 ), (165, 30)],
                 "startbutton_field":[(110, 160), (165, 30)],
-                "startbutton_label":[(16, 163)]
+                "startbutton_label":[(16, 163)],
+                "delaytext":[(290, 125),(40,30)],
+                "scrapeDelaydropdown":[(385, 123),(80, 25)]
             }
         else:
             scrapper_window_config = {
@@ -58,8 +60,10 @@ class ScrapeWindow(wx.Frame):
                 "scrape_type_label_field": [(18, 83)],
                 "fullscrapedropdown_field": [(115, 80), (260, 30)],
                 "fullscrapebutton": [(385, 80), (80, 30)],
-                "visibilityCheck": [(115, 120), (160, 20)],
-                "cropbutton_field": [(290, 160), (165, 30)]
+                "visibilityCheck": [(115, 125), (160, 20)],
+                "cropbutton_field": [(290, 160), (165, 30)],
+                "delaytext":[(290, 125),(40,30)],
+                "scrapeDelaydropdown":[(385, 123),(80, 25)]
             }
         wx.Frame.__init__(self, parent, title=title,pos=scrapper_window_config["frame"][0],  size=scrapper_window_config["frame"][1] ,style=wx.DEFAULT_FRAME_STYLE & ~ (wx.RESIZE_BORDER  | wx.MAXIMIZE_BOX) )
         self.SetBackgroundColour('#ffffff') # set background colour to white
@@ -87,6 +91,8 @@ class ScrapeWindow(wx.Frame):
         self.invalid_urls = ["about:blank","data:,",""]
         self.invalid_url_msg = "There is no URL in the browser selected or the URL is empty/blank. Please load the webpage and then start performing the desired action."
         self.allowed_url_msg = "Only AvoBank URL: "+ allowed_urls[0] + " is supported for this trial."
+        self.delay_time=["0s","5s","10s","15s","20s","25s"]
+        self.delay_time_map={"0s":0,"5s":5,"10s":10,"15s":15,"20s":20,"25s":25}
         self.parent = parent
         if status == False:
             self.socketIO.emit('scrape',status)
@@ -146,6 +152,11 @@ class ScrapeWindow(wx.Frame):
                     self.nextbutton.Bind(wx.EVT_LEFT_DOWN, self.on_next)
                     self.nextbutton.SetToolTip(wx.ToolTip("Select next window/tab"))
                     self.nextbutton.Hide()
+
+                    self.delaytext=wx.StaticText(self.panel, label="Delay", pos=scrapper_window_config["delaytext"][0], size=scrapper_window_config["delaytext"][1], style=0, name="")
+                    self.scrapeDelaydropdown = wx.ComboBox(self.panel, value = "0s", pos = scrapper_window_config["scrapeDelaydropdown"][0], size = scrapper_window_config["scrapeDelaydropdown"][1], choices = self.delay_time, style = wx.CB_DROPDOWN)
+                    self.scrapeDelaydropdown.SetEditable(False)
+                    self.scrapeDelaydropdown.SetToolTip(wx.ToolTip( "Set delay time before start of scraping." ))
 
                     if checkWebPackage['isWebPackage'] == "False":
                         import cropandadd
@@ -237,6 +248,7 @@ class ScrapeWindow(wx.Frame):
                     self.visibilityCheck.Disable()
                     self.startbutton.Disable()
                     self.navigateurl.Disable()
+                    self.scrapeDelaydropdown.Disable()
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Disable()
                     if len(self.driver.window_handles) > 1 and not self.window_selected:
@@ -273,6 +285,7 @@ class ScrapeWindow(wx.Frame):
                 self.visibilityCheck.Disable()
                 self.startbutton.Disable()
                 self.navigateurl.Disable()
+                self.scrapeDelaydropdown.Disable()
                 if checkWebPackage['isWebPackage'] == "False":
                     self.cropbutton.Disable()
                 if len(self.driver.window_handles) > 1 and not self.window_selected:
@@ -294,6 +307,7 @@ class ScrapeWindow(wx.Frame):
     def perform_clickandadd(self):
         state = self.startbutton.GetValue()
         if state == True:
+            time.sleep(self.delay_time_map[self.scrapeDelaydropdown.GetValue()])
             status = clickandaddoj.startclickandadd(self.window_handle_number)
             self.startbutton.SetBitmapLabel(self.stop_img)
             self.startbutton.Enable()

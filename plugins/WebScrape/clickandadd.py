@@ -52,7 +52,6 @@ class Clickandadd():
             #win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
-            # time.sleep(6)
             browserops_obj.checkPopups()
 
             if window_handle_number is not None and window_handle_number > 0:
