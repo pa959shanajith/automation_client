@@ -67,10 +67,10 @@ class For():
         #Reporting part ends
 
     def invalid_for_input(self,endForNum,inputval,reporting_obj):
-        logger.print_on_console('Encountered :'+self.name+'\n')
-        logger.print_on_console('Invalid for count '+inputval+'\n')
+        logger.print_on_console(f'Encountered :{self.name}')
+        logger.print_on_console(f'Invalid for count {inputval}\n')
         #Reporting part
-        self.step_description='Encountered :'+self.name+' Invalid for count '+inputval
+        self.step_description=f'Encountered :{self.name} Invalid for count {inputval}'
         reporting_obj.name=constants.ENDFOR
         self.add_report_step(reporting_obj,constants.ENDFOR_DESCRIPTION)
         #Reporting part ends
@@ -104,7 +104,7 @@ class For():
             endForNum = list(self.info_dict[0].keys())[0]
             inputval=input[0]
             try:
-                if(int(input[0]) <= 0):
+                if(input[0] == None or int(input[0]) <= 0):
                     forIndex=self.invalid_for_input(endForNum,inputval,reporting_obj)
                     local_for.iteration_count[self.index]=0
                     return forIndex
