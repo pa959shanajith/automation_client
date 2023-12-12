@@ -985,7 +985,7 @@ class StepDescription:
         def sendsecurefunctionkeys():
             return 'Enter secure text ' +"'"+input + "'"+ ' in  ' + "'" + tsp.custname + "'"+ '.'
 
-        #Element keywords(7 keywords)
+        #Element keywords(10 keywords)
         def getelementtext():
             return 'Get the value present in ' + "'" + tsp.custname + "'" +' and save the value ' +"'"+ output +"'"+' in '+"'"+tsp_outputval+"'."
         def verifyelementdoesnotexists():
@@ -1000,6 +1000,12 @@ class StepDescription:
             return 'Verify if the element '+ "'" + tsp.custname + "' exists."
         def press():
             return 'Press the ' +"'" + tsp.custname + "'"
+        def getelementcolor():
+            return 'Fetched element color'
+        def drag():
+            return 'Performed drag operation'
+        def drop():
+            return 'Performed drop operation'
 
         #Button Keywords(5 keywords)
         def click():
