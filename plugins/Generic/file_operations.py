@@ -2577,9 +2577,9 @@ class FileOperations:
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=None
-        row = int(row)
-        col = int(col)
         try:
+            row = int(row)
+            col = int(col)
             if filePath != None and filePath != '':
                 with open(filePath, "r") as file1:
                     read_content = file1.readlines()

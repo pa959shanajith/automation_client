@@ -57,6 +57,8 @@ class StepDescription:
             return "Verify '"+ inputval[1]+"' is present in the file '"+ inputval[0]+"'"
         def getcontent():
             return "Get content from the file '"+ input+"' and save it in '"+ tsp.outputval+"'"
+        def getdelimitedvalue():
+            return "Get content from the file '"+ input+"' based on input and save it in '"+ tsp.outputval+"'"
         def comparefiles():
             return "Compared the contents of files '"+ inputval[0] + "' and '"+ inputval[1]+"'"
         def compareinputs():
