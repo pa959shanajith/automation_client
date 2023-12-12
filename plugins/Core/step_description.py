@@ -905,7 +905,7 @@ class StepDescription:
         def unselectcheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"+'.'
 
-        #Application keywords(@Window keywords- 7 keywords)
+        #Application keywords(@Window keywords- 8 keywords)
         def launchapplication():
             return 'The application present in the path  '+"'"+ inputval[0]+"'"+ ' is launched.'
         def getpagetitle():
@@ -920,6 +920,8 @@ class StepDescription:
             return 'Perform maximize window operation on the window.'
         def minimizewindow():
             return 'Perform minimize window operation on the window.'
+        def closesubwindow():
+            return 'The subwindow is closed.'
 
         #Mail Related keywords(@Email keywords- 15 keywords)
         def getattachmentstatus():
