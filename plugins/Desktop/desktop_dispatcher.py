@@ -79,6 +79,7 @@ class DesktopDispatcher:
         'minimizewindow' : launch_keywords_obj.minimize_window,
         'getpagetitle' : launch_keywords_obj.getPageTitle,
         'closeapplication' : launch_keywords_obj.closeApplication,
+        'closesubwindow' : launch_keywords_obj.close_subwindow,
         'verifyenabled' : util_keywords_obj.verifyEnabled,
         'verifydisabled' : util_keywords_obj.verifyDisabled,
         'verifyvisible' : util_keywords_obj.verifyVisible,
@@ -264,7 +265,7 @@ class DesktopDispatcher:
             keyword = keyword.lower()
             ele = None
             if ( keyword in list(self.desktop_dict.keys()) ):
-                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
+                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'closesubwindow' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
                     result = self.desktop_dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()
