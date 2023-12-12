@@ -2565,3 +2565,53 @@ class FileOperations:
             logger.print_on_console(err_msg)
 
         return status,methodoutput,pageCount,err_msg
+
+    def get_delimited_value(self, filePath, row, col, delimiter):
+        """
+        def : get_delimited_value
+        purpose : To fecth value from file based on row and column separated by delimiter
+        param : filePath, row, col, delimiter
+        return : value
+        """
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=None
+        row = int(row)
+        col = int(col)
+        try:
+            if filePath != None and filePath != '':
+                with open(filePath, "r") as file1:
+                    read_content = file1.readlines()
+                if row != None and row != '':
+                    if row < len(read_content):
+                        if delimiter != None and delimiter != '':
+                            content = read_content[row].split(delimiter)
+                            if col != None and col != '':
+                                if col < len(content):
+                                    value = content[col-1]
+                                    logger.print_on_console(f"Value: {value}")
+                                    status=TEST_RESULT_PASS
+                                    methodoutput=TEST_RESULT_TRUE
+                                    output = value
+                                else:
+                                    err_msg = 'column length is out of index.'
+                            else:
+                                err_msg = 'colum number is empty.'
+                        else:
+                            err_msg = 'delimiter is empty.'
+                    else:
+                        err_msg = 'row length is out of index.'
+                else:
+                    err_msg = 'row number is empty.'
+            else:
+                err_msg = 'Error in File Path.'
+
+        except Exception as e:
+            err_msg = 'Error occured while fetching value.'
+            log.error(e)
+        if err_msg!=None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+
+        return status,methodoutput,output,err_msg
