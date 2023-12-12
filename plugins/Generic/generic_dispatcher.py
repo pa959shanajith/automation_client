@@ -173,7 +173,8 @@ class GenericKeywordDispatcher:
             'selectivecellcompare': local_generic.generic_file.selective_cell_compare,
             'getpagecount': local_generic.generic_file.get_page_count,
             'createconstvariable':local_generic.const_var_obj.create_constant_variable,
-            'deleteconstvariable':local_generic.const_var_obj.delete_const_variable
+            'deleteconstvariable':local_generic.const_var_obj.delete_const_variable,
+            'getdelimitedvalue':local_generic.generic_file.get_delimited_value
             }
 	#Call to fetch data in database keywords
     def fetch_data(self,input):
