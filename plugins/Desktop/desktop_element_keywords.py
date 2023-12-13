@@ -305,8 +305,8 @@ class ElementKeywords():
                         element_properties = element.get_properties()
                         left = element_properties['rectangle'].left
                         top = element_properties['rectangle'].top
-                        left = left+2
-                        top = top+2
+                        left = left+8
+                        top = top+8
                         color = pyautogui.pixel(left, top)
                         logger.print_on_console( f'RGB color value of the element is: {color}' )
                         if not (input is None or input is ''):
