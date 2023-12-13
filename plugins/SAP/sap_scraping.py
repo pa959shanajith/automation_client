@@ -225,6 +225,7 @@ class Scrape:
                                                 dict = next_ele
                                         except Exception as e:
                                             break
+                                    elem = dict
                                 except Exception as e:
                                     log.error( 'Error occurred in custom clickandadd scraping' + str(e) )
                             else:
@@ -249,8 +250,10 @@ class Scrape:
                                     'tooltip': elem.__getattr__("ToolTip") if hasattr(elem, "ToolTip") else "",
                                     'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else ""
                                 }
+                                
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 view.append(dict)
+
                             #Highlight objects while scraping
                             import sap_highlight
                             highlight_obj = sap_highlight.highLight()
