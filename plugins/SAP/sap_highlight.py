@@ -155,10 +155,10 @@ class highLight():
         if colour in colours : colour = colours[colour]
 
         # if rect is None:
-        h=elem.__getattr__("Height")
-        w=elem.__getattr__("Width")
-        l=elem.__getattr__("ScreenLeft")
-        t=elem.__getattr__("ScreenTop")
+        h=elem.__getattr__("Height") if hasattr(elem, "Height") else elem["height"]
+        w=elem.__getattr__("Width") if hasattr(elem, "Width") else elem["width"]
+        l=elem.__getattr__("ScreenLeft") if hasattr(elem, "ScreenLeft") else elem["left"]
+        t=elem.__getattr__("ScreenTop") if hasattr(elem, "ScreenTop") else elem["top"]
         r=l+w
         b=t+h
         rect={
