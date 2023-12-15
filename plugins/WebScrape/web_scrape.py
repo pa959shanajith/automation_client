@@ -259,6 +259,8 @@ class ScrapeWindow(wx.Frame):
                         if checkWebPackage['isWebPackage'] == "False":
                             self.cropbutton.Hide()
                         self.fullscrapedropdown.Hide()
+                        self.scrapeDelaydropdown.Hide()
+                        self.delaytext.Hide()
                         self.nextbutton.Show()
                         self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
                         self.resume_scraping_button.Show()
@@ -296,6 +298,8 @@ class ScrapeWindow(wx.Frame):
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Hide()
                     self.fullscrapedropdown.Hide()
+                    self.scrapeDelaydropdown.Hide()
+                    self.delaytext.Hide()
                     self.nextbutton.Show()
                     self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
                     self.resume_scraping_button.Show()
@@ -414,6 +418,7 @@ class ScrapeWindow(wx.Frame):
                 else:
                     self.scrape_type = "fullscrape"
                     self.startbutton.Disable()
+                    self.navigateurl.Disable()
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Disable()  
 
@@ -425,6 +430,9 @@ class ScrapeWindow(wx.Frame):
                         if checkWebPackage['isWebPackage'] == "False":
                             self.cropbutton.Hide()
                         self.fullscrapedropdown.Hide()
+                        self.startbutton_label.Hide()
+                        self.delaytext.Hide()
+                        self.scrapeDelaydropdown.Hide()
                         self.nextbutton.Show()
                         self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
                         self.resume_scraping_button.Show()
@@ -446,6 +454,7 @@ class ScrapeWindow(wx.Frame):
             else:
                 self.scrape_type = "fullscrape"
                 self.startbutton.Disable()
+                self.navigateurl.Disable()
                 if checkWebPackage['isWebPackage'] == "False":
                     self.cropbutton.Disable()
 
@@ -457,6 +466,9 @@ class ScrapeWindow(wx.Frame):
                     if checkWebPackage['isWebPackage'] == "False":
                         self.cropbutton.Hide()
                     self.fullscrapedropdown.Hide()
+                    self.startbutton_label.Hide()
+                    self.delaytext.Hide()
+                    self.scrapeDelaydropdown.Hide()
                     self.nextbutton.Show()
                     self.resume_scraping_button.SetToolTip(wx.ToolTip("Resume " + self.scrape_type))
                     self.resume_scraping_button.Show()
@@ -542,7 +554,7 @@ class ScrapeWindow(wx.Frame):
 
     def resume_scraping(self,event):
         selector_window_buttons = [self.nextbutton,self.resume_scraping_button,self.prevbutton]
-        scrape_window_basic_buttons = [self.fullscrapebutton, self.startbutton, self.fullscrapedropdown,self.visibilityCheck]
+        scrape_window_basic_buttons = [self.fullscrapebutton, self.startbutton, self.fullscrapedropdown,self.visibilityCheck, self.delaytext, self.scrapeDelaydropdown, self.startbutton_label]
         list(map(lambda button: button.Disable(),selector_window_buttons))
         if self.scrape_type == "fullscrape":
             self.perform_fullscrape()
