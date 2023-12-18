@@ -213,7 +213,7 @@ NON_WEBELEMENT_KEYWORDS=['openbrowser','opennewtab','navigatetourl','getpagetitl
 
 FOUND='found'
 
-BROWSER_NAME_MAP = {'chrome': 'Chrome', 'firefox': 'Firefox', 'internet explorer': 'Internet Explorer', 'MicrosoftEdge': 'Edge Legacy', 'msedge': 'Edge Chromium', 'Safari': 'Safari'}
+BROWSER_NAME_MAP = {'chrome': 'Chrome', 'firefox': 'Firefox', 'internet explorer': 'Internet Explorer', 'MicrosoftEdge': 'Edge Legacy', 'msedge': 'Edge Chromium', 'Safari': 'Safari', 'chrome-headless-shell': 'Chrome', 'edge-headless-shell': 'Edge Chromium'}
 
 
 """
