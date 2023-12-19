@@ -225,6 +225,7 @@ class Scrape:
                                                 dict = next_ele
                                         except Exception as e:
                                             break
+                                    elem = dict
                                 except Exception as e:
                                     log.error( 'Error occurred in custom clickandadd scraping' + str(e) )
                             else:
@@ -237,20 +238,22 @@ class Scrape:
                                 path = wnd_title + elem.__getattr__("Id")[25:]
                                 custname, tag = scrape_obj.get_ele_custname_tag(elem)
                                 dict = {
-                                        'xpath': path,
-                                        'id': elem.__getattr__("Id"),
-                                        'text': elem.__getattr__("Text"),
-                                        'tag': tag,
-                                        'custname': custname,
-                                        'left': elem.__getattr__("ScreenLeft"),
-                                        'top': elem.__getattr__("ScreenTop"),
-                                        'height': elem.__getattr__("Height"),
-                                        'width': elem.__getattr__("Width"),
-                                        'tooltip': elem.__getattr__("ToolTip"),
-                                        'defaulttooltip': elem.__getattr__("DefaultToolTip")
-                                        }
+                                    'xpath': path,
+                                    'id': elem.__getattr__("Id"),
+                                    'text': elem.__getattr__("Text"),
+                                    'tag': tag,
+                                    'custname': custname,
+                                    'left': elem.__getattr__("ScreenLeft"),
+                                    'top': elem.__getattr__("ScreenTop"),
+                                    'height': elem.__getattr__("Height"),
+                                    'width': elem.__getattr__("Width"),
+                                    'tooltip': elem.__getattr__("ToolTip") if hasattr(elem, "ToolTip") else "",
+                                    'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else ""
+                                }
+                                
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 view.append(dict)
+
                             #Highlight objects while scraping
                             import sap_highlight
                             highlight_obj = sap_highlight.highLight()
