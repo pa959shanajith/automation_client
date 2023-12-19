@@ -1916,7 +1916,7 @@ class ProxyConfig_window(wx.Frame):
                 self.proxy_user.SetValue('')
 
             self.proxy_pass_path=wx.StaticText(self.panel, label="Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
-            self.proxy_pass_path.SetToolTip(wx.ToolTip("Password for proxy authentication"))
+            self.proxy_pass_path.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
             self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
             if data != False:
                 self.proxy_pass.SetValue(data['password'])
@@ -1989,18 +1989,18 @@ class ProxyConfig_window(wx.Frame):
                 self.proxy_url_path.SetLabel('Proxy URL')
                 self.proxy_url_path.SetForegroundColour((0,0,0))
             if len(data['username']) == 0 and len(data['password']) != 0:
-                self.proxy_user_path.SetLabel('Proxy Username*')
+                self.proxy_user_path.SetLabel('Username*')
                 self.proxy_user_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_user_path.SetLabel('Proxy Username')
+                self.proxy_user_path.SetLabel('Username')
                 self.proxy_user_path.SetForegroundColour((0,0,0))
             if len(data['username']) != 0 and len(data['password']) == 0:
-                self.proxy_pass_path.SetLabel('Proxy Password*')
+                self.proxy_pass_path.SetLabel('Password*')
                 self.proxy_pass_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_pass_path.SetLabel('Proxy Password')
+                self.proxy_pass_path.SetLabel('Password')
                 self.proxy_pass_path.SetForegroundColour((0,0,0))
         if not nosave:
             self.jsonCreater(data)
