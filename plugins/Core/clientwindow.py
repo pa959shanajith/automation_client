@@ -1917,7 +1917,7 @@ class ProxyConfig_window(wx.Frame):
 
             self.proxy_pass_path=wx.StaticText(self.panel, label="Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
             self.proxy_pass_path.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
-            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
+            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3], style=wx.TE_PASSWORD)
             if data != False:
                 self.proxy_pass.SetValue(data['password'])
             else:
