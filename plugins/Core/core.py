@@ -2278,7 +2278,7 @@ def check_browser():
     finally:
         logger.print_on_console('Browser compatibility check completed')
         browsercheck_inprogress = False
-    return browsercheckFlag 
+    return browsercheckFlag  
 
 def wait_until_browsercheck():
     if browsercheck_inprogress:
