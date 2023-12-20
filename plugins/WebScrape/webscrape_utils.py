@@ -1908,7 +1908,7 @@ class WebScrape_Utils:
     window.tastopflag = "true";
     document.getElementsByTagName('HTML')[0].click();
     if (window.tasarr.length==0)
-        document.getElementsByClassName('AvoAssure_Highlight').click();
+        document.getElementsByClassName('AvoAssure_Highlight')[0].click();
     var elements=[];
     function addNodesOuter(elements, collection) {
         for (var i = 0; collection && collection.length && i < collection.length; i++) {
