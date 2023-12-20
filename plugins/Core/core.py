@@ -1145,7 +1145,6 @@ class MainNamespace(BaseNamespace):
         try:
             wait_until_browsercheck()
             core_utils.get_all_the_imports('Mobility')
-            core_utils.get_all_the_imports('Saucelabs')
             import mobile_app_scrape
             obj = mobile_app_scrape.MobileWindow()
             obj.checking_mobile_client(socketIO)
