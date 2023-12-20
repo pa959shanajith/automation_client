@@ -1295,19 +1295,73 @@ return isVisible(s);"""
         methodoutput=TEST_RESULT_FALSE
         err_msg=None
         output=OUTPUT_CONSTANT
+        eleStatus=False
+        index=0
         try:
-            if webelement.is_enabled()==False:
-                local_uo.log.error(ERR_DISABLED_OBJECT)
-                err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
-                logger.print_on_console(ERR_DISABLED_OBJECT)  
-            else:                
-                verify_result = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.VERIFY_STYLE, webelement,input[0],input[1])
-                if verify_result:
-                    logger.print_on_console("The style attribute matches.")
-                    methodoutput = TEST_RESULT_TRUE
-                    status = TEST_RESULT_PASS
+            if webelement != None and webelement !='' and webelement.tag_name.lower()=='table' and len(input)!=1:
+                if len(input) >= 4 and input[3] and int(input[3]) <= 0:
+                    err_msg = self._index_zero()
+                elif input[2]:
+                    if(len(input) == 6 and all(v for v in input) and (not input[2] == 'tr')):
+                        attr_name=input[4]
+                        attr_value = input[5]
+                        webelement1=None
+                        row_number=int(input[0])-1
+                        col_number=int(input[1])-1
+                        tag=input[2].lower()
+                        if input[3]: index=int(input[3])
+                        eleStatus, webelement1 = self.get_table_cell(webelement, row_number, col_number, tag, index)
+                        webelement=webelement1
+                    elif(input[2]=='tr'): #fetch the attribute value of tr (index is needed)
+                        if not(input[4]):
+                            err_msg = 'Input Error: Please enter attribute name'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                        elif input[3] and int(input[3]) >= 1:
+                            attr_name=input[4]
+                            attr_value = input[5]
+                            index=int(input[3])-1
+                            tablerow_js='var targetTable = arguments[0]; var index = arguments[1]; var rowCount = targetTable.rows; return rowCount[index];'
+                            webelement = browser_Keywords.local_bk.driver_obj.execute_script(tablerow_js,webelement,index)
+                            eleStatus=True
+                        elif input[3] and int(input[3]) <= 0:
+                            err_msg = 'Invalid Input: Index input cannot be 0 for table'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                        else:
+                            err_msg = 'Input Error: Missing index'
+                            logger.print_on_console(err_msg)
+                            local_uo.log.error(err_msg)
+                # checking attribute value of table itself
+                elif(len(input) == 6 and (not all(i for i in input[:-1]))):
+                    attr_name=input[4]
+                    attr_value = input[5]
+                    eleStatus=True
+                elif(len(input) == 6 and (not input[2])):
+                    err_msg = 'Input Error: Please specify valid object type'
+                    logger.print_on_console(err_msg)
+                    local_uo.log.error(err_msg)
+            elif(len(input)==2) and not err_msg:
+                attr_name=input[0]
+                attr_value = input[1]
+                eleStatus=True
+            if(eleStatus):
+                if webelement.is_enabled()==False:
+                    local_uo.log.error(ERR_DISABLED_OBJECT)
+                    err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                    logger.print_on_console(ERR_DISABLED_OBJECT)
                 else:
-                    logger.print_on_console("The style attribute doesn't match.")
+                    verify_result = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.VERIFY_STYLE, webelement,attr_name,attr_value)
+                    if verify_result:
+                        logger.print_on_console("The style attribute matches.")
+                        methodoutput = TEST_RESULT_TRUE
+                        status = TEST_RESULT_PASS
+                    else:
+                        logger.print_on_console("The style attribute doesn't match.")
+            elif not err_msg:
+                err_msg = 'Input Error: Invalid number of inputs'
+                logger.print_on_console(err_msg)
+                local_uo.log.error(err_msg)
         except Exception as e:
             err_msg = 'Error occured while fetching style value'
             logger.print_on_console(err_msg)

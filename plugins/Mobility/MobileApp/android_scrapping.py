@@ -201,6 +201,10 @@ class InstallAndLaunch():
                                 self.desired_caps['adbExecTimeout'] = 120000
                             driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
                             device_id = device_name
+                        else:
+                            driver = None
+                            device_id = None
+                            return None    
                     else:
                         driver = None
                         device_id = None

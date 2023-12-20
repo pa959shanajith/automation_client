@@ -69,6 +69,9 @@ class DesktopDispatcher:
         'getelementtext' : element_keywords_obj.get_element_text,
         'verifyelementtext' : element_keywords_obj.verify_element_text,
         'mousehover' : element_keywords_obj.mouseHover,
+        'getelementcolor' : element_keywords_obj.get_element_color,
+        'drag' : element_keywords_obj.drag,
+        'drop' : element_keywords_obj.drop,
         'launchapplication' : launch_keywords_obj.launch_application,
         'findwindowandattach' : launch_keywords_obj.find_window_and_attach,
         'selectmenu': launch_keywords_obj.select_menu,
@@ -76,6 +79,7 @@ class DesktopDispatcher:
         'minimizewindow' : launch_keywords_obj.minimize_window,
         'getpagetitle' : launch_keywords_obj.getPageTitle,
         'closeapplication' : launch_keywords_obj.closeApplication,
+        'closesubwindow' : launch_keywords_obj.close_subwindow,
         'verifyenabled' : util_keywords_obj.verifyEnabled,
         'verifydisabled' : util_keywords_obj.verifyDisabled,
         'verifyvisible' : util_keywords_obj.verifyVisible,
@@ -261,7 +265,7 @@ class DesktopDispatcher:
             keyword = keyword.lower()
             ele = None
             if ( keyword in list(self.desktop_dict.keys()) ):
-                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
+                if ( keyword == 'launchapplication' or keyword == 'findwindowandattach' or keyword == 'closesubwindow' or keyword == 'selectmenu' or keyword in list(self.email_dict.keys()) ):
                     result = self.desktop_dict[keyword](input,output)
                 else:
                     self.launch_keywords_obj.verifyWindowTitle()

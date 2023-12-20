@@ -345,123 +345,129 @@ class Launch_Keywords():
         win_handle_flag = False
         term = None
         try:
-            if ( len(input_val) == 2 ):
-                windowname = input_val[0]
-                # launch_time_out = input_val[1]
-                win_handle_index = int(input_val[1])
-                win_handle_flag = True
-            elif ( len(input_val) == 1 ):
-                windowname = input_val[0]
-            title_matched_windows = self.getProcessWindows(windowname)
-            total_tmw = len(title_matched_windows)
-            log.debug( "Number of title matched windows is %s",str(total_tmw) )
-            hwnd = win32gui.FindWindow(None, windowname)
-            log.debug( "value of hwnd is %s",str(hwnd) )
-            threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
-            flag = False
-            if ( len( title_matched_windows ) > 1 ):
-                pidset = set()
-                for i in title_matched_windows:
-                    threadid, pid = win32process.GetWindowThreadProcessId(i)
-                    pidset.add(pid)
-                if ( len(pidset) == 1 ):
-                    flag = True
-                else:
-                    for i in range(0, len(pidset)):
-                        if ( pidset.pop() == temp_pid ):
-                            flag = True
-                            break
-                        else:
-                            flag = False
-                if ( flag ):
-                    if ( not(windowname is None and windowname is '') ):
-                        start_time = time.time()
-                        var = 1
-                        while var == 1:
-                            title_matched_windows = self.getProcessWindows(windowname)
-                            # print("no of window handles",len(title_matched_windows))
-                            log.debug(len(title_matched_windows))
-                            if ( win_handle_flag == True ):
-                                if ( win_handle_index < len(title_matched_windows) ):
+            if not input_val[0] == '':
+                if ( len(input_val) == 2 ):
+                    windowname = input_val[0]
+                    # launch_time_out = input_val[1]
+                    win_handle_index = int(input_val[1])
+                    win_handle_flag = True
+                elif ( len(input_val) == 1 ):
+                    windowname = input_val[0]
+                title_matched_windows = self.getProcessWindows(windowname)
+                total_tmw = len(title_matched_windows)
+                log.debug( "Number of title matched windows is %s",str(total_tmw) )
+                hwnd = win32gui.FindWindow(None, windowname)
+                log.debug( "value of hwnd is %s",str(hwnd) )
+                threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
+                flag = False
+                if ( len( title_matched_windows ) > 1 ):
+                    pidset = set()
+                    for i in title_matched_windows:
+                        threadid, pid = win32process.GetWindowThreadProcessId(i)
+                        pidset.add(pid)
+                    if ( len(pidset) == 1 ):
+                        flag = True
+                    else:
+                        for i in range(0, len(pidset)):
+                            if ( pidset.pop() == temp_pid ):
+                                flag = True
+                                break
+                            else:
+                                flag = False
+                    if ( flag ):
+                        if ( not(windowname is None and windowname is '') ):
+                            start_time = time.time()
+                            var = 1
+                            while var == 1:
+                                title_matched_windows = self.getProcessWindows(windowname)
+                                # print("no of window handles",len(title_matched_windows))
+                                log.debug(len(title_matched_windows))
+                                if ( win_handle_flag == True ):
+                                    if ( win_handle_index < len(title_matched_windows) ):
+                                        if ( len(title_matched_windows) > 1 ):
+                                            log.debug( 'title matched windows is %s', str(title_matched_windows) )
+                                            sorted_title_matched_windows=self.timestamp_sort_for_tmw(title_matched_windows)
+                                            log.debug( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
+                                            self.windowHandle = sorted_title_matched_windows[win_handle_index]
+                                            self.windowname = self.getWindowText(self.windowHandle)
+                                            window_name = self.windowname
+                                            log.debug( 'Given windowname is %s', window_name )
+                                            window_pid=self.get_window_pid_by_hwnd(self.windowHandle)
+                                            log.debug( 'window handle is %s', str(self.windowHandle) )
+                                            log.debug( 'connected to window pid is %s', str(window_pid) )
+                                            app_win32 = Application(backend='win32').connect(process = window_pid)
+                                            app_uia = Application(backend='uia').connect(process = window_pid)
+                                            # self.bring_Window_Front()
+                                            app_win32.top_window().set_focus()
+                                            status = desktop_constants.TEST_RESULT_PASS
+                                            result = desktop_constants.TEST_RESULT_TRUE
+                                            break
+                                    else:
+                                        error_msg = 'specified window handle is not present'
+                                        logger.print_on_console( error_msg )
+                                        log.info( error_msg )
+                                        term = TERMINATE
+                                        break
+                                elif ( win_handle_flag == False ):
                                     if ( len(title_matched_windows) > 1 ):
-                                        log.debug( 'title matched windows is %s', str(title_matched_windows) )
-                                        sorted_title_matched_windows=self.timestamp_sort_for_tmw(title_matched_windows)
-                                        log.debug( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
-                                        self.windowHandle = sorted_title_matched_windows[win_handle_index]
+                                        self.windowHandle = title_matched_windows[0]
                                         self.windowname = self.getWindowText(self.windowHandle)
                                         window_name = self.windowname
-                                        log.debug( 'Given windowname is %s', window_name )
-                                        window_pid=self.get_window_pid_by_hwnd(self.windowHandle)
-                                        log.debug( 'window handle is %s', str(self.windowHandle) )
-                                        log.debug( 'connected to window pid is %s', str(window_pid) )
+                                        logger.print_on_console( 'Given windowname is ' + windowname )
+                                        window_handle = title_matched_windows[0]
+                                        window_pid = self.get_window_pid(self.windowname)
+                                        self.windowHandle=title_matched_windows[0]
                                         app_win32 = Application(backend='win32').connect(process = window_pid)
                                         app_uia = Application(backend='uia').connect(process = window_pid)
-                                        # self.bring_Window_Front()
-                                        app_win32.top_window().set_focus()
                                         status = desktop_constants.TEST_RESULT_PASS
                                         result = desktop_constants.TEST_RESULT_TRUE
                                         break
-                                else:
-                                    error_msg = 'specified window handle is not present'
-                                    logger.print_on_console( error_msg )
-                                    log.info( error_msg )
-                                    term = TERMINATE
-                                    break
-                            elif ( win_handle_flag == False ):
-                                if ( len(title_matched_windows) > 1 ):
-                                    self.windowHandle = title_matched_windows[0]
-                                    self.windowname = self.getWindowText(self.windowHandle)
-                                    window_name = self.windowname
-                                    logger.print_on_console( 'Given windowname is ' + windowname )
-                                    window_handle = title_matched_windows[0]
-                                    window_pid = self.get_window_pid(self.windowname)
-                                    self.windowHandle=title_matched_windows[0]
-                                    app_win32 = Application(backend='win32').connect(process = window_pid)
-                                    app_uia = Application(backend='uia').connect(process = window_pid)
-                                    status = desktop_constants.TEST_RESULT_PASS
-                                    result = desktop_constants.TEST_RESULT_TRUE
-                                    break
-                else:
-                    self.multiInstance = title_matched_windows[0]
+                    else:
+                        self.multiInstance = title_matched_windows[0]
+                        term = TERMINATE
+                if ( len(title_matched_windows) == 1 ):
+                    if ( not(windowname is None and windowname is '' )):
+                        start_time = time.time()
+                        var = 1
+                        while ( var == 1 ):
+                            title_matched_windows = self.getProcessWindows(windowname)
+                            if ( len(title_matched_windows) == 1 ):
+                                self.windowHandle = title_matched_windows[0]
+                                self.windowname = self.getWindowText(self.windowHandle)
+                                logger.print_on_console('Application handle found')
+                                window_name = self.windowname
+                                logger.print_on_console('Given windowname is '+ windowname)
+                                window_handle = title_matched_windows[0]
+                                window_pid = self.get_window_pid(self.windowname)
+                                self.windowHandle = title_matched_windows[0]
+                                app_win32 = Application(backend = 'win32').connect(process = window_pid)
+                                app_uia = Application(backend = 'uia').connect(process = window_pid)
+                                """
+                                    trying to focus on the window using win32 native API's if it fails briging the window to front using win32gui
+                                """
+                                try:
+                                    app_win32.top_window().set_focus()
+                                except:
+                                    self.bring_Window_Front()
+
+                                # time.sleep(3)
+                                # im = PIL.ImageGrab.grab()
+
+                                # core_utils.get_all_the_imports('IRIS')
+
+                                # import client
+                                # message=client.api_request().image_save(im)
+
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                                break
+                elif ( len(title_matched_windows) == 0 ):
+                    err_msg = 'The given window name is not found'
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
                     term = TERMINATE
-            if ( len(title_matched_windows) == 1 ):
-                if ( not(windowname is None and windowname is '' )):
-                    start_time = time.time()
-                    var = 1
-                    while ( var == 1 ):
-                        title_matched_windows = self.getProcessWindows(windowname)
-                        if ( len(title_matched_windows) == 1 ):
-                            self.windowHandle = title_matched_windows[0]
-                            self.windowname = self.getWindowText(self.windowHandle)
-                            logger.print_on_console('Application handle found')
-                            window_name = self.windowname
-                            logger.print_on_console('Given windowname is '+ windowname)
-                            window_handle = title_matched_windows[0]
-                            window_pid = self.get_window_pid(self.windowname)
-                            self.windowHandle = title_matched_windows[0]
-                            app_win32 = Application(backend = 'win32').connect(process = window_pid)
-                            app_uia = Application(backend = 'uia').connect(process = window_pid)
-                            """
-                                trying to focus on the window using win32 native API's if it fails briging the window to front using win32gui
-                            """
-                            try:
-                                app_win32.top_window().set_focus()
-                            except:
-                                self.bring_Window_Front()
-
-                            # time.sleep(3)
-                            # im = PIL.ImageGrab.grab()
-
-                            # core_utils.get_all_the_imports('IRIS')
-
-                            # import client
-                            # message=client.api_request().image_save(im)
-
-                            status = desktop_constants.TEST_RESULT_PASS
-                            result = desktop_constants.TEST_RESULT_TRUE
-                            break
-            elif ( len(title_matched_windows) == 0 ):
-                err_msg = 'The given window name is not found'
+            else:
+                err_msg = 'Invalid Input: Please provide a valid window name.'
                 log.info( err_msg )
                 logger.print_on_console( err_msg )
                 term = TERMINATE
@@ -716,3 +722,151 @@ class Launch_Keywords():
             if ( filename == line ):
                 return True
         return False
+    
+    def close_subwindow(self, input_val, input, *args):
+        global window_name
+        global window_handle
+        global window_pid
+        global app_uia
+        global app_win32
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        windowname = ''
+        sorted_title_matched_windows=[]
+        # launch_time_out = 0
+        win_handle_index = 0
+        win_handle_flag = False
+        term = None
+        try:
+            if ( len(input_val) == 2 ):
+                windowname = input_val[0]
+                # launch_time_out = input_val[1]
+                win_handle_index = int(input_val[1])
+                win_handle_flag = True
+            elif ( len(input_val) == 1 ):
+                windowname = input_val[0]
+            title_matched_windows = self.getProcessWindows(windowname)
+            total_tmw = len(title_matched_windows)
+            log.debug( "Number of title matched windows is %s",str(total_tmw) )
+            hwnd = win32gui.FindWindow(None, windowname)
+            log.debug( "value of hwnd is %s",str(hwnd) )
+            threadid, temp_pid = win32process.GetWindowThreadProcessId(hwnd)
+            flag = False
+            if ( len( title_matched_windows ) > 1 ):
+                pidset = set()
+                for i in title_matched_windows:
+                    threadid, pid = win32process.GetWindowThreadProcessId(i)
+                    pidset.add(pid)
+                if ( len(pidset) == 1 ):
+                    flag = True
+                else:
+                    for i in range(0, len(pidset)):
+                        if ( pidset.pop() == temp_pid ):
+                            flag = True
+                            break
+                        else:
+                            flag = False
+                if ( flag ):
+                    if ( not(windowname is None and windowname is '') ):
+                        start_time = time.time()
+                        var = 1
+                        while var == 1:
+                            title_matched_windows = self.getProcessWindows(windowname)
+                            # print("no of window handles",len(title_matched_windows))
+                            log.debug(len(title_matched_windows))
+                            if ( win_handle_flag == True ):
+                                if ( win_handle_index < len(title_matched_windows) ):
+                                    if ( len(title_matched_windows) > 1 ):
+                                        log.debug( 'title matched windows is %s', str(title_matched_windows) )
+                                        sorted_title_matched_windows=self.timestamp_sort_for_tmw(title_matched_windows)
+                                        log.debug( 'sorted title matched windows is %s', str(sorted_title_matched_windows) )
+                                        self.windowHandle = sorted_title_matched_windows[win_handle_index]
+                                        self.windowname = self.getWindowText(self.windowHandle)
+                                        window_name = self.windowname
+                                        log.debug( 'Given windowname is %s', window_name )
+                                        window_pid=self.get_window_pid_by_hwnd(self.windowHandle)
+                                        log.debug( 'window handle is %s', str(self.windowHandle) )
+                                        log.debug( 'connected to window pid is %s', str(window_pid) )
+                                        app_win32 = Application(backend='win32').connect(process = window_pid)
+                                        app_uia = Application(backend='uia').connect(process = window_pid)
+                                        # self.bring_Window_Front()
+                                        app_win32.top_window().set_focus()
+                                        app_win32.top_window().close()
+                                        status = desktop_constants.TEST_RESULT_PASS
+                                        result = desktop_constants.TEST_RESULT_TRUE
+                                        break
+                                else:
+                                    error_msg = 'specified window handle is not present'
+                                    logger.print_on_console( error_msg )
+                                    log.info( error_msg )
+                                    term = TERMINATE
+                                    break
+                            elif ( win_handle_flag == False ):
+                                if ( len(title_matched_windows) > 1 ):
+                                    self.windowHandle = title_matched_windows[0]
+                                    self.windowname = self.getWindowText(self.windowHandle)
+                                    window_name = self.windowname
+                                    logger.print_on_console( 'Given windowname is ' + windowname )
+                                    window_handle = title_matched_windows[0]
+                                    window_pid = self.get_window_pid(self.windowname)
+                                    self.windowHandle=title_matched_windows[0]
+                                    app_win32 = Application(backend='win32').connect(process = window_pid)
+                                    app_uia = Application(backend='uia').connect(process = window_pid)
+                                    status = desktop_constants.TEST_RESULT_PASS
+                                    result = desktop_constants.TEST_RESULT_TRUE
+                                    break
+                else:
+                    self.multiInstance = title_matched_windows[0]
+                    term = TERMINATE
+            if ( len(title_matched_windows) == 1 ):
+                if ( not(windowname is None and windowname is '' )):
+                    start_time = time.time()
+                    var = 1
+                    while ( var == 1 ):
+                        title_matched_windows = self.getProcessWindows(windowname)
+                        if ( len(title_matched_windows) == 1 ):
+                            self.windowHandle = title_matched_windows[0]
+                            self.windowname = self.getWindowText(self.windowHandle)
+                            logger.print_on_console('Application handle found')
+                            window_name = self.windowname
+                            logger.print_on_console('Given windowname is '+ windowname)
+                            window_handle = title_matched_windows[0]
+                            window_pid = self.get_window_pid(self.windowname)
+                            self.windowHandle = title_matched_windows[0]
+                            app_win32 = Application(backend = 'win32').connect(process = window_pid)
+                            app_uia = Application(backend = 'uia').connect(process = window_pid)
+                            """
+                                trying to focus on the window using win32 native API's if it fails briging the window to front using win32gui
+                            """
+                            try:
+                                app_win32.top_window().set_focus()
+                                app_win32.top_window().close()
+                            except:
+                                self.bring_Window_Front()
+
+                            # time.sleep(3)
+                            # im = PIL.ImageGrab.grab()
+
+                            # core_utils.get_all_the_imports('IRIS')
+
+                            # import client
+                            # message=client.api_request().image_save(im)
+
+                            status = desktop_constants.TEST_RESULT_PASS
+                            result = desktop_constants.TEST_RESULT_TRUE
+                            break
+            elif ( len(title_matched_windows) == 0 ):
+                err_msg = 'The given window name is not found'
+                log.info( err_msg )
+                logger.print_on_console( err_msg )
+                term = TERMINATE
+        except Exception as e:
+            err_msg = desktop_constants.ERROR_MSG + ' : ' + str(e)
+            log.error( err_msg )
+            logger.print_on_console( err_msg )
+            term = TERMINATE
+        if ( term ):
+            return term
+        return status, result, verb, err_msg

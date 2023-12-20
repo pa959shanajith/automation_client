@@ -1861,14 +1861,14 @@ class ProxyConfig_window(wx.Frame):
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 170),(400, 230)],
+                "Frame":[(300, 170),(400, 265)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(17,7), (180,40)],
-                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
-                "username":[(17,97),(95, 20),(120,91), (245,-1)],
-                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
-                "Save":[(157, 153), (100, 28)],
-                "Close":[(264,153), (100, 28)]
+                "proxy_enable":[(17,0), (348,65)],
+                "proxy_url":[(17,77),(95, 50),(120,74), (245,-1)],
+                "username":[(17,107),(95, 20),(120,105), (245,-1)],
+                "passwd":[(17,138),(95, 20),(120,137), (245,-1)],
+                "Save":[(157, 175), (100, 28)],
+                "Close":[(265,175), (100, 28)]
             }
             elif SYSTEM_OS=='Darwin':
                 upload_fields={
@@ -1878,18 +1878,18 @@ class ProxyConfig_window(wx.Frame):
             }
             elif SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame": [(300, 170), (420, 230)],
+                "Frame": [(300, 170), (420, 265)],
                 "disp_msg": [(12, 18), (80, 28), (100, 18), (310, -1), (415, 18), (30, -1)],
-                "proxy_enable": [(17, 7), (180, 40)],
-                "proxy_url": [(17, 67), (95, 50), (150, 61), (245, 25)],
-                "username": [(17, 97), (130, 40), (150, 91), (245, 25)],
-                "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
-                "Save": [(157, 153), (100, 28)],
-                "Close": [(264, 153), (100, 28)]
+                "proxy_enable": [(17, 0), (348, 65)],
+                "proxy_url": [(17, 77), (95, 50), (150, 74), (245, 25)],
+                "username": [(17, 107), (130, 40), (150, 105), (245, 25)],
+                "passwd": [(17, 138), (130, 50), (150, 137), (245, 25)],
+                "Save": [(157, 175), (100, 28)],
+                "Close": [(264, 175), (100, 28)]
             }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
-            self.SetBackgroundColour('#e6e7e8')
+            self.SetBackgroundColour('#ffffff')
             self.iconpath = IMAGES_PATH + "avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
@@ -1899,24 +1899,24 @@ class ProxyConfig_window(wx.Frame):
             self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure Client"))
             self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
             self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
-            self.proxy_url_path.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             self.proxy_url=wx.TextCtrl(self.panel, pos=upload_fields["proxy_url"][2], size=upload_fields["proxy_url"][3])
+            self.proxy_url.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             if data != False:
                 self.proxy_url.SetValue(data['url'])
             else:
                 self.proxy_url.SetValue('')
 
-            self.proxy_user_path=wx.StaticText(self.panel, label="Proxy Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
-            self.proxy_user_path.SetToolTip(wx.ToolTip("Username for proxy authentication"))
+            self.proxy_user_path=wx.StaticText(self.panel, label="Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
             self.proxy_user = wx.TextCtrl(self.panel, pos=upload_fields["username"][2], size=upload_fields["username"][3])
+            self.proxy_user.SetToolTip(wx.ToolTip("Username for proxy authentication"))
             if data != False:
                 self.proxy_user.SetValue(data['username'])
             else:
                 self.proxy_user.SetValue('')
 
-            self.proxy_pass_path=wx.StaticText(self.panel, label="Proxy Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
-            self.proxy_pass_path.SetToolTip(wx.ToolTip("Password for proxy authentication"))
-            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
+            self.proxy_pass_path=wx.StaticText(self.panel, label="Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
+            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3], style=wx.TE_PASSWORD)
+            self.proxy_pass.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
             if data != False:
                 self.proxy_pass.SetValue(data['password'])
             else:
@@ -1988,18 +1988,18 @@ class ProxyConfig_window(wx.Frame):
                 self.proxy_url_path.SetLabel('Proxy URL')
                 self.proxy_url_path.SetForegroundColour((0,0,0))
             if len(data['username']) == 0 and len(data['password']) != 0:
-                self.proxy_user_path.SetLabel('Proxy Username*')
+                self.proxy_user_path.SetLabel('Username*')
                 self.proxy_user_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_user_path.SetLabel('Proxy Username')
+                self.proxy_user_path.SetLabel('Username')
                 self.proxy_user_path.SetForegroundColour((0,0,0))
             if len(data['username']) != 0 and len(data['password']) == 0:
-                self.proxy_pass_path.SetLabel('Proxy Password*')
+                self.proxy_pass_path.SetLabel('Password*')
                 self.proxy_pass_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_pass_path.SetLabel('Proxy Password')
+                self.proxy_pass_path.SetLabel('Password')
                 self.proxy_pass_path.SetForegroundColour((0,0,0))
         if not nosave:
             self.jsonCreater(data)
