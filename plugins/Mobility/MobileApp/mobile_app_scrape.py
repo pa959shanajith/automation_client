@@ -466,20 +466,12 @@ class MobileWindow():
             Returns Mobile CLient is Present or not 
         """
         try:
-            if (SYSTEM_OS == 'Darwin'):
-                folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'node_modules'
-                if os.path.exists(folder_path):
-                    socket.emit('checking_Mobile_Client', 'true')
-                else:
-                    logger.print_on_console('node_modules Folder is not Available in ICE package')
-                    socket.emit('checking_Mobile_Client','false')
+            folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'avoAssureClient_Mobile'
+            if os.path.exists(folder_path):
+                socket.emit('checking_Mobile_Client', 'true')
             else:
-                folder_path = os.environ.get("AVO_ASSURE_HOME") + os.sep +  'avoAssureClient_Mobile'
-                if os.path.exists(folder_path):
-                    socket.emit('checking_Mobile_Client', 'true')
-                else:
-                    logger.print_on_console('avoAssureClient_Mobile Folder is not Available in ICE package')
-                    socket.emit('checking_Mobile_Client','false')
+                logger.print_on_console('avoAssureClient_Mobile Folder is not Available in ICE package')
+                socket.emit('checking_Mobile_Client','false')
                 
         except Exception as e:
             socket.emit('checking_Mobile_Client', 'Error occurred in Finding Mobile Client')
