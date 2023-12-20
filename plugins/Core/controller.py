@@ -1113,6 +1113,10 @@ class Controller():
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
         print('=======================================================================================================')
+        #Delete network_data.json after debug
+        networkpath = AVO_ASSURE_HOME + "/network_data.json"
+        if os.path.exists(networkpath):
+            os.remove(networkpath)
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
