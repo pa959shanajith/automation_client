@@ -1899,15 +1899,14 @@ class ProxyConfig_window(wx.Frame):
             self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure Client"))
             self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
             self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
-            self.proxy_url_path.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             self.proxy_url=wx.TextCtrl(self.panel, pos=upload_fields["proxy_url"][2], size=upload_fields["proxy_url"][3])
+            self.proxy_url.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             if data != False:
                 self.proxy_url.SetValue(data['url'])
             else:
                 self.proxy_url.SetValue('')
 
             self.proxy_user_path=wx.StaticText(self.panel, label="Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
-            self.proxy_user_path.SetToolTip(wx.ToolTip("Username for proxy authentication"))
             self.proxy_user = wx.TextCtrl(self.panel, pos=upload_fields["username"][2], size=upload_fields["username"][3])
             self.proxy_user.SetToolTip(wx.ToolTip("Username for proxy authentication"))
             if data != False:
@@ -1916,8 +1915,8 @@ class ProxyConfig_window(wx.Frame):
                 self.proxy_user.SetValue('')
 
             self.proxy_pass_path=wx.StaticText(self.panel, label="Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
-            self.proxy_pass_path.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
             self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3], style=wx.TE_PASSWORD)
+            self.proxy_pass.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
             if data != False:
                 self.proxy_pass.SetValue(data['password'])
             else:
