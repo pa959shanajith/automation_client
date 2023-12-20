@@ -1068,6 +1068,7 @@ class WebScrape_Utils:
         }
         var currentElement;
         function handler(event) {
+        debugger;
             tagtype = '';
             if (window.tastopflag == 'true') {
                 if (window.Prototype) {
@@ -1791,8 +1792,8 @@ class WebScrape_Utils:
                         }
                     }
                     //Using CSS to make pointer events auto after highlighting.
-                    if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox
-                        document.getElementsByTagName('html')[0].style.pointerEvents='auto';
+                    //if (browser!='2' && currentElement.tagName!='HTML')   //Excluding the changes for firefox
+                    //    document.getElementsByTagName('html')[0].style.pointerEvents='auto';
                 }
                 return false;
             }
@@ -1805,8 +1806,8 @@ class WebScrape_Utils:
                 return true;
             }
             //Using CSS to make pointer events none as event.preventDefault can't cancel sometimes.
-            if (browser!='2' && currentElement.tagName!='HTML'  && currentElement._scopedScroll==undefined)   //Excluding the changes for firefox and for scrollbar
-                document.getElementsByTagName('html')[0].style.pointerEvents='none';
+            //if (browser!='2' && currentElement.tagName!='HTML'  && currentElement._scopedScroll==undefined)   //Excluding the changes for firefox and for scrollbar
+             //   document.getElementsByTagName('html')[0].style.pointerEvents='none';
             if (event.preventDefault) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -1902,89 +1903,92 @@ class WebScrape_Utils:
     javascript_stopclicknadd_IE = """window.tastopflag = "true";document.getElementsByTagName('HTML')[0].click();function getElementsByClassName(classname) {    var a = [];    var re = new RegExp('(^| )' + classname + '( |$)');    var els = document.getElementsByTagName("*");    var elesal = document.getElementsByTagName("one-record-home-flexipage2");    var elesal1 = document.getElementsByTagName("records-lwc-detail-panel");    for (var i = 0, j = els.length; i < j; i++)        if (re.test(els[i].className)) a.push(els[i]);    if (elesal.length > 0) {        els1 = elesal[0].getElementsByTagName("*");        for (var i = 0, j = els1.length; i < j; i++) {            if (re.test(els1[i].className)) {                a.push(els1[i]);            }        }    }    if (elesal1.length > 0) {        els2 = elesal1[0].getElementsByTagName("*");        for (var i = 0, j = els2.length; i < j; i++) {            if (re.test(els2[i].className)) {                a.push(els2[i]);            }        }    }    return a;}if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {    styleTag = document.getElementById('AvoAssureCheckboxHighlight');    styleTagH = document.getElementById('AvoAssureBorderHighlight');    head = document.head || document.getElementsByTagName('head')[0] || document.getElementById('AvoAssure_head');    head.removeChild(styleTag);    head.removeChild(styleTagH);    var a = getElementsByClassName('AvoAssure_Highlight');    for (var i = 0; i < a.length; i++) {        a[i].removeAttribute('style');    }    var elms = document.querySelectorAll("*[style]");    Array.prototype.forEach.call(elms, function(elm) {        var clr = elm.style.background || "";        clr = clr.replace(/\s/g, "").toLowerCase();        if (clr === '#fff300' || clr === 'rgb(255,243,0)' || clr === 'rgb(255,243,0)nonerepeatscroll0%0%') {            elm.removeAttribute('style');        }    });    if (document.getElementById('AvoAssure_head') != undefined) {        var html = document.children[0];        if (html.childElementCount > 1) html.removeChild(html.children[1]);    }    var b = getElementsByClassName('AvoAssureBorderHighlight');    var c = getElementsByClassName('AvoAssureCheckboxHighlight');    var className = "AvoAssure_Highlight";    var classNameB = "AvoAssureBorderHighlight";    var classNameC = "AvoAssureCheckboxHighlight";    for (var i = 0; i < a.length; i++) {        if (a[i].classList) {            a[i].classList.remove(className);        } else if (hasClass(a[i], className)) {            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');            a[i].className = a[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < b.length; i++) {        if (b[i].classList) {            b[i].classList.remove(classNameB);        } else if (hasClass(b[i], classNameB)) {            var reg = new RegExp('(\\s|^)' + classNameB + '(\\s|$)');            b[i].className = b[i].className.replace(reg, ' ');        }    }    for (var i = 0; i < c.length; i++) {        if (c[i].classList) {            c[i].classList.remove(classNameC);        } else if (hasClass(c[i], classNameC)) {            var reg = new RegExp('(\\s|^)' + classNameC + '(\\s|$)');            c[i].className = c[i].className.replace(reg, ' ');        }    }}var temp = window.tasarr;window.tasarr = null;return (temp);"""
 
     """Javascript logic used in stop click and add operation"""
-    javascript_stopclicknadd = """window.tastopflag = "true";
-document.getElementsByTagName('HTML')[0].click();
-var elements=[];
-function addNodesOuter(elements, collection) {
-    for (var i = 0; collection && collection.length && i < collection.length; i++) {
-            elements.push(collection[i]);
-    }
-};
-ele = document.getElementsByTagName('*');
-for (var i=0;i<ele.length;i++)
-{
-    elements.push(ele[i]);
-    if (ele[i].shadowRoot)
-        addNodesOuter(elements, ele[i].getElementsByTagName('*'));
-}
+    javascript_stopclicknadd = """
+    debugger;
+    window.tastopflag = "true";
+    document.getElementsByTagName('HTML')[0].click();
 
-function getElementsByClassName(classname) {
-    var a = [];
-    
-    for ( i = 0, j = elements.length; i < j; i++) {
-        if (Object.values(elements[i].classList).includes(classname)) {
-            a.push(elements[i]);
+    var elements=[];
+    function addNodesOuter(elements, collection) {
+        for (var i = 0; collection && collection.length && i < collection.length; i++) {
+                elements.push(collection[i]);
+        }
+    };
+    ele = document.getElementsByTagName('*');
+    for (var i=0;i<ele.length;i++)
+    {
+        elements.push(ele[i]);
+        if (ele[i].shadowRoot)
+            addNodesOuter(elements, ele[i].getElementsByTagName('*'));
+    }
+
+    function getElementsByClassName(classname) {
+        var a = [];
+        
+        for ( i = 0, j = elements.length; i < j; i++) {
+            if (Object.values(elements[i].classList).includes(classname)) {
+                a.push(elements[i]);
+            }
+        }
+        return a;
+    }
+    if (document.getElementById('AvoAssure_Table'))
+        document.getElementById('AvoAssure_Table').remove()
+    if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {
+        styleTag = document.getElementById('AvoAssureCheckboxHighlight');
+        styleTagH = document.getElementById('AvoAssureBorderHighlight');
+        head = document.head || document.getElementsByTagName('head')[0] || document.getElementById('AvoAssure_head');
+        head.removeChild(styleTag);
+        head.removeChild(styleTagH);
+        var a = getElementsByClassName('AvoAssure_Highlight');
+        for (var i = 0; i < a.length; i++) {
+            a[i].setAttribute('style',a[i].getAttribute('style').replace('background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;',''));
+        }
+        var elms = document.querySelectorAll("*[style]");
+        Array.prototype.forEach.call(elms, function(elm) {
+            var clr = elm.style.background || "";
+            clr = clr.replace(/\s/g, "").toLowerCase();
+            if (clr === '#fff300' || clr === 'rgb(255,243,0)' || clr === 'rgb(255,243,0)nonerepeatscroll0%0%') {
+                elm.removeAttribute('style');
+            }
+        });
+        if (document.getElementById('AvoAssure_head') != undefined) {
+            var html = document.children[0];
+            if (html.childElementCount > 1) html.removeChild(html.children[1]);
+        }
+        var b = getElementsByClassName('AvoAssureBorderHighlight');
+        var c = getElementsByClassName('AvoAssureCheckboxHighlight');
+        var className = "AvoAssure_Highlight";
+        var classNameB = "AvoAssureBorderHighlight";
+        var classNameC = "AvoAssureCheckboxHighlight";
+        for (var i = 0; i < a.length; i++) {
+            if (a[i].classList) {
+                a[i].classList.remove(className);
+            } else if (hasClass(a[i], className)) {
+                var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+                a[i].className = a[i].className.replace(reg, ' ');
+            }
+        }
+        for (var i = 0; i < b.length; i++) {
+            if (b[i].classList) {
+                b[i].classList.remove(classNameB);
+            } else if (hasClass(b[i], classNameB)) {
+                var reg = new RegExp('(\\s|^)' + classNameB + '(\\s|$)');
+                b[i].className = b[i].className.replace(reg, ' ');
+            }
+        }
+        for (var i = 0; i < c.length; i++) {
+            if (c[i].classList) {
+                c[i].classList.remove(classNameC);
+            } else if (hasClass(c[i], classNameC)) {
+                var reg = new RegExp('(\\s|^)' + classNameC + '(\\s|$)');
+                c[i].className = c[i].className.replace(reg, ' ');
+            }
         }
     }
-    return a;
-}
-if (document.getElementById('AvoAssure_Table'))
-    document.getElementById('AvoAssure_Table').remove()
-if (document.getElementById('AvoAssureCheckboxHighlight') || document.getElementById('AvoAssureBorderHighlight')) {
-    styleTag = document.getElementById('AvoAssureCheckboxHighlight');
-    styleTagH = document.getElementById('AvoAssureBorderHighlight');
-    head = document.head || document.getElementsByTagName('head')[0] || document.getElementById('AvoAssure_head');
-    head.removeChild(styleTag);
-    head.removeChild(styleTagH);
-    var a = getElementsByClassName('AvoAssure_Highlight');
-    for (var i = 0; i < a.length; i++) {
-        a[i].setAttribute('style',a[i].getAttribute('style').replace('background: #fff300 !important;opacity:1!important; border: 2px solid #cc3300 !important;outline: 2px solid #fff300 !important;',''));
-    }
-    var elms = document.querySelectorAll("*[style]");
-    Array.prototype.forEach.call(elms, function(elm) {
-        var clr = elm.style.background || "";
-        clr = clr.replace(/\s/g, "").toLowerCase();
-        if (clr === '#fff300' || clr === 'rgb(255,243,0)' || clr === 'rgb(255,243,0)nonerepeatscroll0%0%') {
-            elm.removeAttribute('style');
-        }
-    });
-    if (document.getElementById('AvoAssure_head') != undefined) {
-        var html = document.children[0];
-        if (html.childElementCount > 1) html.removeChild(html.children[1]);
-    }
-    var b = getElementsByClassName('AvoAssureBorderHighlight');
-    var c = getElementsByClassName('AvoAssureCheckboxHighlight');
-    var className = "AvoAssure_Highlight";
-    var classNameB = "AvoAssureBorderHighlight";
-    var classNameC = "AvoAssureCheckboxHighlight";
-    for (var i = 0; i < a.length; i++) {
-        if (a[i].classList) {
-            a[i].classList.remove(className);
-        } else if (hasClass(a[i], className)) {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            a[i].className = a[i].className.replace(reg, ' ');
-        }
-    }
-    for (var i = 0; i < b.length; i++) {
-        if (b[i].classList) {
-            b[i].classList.remove(classNameB);
-        } else if (hasClass(b[i], classNameB)) {
-            var reg = new RegExp('(\\s|^)' + classNameB + '(\\s|$)');
-            b[i].className = b[i].className.replace(reg, ' ');
-        }
-    }
-    for (var i = 0; i < c.length; i++) {
-        if (c[i].classList) {
-            c[i].classList.remove(classNameC);
-        } else if (hasClass(c[i], classNameC)) {
-            var reg = new RegExp('(\\s|^)' + classNameC + '(\\s|$)');
-            c[i].className = c[i].className.replace(reg, ' ');
-        }
-    }
-}
-var temp = window.tasarr;
-window.tasarr = null;
-return (temp);"""
+    var temp = window.tasarr;
+    window.tasarr = null;
+    return (temp);"""
 
     javascript_get_object_properties = """
     if (!window.Element || !window.Element.prototype || !window.Element.prototype.hasAttribute) {

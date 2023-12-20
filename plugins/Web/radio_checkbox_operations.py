@@ -303,26 +303,30 @@ class RadioCheckboxKeywords():
                     if not(webelement.is_selected()) and err_msg == None:
                         if not (self.utilobj.is_visible(webelement)) and self.__check_visibility_from_config():
                             # performing js code
-                            local_rco.log.debug('element is invisible, performing js code')
+                            local_rco.log.info('element is invisible and visibility is ignored, performing js code')
                             browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                             status = TEST_RESULT_PASS
                             methodoutput = TEST_RESULT_TRUE
                         else:
                             if self.__check_visibility_from_config():
                                 # performing js code
-                                local_rco.log.debug('element is visible, performing js code')
+                                local_rco.log.info('element is visible, performing js code')
                                 browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
                                 status = TEST_RESULT_PASS
                                 methodoutput = TEST_RESULT_TRUE
                             elif self.utilobj.is_visible(webelement):
                                 # performing selenium code
-                                local_rco.log.debug('element is visible, performing selenium code')
+                                local_rco.log.info('element is visible, performing selenium code')
                                 browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'center'});", webelement)
                                 webelement.click()
                                 status=TEST_RESULT_PASS
                                 methodoutput=TEST_RESULT_TRUE
                             else:
-                                err_msg = self.__element_not_displayed()
+                                #For CNA, they required invisible checkbox selected with visibility not ignored.
+                                local_rco.log.info('element is invisible and visibility is not ignored, performing js code')
+                                browser_Keywords.local_bk.driver_obj.execute_script(webconstants.CLICK_RADIO_CHECKBOX,webelement)
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
                     else:
                         err_msg=ERROR_CODE_DICT['ERR_OBJECTSELECTED']
                         logger.print_on_console(err_msg)
