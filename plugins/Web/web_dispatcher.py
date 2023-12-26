@@ -730,8 +730,10 @@ class Dispatcher:
                     xpath=teststepproperty.objectname.split(';')[0]
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
+                    driver = web_keywords.local_wk.driver
                     driver.switch_to.default_content()
                     webelement=send_webelement_to_keyword(web_keywords.local_wk.driver,objectname,url)
+                    browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
