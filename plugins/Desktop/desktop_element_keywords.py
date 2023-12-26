@@ -308,6 +308,7 @@ class ElementKeywords():
                         left = left+8
                         top = top+8
                         color = pyautogui.pixel(left, top)
+                        output = color
                         logger.print_on_console( f'RGB color value of the element is: {color}' )
                         if not (input is None or input is ''):
                             if ( str(color) == input):
@@ -334,7 +335,7 @@ class ElementKeywords():
             log.error( err_msg )
             logger.print_on_console( err_msg )
         log.info( RETURN_RESULT )
-        return status, result, verb, err_msg
+        return status, result, output, err_msg
     
     def drag(self, element, parent, *args):
         status = desktop_constants.TEST_RESULT_FAIL
