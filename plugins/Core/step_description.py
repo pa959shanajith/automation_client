@@ -1434,6 +1434,8 @@ class StepDescription:
             return 'Clear the cache of browser'
         def refresh():
             return 'Refresh the web page'
+        def setbrowserzoomlevel():
+            return 'Zoom level changed'
 
         #Element keywords
         def gettooltiptext():

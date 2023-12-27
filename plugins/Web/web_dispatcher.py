@@ -206,6 +206,7 @@ class Dispatcher:
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
             'savefile': local_Wd.browser_object.save_file,
+            'setbrowserzoomlevel':  local_Wd.browser_object.set_zoom_level,
 
             # Combobox Keywords
             'cmbselectvaluebyindex':local_Wd.combobox_object.cmbSelectValueByIndex,
