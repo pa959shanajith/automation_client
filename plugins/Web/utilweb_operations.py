@@ -1200,7 +1200,7 @@ return isVisible(s);"""
             input.pop()
         local_uo.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            if webelement != None and webelement !='' and webelement.tag_name.lower()=='table':
+            if webelement != None and webelement !='' and webelement.tag_name.lower()=='table' and len(input)!=1:
                 if len(input) >= 4 and input[3] and int(input[3]) <= 0:
                     err_msg = self._index_zero()
                 elif input[2]:
@@ -1325,7 +1325,7 @@ return isVisible(s);"""
                 err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                 logger.print_on_console(ERR_DISABLED_OBJECT)  
             else:     
-                output = len(webelement.find_elements_by_xpath('.//*[contains(@value,"'+input[0]+'")]'))|len(webelement.find_elements_by_xpath('.//*[contains(@text,"'+input[0]+'")]'))
+                output = len(webelement.find_elements_by_xpath('.//*[contains(@text(),"'+input[0]+'")]'))
                 logger.print_on_console("Count of elements with "+input[0]+" is "+str(output)+".")
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS
