@@ -1907,6 +1907,7 @@ class WebScrape_Utils:
     debugger;
     window.tastopflag = "true";
     document.getElementsByTagName('HTML')[0].click();
+    //If HTML element doesnt receive click, clicking the first scraped element to trigger handler of start click and add to get all scraped elements.
     if (window.tasarr.length==0)
         document.getElementsByClassName('AvoAssure_Highlight')[0].click();
     var elements=[];
