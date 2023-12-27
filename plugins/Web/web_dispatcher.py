@@ -871,8 +871,8 @@ class Dispatcher:
         try:
             index = 0
             if identifiers_type == 'rxpath':
-                webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 driver.switch_to.default_content()
+                webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 if webElement==None:
                     # webelement might be in same origin iframe or xpath might have changed.
                     iframes = driver.find_elements_by_tag_name('iframe')
