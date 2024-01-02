@@ -1379,7 +1379,7 @@ return isVisible(s);"""
                 err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
                 logger.print_on_console(ERR_DISABLED_OBJECT)  
             else:     
-                output = len(webelement.find_elements_by_xpath('.//*[contains(@value,"'+input[0]+'")]'))|len(webelement.find_elements_by_xpath('.//*[contains(@text,"'+input[0]+'")]'))
+                output = len(webelement.find_elements_by_xpath('.//*[contains(@text(),"'+input[0]+'")]'))
                 logger.print_on_console("Count of elements with "+input[0]+" is "+str(output)+".")
                 methodoutput = TEST_RESULT_TRUE
                 status = TEST_RESULT_PASS

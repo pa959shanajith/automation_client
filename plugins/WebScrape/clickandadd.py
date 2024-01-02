@@ -223,6 +223,8 @@ class Clickandadd():
             new_obj=[]
             obj=CoreUtils()
             for a in tempne_stopclicknadd:
+                if a is None:
+                    continue
                 # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))
