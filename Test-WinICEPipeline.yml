@@ -1,0 +1,64 @@
+name: Test-WinICEPipeline 
+trigger: none
+resources:
+  pipelines:
+  - pipeline: Test-WinICEPipeline  
+    source: Test-LinuxDASPipeline
+    trigger: true
+steps:
+- task: DownloadBuildArtifacts@1
+  inputs:
+    buildType: 'specific'
+    project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
+    pipeline: '173'
+    buildVersionToDownload: 'latest'
+    downloadType: 'single'
+    artifactName: 'BranchName'
+    downloadPath: '$(System.ArtifactsDirectory)'
+
+- checkout: git://$(System.TeamProject)/ICE  #####
+  persistCredentials: true
+  clean: true
+  path: s/itdm
+- task: CmdLine@2
+  inputs:
+    script: |
+      BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
+      echo "Branch Name is:$BranchName"
+      echo $(Build.SourceBranch)
+      cd s/itdm
+      git checkout $BranchName
+      ls
+
+- task: PythonScript@0
+  displayName: 'Running build python script'
+  inputs:
+    scriptPath: 'build/build_classic.py'
+
+- script: |
+   mkdir AvoAssure 
+  displayName: 'Creating AvoAssure directory/folder'
+ 
+- script: |
+   cd assets 
+   del update.py
+   cd..
+   move plugins AvoAssure
+   move  assets AvoAssure
+  displayName: 'Moving plugins and assets to AvoAssure folder'
+ 
+- task: ArchiveFiles@2
+  displayName: 'Archive AvoAssure'
+  inputs:
+    rootFolderOrFile: AvoAssure
+    includeRootFolder: false
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/AvoAssure.7z'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: dist'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/AvoAssure.7z'
+    ArtifactName: dist
+
+
