@@ -89,6 +89,7 @@ status_ping_thread = None
 update_obj = None
 termination_inprogress = False
 browsercheck_inprogress = False
+execReq = None
 core_utils_obj = core_utils.CoreUtils() 
 
 
@@ -313,11 +314,12 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq
         wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
+            execReq = exec_data
             if("integration" in exec_data):
                 if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
@@ -1284,7 +1286,7 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         if self.cicd_mode:
             check_browser()
-        global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
+        global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress, execReq
         batch_id = None
         termination_inprogress = True
         try:
@@ -1374,6 +1376,7 @@ class TestThread(threading.Thread):
                     if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
                     result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                     if controller.manual_terminate_flag: result["userTerminated"] = True
+                    result['execReq'] = execReq
                     socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
             log.error(e, exc_info=True)
@@ -1386,6 +1389,7 @@ class TestThread(threading.Thread):
                     elif self.action==EXECUTE:
                         result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
                         if controller.manual_terminate_flag: result["userTerminated"] = True
+                        result['execReq'] = execReq
                         socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
