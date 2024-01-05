@@ -760,8 +760,10 @@ class Dispatcher:
                     xpath = teststepproperty.objectname.split(';')[0]
                     if (teststepproperty.name == "waitForElementVisible"):
                         input = xpath
+                    driver = browserstack_web_keywords.local_bwk.driver
                     driver.switch_to.default_content()
                     webelement = send_webelement_to_keyword(browserstack_web_keywords.local_bwk.driver, objectname, url)
+                    browser_Keywords.local_bk.driver_obj = browserstack_web_keywords.local_bwk.driver
                     result = self.sauce_web_dict[teststepproperty.name](webelement, input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
