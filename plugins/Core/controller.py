@@ -39,6 +39,7 @@ import requests
 local_cont = threading.local()
 import cicd_core
 from retryapis_cicd import Retryrequests
+import core
 #index for iterating the teststepproperty for executor
 ##i = 0
 terminate_flag=False
@@ -1536,6 +1537,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                             else:
+                                execute_result_data['execReq'] = core.execReq
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1572,6 +1574,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)  
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
                             else:
+                                execute_result_data['execReq'] = core.execReq
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1797,6 +1800,7 @@ class Controller():
                             # res = requests.post(server_url,json=data_dict, verify=False)
                             res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                         else:
+                            execute_result_data['execReq'] = core.execReq
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
                         sc_idx += 1
@@ -1835,6 +1839,7 @@ class Controller():
                         # res = requests.post(server_url,json=data_dict, verify=False)
                         res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                     else:
+                        execute_result_data['execReq'] = core.execReq
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
                     sc_idx += 1
@@ -1966,6 +1971,7 @@ class Controller():
                 obj_reporting.save_report_json(filename,json_data,status_percentage)
                 execute_result_data["scenarioId"]=aws_scenario[sc_idx]
                 execute_result_data["reportData"] = obj_reporting.report_json
+                execute_result_data['execReq'] = core.execReq
                 socketIO.emit('result_executeTestSuite', execute_result_data)
                 sc_idx+=1
                 idx_t+=1
