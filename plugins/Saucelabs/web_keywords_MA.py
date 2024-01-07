@@ -56,14 +56,17 @@ def request_content(self, url, filename, dirpath=None, body=None, content_type='
         with open(filename2, 'wb') as file_handle:
             file_handle.write(data)
     connection.close()
-    if response1.status not in [200, 201]:
-        raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
-            response1.status, response1.reason), response1=response1)
-    if response2.status not in [200, 201]:
-        raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
-            response2.status, response2.reason), response2=response2)
-    return True
-
+    try:
+        if response1.status not in [200, 201]:
+            raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
+                response1.status, response1.reason), response1=response1)
+        if response2.status not in [200, 201]:
+            raise sauceclient.SauceException('{}: {}.\nSauce Status NOT OK'.format(
+                response2.status, response2.reason), response2=response2)
+        return True
+    except sauceclient.SauceException as e:
+        print(f"An exception occurred: {e}")
+        return False 
 def get_job_asset_content(self, job_id, filename, dirpath=None):
     """Get content collected for a specific asset on a specific job."""
     endpoint = 'https://saucelabs.com/rest/v1/{}/jobs/{}/assets/'.format(
