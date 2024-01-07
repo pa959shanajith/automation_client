@@ -1125,7 +1125,7 @@ class Dispatcher:
                         identifiers_id = str(identifiers_index + 1)
                         if identifiers_index<len(identifiers):
                             webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
-                        if (webElement.tag_name.lower() == 'table'):
+                        if (webElement and webElement.tag_name.lower() == 'table'):
                             cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
                             if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
                                 break
@@ -1169,7 +1169,7 @@ class Dispatcher:
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
                     #Table appears but the cell inside doesnt. So, waiting for cell to appear...
-                    if (webElement.tag_name.lower() == 'table' and len(table_inputs)>1):
+                    if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1):
                         cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
                         if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
                             break
