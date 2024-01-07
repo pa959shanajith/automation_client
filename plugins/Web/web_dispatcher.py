@@ -1125,7 +1125,7 @@ class Dispatcher:
                         identifiers_id = str(identifiers_index + 1)
                         if identifiers_index<len(identifiers):
                             webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
-                        if (wenElement and webElement.tag_name.lower() == 'table'):
+                        if (webElement and webElement.tag_name.lower() == 'table'):
                             cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
                             if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
                                 break
