@@ -389,7 +389,7 @@ class MobileDispatcher:
                             desired_caps['log_level'] = False
                             desired_caps['appium:waitForQuiescence'] = True 
                             desired_caps['sauce:options'] = {}
-                            desired_caps['sauce:options']['appiumVersion'] = '1.16.0'
+                            desired_caps['sauce:options']['appiumVersion'] = '2.0.0'
                             desired_caps['sauce:options']['username'] = self.sauce_conf['sauce_username']
                             desired_caps['sauce:options']['accessKey'] = self.sauce_conf['sauce_access_key']
                             desired_caps['sauce:options']['name'] = teststepproperty.testscript_name
