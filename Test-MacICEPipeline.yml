@@ -2,7 +2,7 @@ name: Test-MacICEPipeline
 
 trigger: none
 pool:
-  name: armocipool
+  name: MAC
 resources:
   pipelines:
   - pipeline: Test-MacICEPipeline
