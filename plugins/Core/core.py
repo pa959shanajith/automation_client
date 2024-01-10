@@ -2435,6 +2435,11 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     else:
         result['mode'] = False
     result["host"] = readconfig.configvalues['server_ip']
+    token_obj = ICEToken()
+    ice_token = None
+    if token_obj.token:
+        ice_token = token_obj.token
+    result["icename"] = ice_token["icename"]
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 
