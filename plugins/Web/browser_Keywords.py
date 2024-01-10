@@ -980,14 +980,14 @@ class BrowserKeywords():
             err_msg=self.__web_driver_exception(e)
         return status,result,browsername,err_msg
     
-    def set_zoom_level(self, zoom_percentage, input, *args):
+    def set_zoom_level(self, webelement, inputval, *args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
         local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            zoom_percentage = input[0]
+            zoom_percentage = inputval[0]
             if not (zoom_percentage is None or zoom_percentage is ''):
                 zoom_percentage = int(zoom_percentage)/100
                 script = f'chrome.settingsPrivate.setDefaultZoom({zoom_percentage});'
