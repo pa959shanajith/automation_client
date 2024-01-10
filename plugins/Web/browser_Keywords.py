@@ -979,6 +979,37 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,browsername,err_msg
+    
+    def set_zoom_level(self, webelement, inputval, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            zoom_percentage = inputval[0]
+            if not (zoom_percentage is None or zoom_percentage is ''):
+                zoom_percentage = int(zoom_percentage)/100
+                script = f'chrome.settingsPrivate.setDefaultZoom({zoom_percentage});'
+                name = local_bk.driver_obj.name
+                if name == 'msedge':
+                    local_bk.driver_obj.get('edge://settings/')
+                    local_bk.driver_obj.execute_script(script)
+                if name == 'chrome':
+                    local_bk.driver_obj.get('chrome://settings/')
+                    local_bk.driver_obj.execute_script(script)
+                logger.print_on_console("Changed zoom level to: ", zoom_percentage*100)
+                local_bk.log.info("Changed zoom level to: %s", zoom_percentage*100)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                return status,methodoutput,output,err_msg
+            else:
+                logger.print_on_console(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                local_bk.log.error(INVALID_INPUT)           
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
 
     def update_window_handles(self):
         global local_bk
