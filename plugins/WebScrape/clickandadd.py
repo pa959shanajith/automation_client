@@ -52,7 +52,6 @@ class Clickandadd():
             #win32gui.ShowWindow(actwindow, win32con.SW_MAXIMIZE)
             log.info('Minimizing the foreground window i.e tool and assuming AUT on top .....')
             javascript_hasfocus = """return(document.hasFocus());"""
-            # time.sleep(6)
             browserops_obj.checkPopups()
 
             if window_handle_number is not None and window_handle_number > 0:
@@ -224,6 +223,8 @@ class Clickandadd():
             new_obj=[]
             obj=CoreUtils()
             for a in tempne_stopclicknadd:
+                if a is None:
+                    continue
                 # a['url']= obj.scrape_wrap(a['url'])
                 xpath_string=a['xpath'].split(';') + ["null",a['tag']]
                 # left_part=obj.scrape_wrap(';'.join(xpath_string[:2]))

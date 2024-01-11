@@ -201,6 +201,10 @@ class InstallAndLaunch():
                                 self.desired_caps['adbExecTimeout'] = 120000
                             driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
                             device_id = device_name
+                        else:
+                            driver = None
+                            device_id = None
+                            return None    
                     else:
                         driver = None
                         device_id = None
@@ -267,6 +271,23 @@ class InstallAndLaunch():
             result = TEST_RESULT_TRUE
         except Exception as e:
             err_msg = self.print_error("Not able to uninstall application")
+            log.error(e,exc_info=True)    
+        return status, result, output, err_msg
+
+    def stopSession_browserStack(self,objectname,input_val,*args):
+        global driver
+        status = TEST_RESULT_FAIL
+        output = OUTPUT_CONSTANT
+        result=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            driver.quit()
+            log.info("Browser Stack Session Stopped Sucessfully")
+            status = TEST_RESULT_PASS
+            result = TEST_RESULT_TRUE
+        except Exception as e:
+            err_msg = self.print_error("Error in Stopping Browser Stack Session")
             log.error(e,exc_info=True)    
         return status, result, output, err_msg
 

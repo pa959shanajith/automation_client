@@ -1107,9 +1107,16 @@ class Config_window(wx.Frame):
         else:
             self.rbox24.SetSelection(1)
         self.rbox24.SetToolTip(wx.ToolTip("Captures screenshots using Browser's driver instance"))
-
+        
+        self.rbox25 = wx.RadioBox(self.panel1, label = "Network Data", choices = lblList,
+            majorDimension = 1, style = wx.RA_SPECIFY_ROWS)
+        if isConfigJson != False and isConfigJson['network_data'].title() == lblList[0]:
+            self.rbox25.SetSelection(0)
+        else:
+            self.rbox25.SetSelection(1)
+        self.rbox25.SetToolTip(wx.ToolTip("Captures Network Data"))
         #Adding GridSizer which will show the radio buttons into grid of 12 rows and 2 colums it can be changed based on the requirements
-        self.gs=wx.GridSizer(12,2,5,5)
+        self.gs=wx.GridSizer(13,2,5,5)
         self.gs.AddMany([(self.rbox9,0,wx.EXPAND), (self.rbox1,0,wx.EXPAND), (self.rbox2,0,wx.EXPAND),
             (self.rbox5,0,wx.EXPAND), (self.rbox6,0,wx.EXPAND), (self.rbox3,0,wx.EXPAND),
             (self.rbox4,0,wx.EXPAND), (self.rbox8,0,wx.EXPAND), (self.rbox7,0,wx.EXPAND),
@@ -1117,7 +1124,8 @@ class Config_window(wx.Frame):
             (self.rbox13,0,wx.EXPAND), (self.rbox14,0,wx.EXPAND), (self.rbox15,0,wx.EXPAND),
             (self.rbox16,0,wx.EXPAND), (self.rbox17,0,wx.EXPAND), (self.rbox18,0,wx.EXPAND),
             (self.rbox19,0,wx.EXPAND), (self.rbox20,0,wx.EXPAND), (self.rbox21,0,wx.EXPAND),
-            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND), (self.rbox24,0,wx.EXPAND)])
+            (self.rbox22,0,wx.EXPAND), (self.rbox23,0,wx.EXPAND), (self.rbox24,0,wx.EXPAND),
+            (self.rbox25,0,wx.EXPAND)])
 
         #adding  GridSizer to bSizer which is a box sizer
         self.bSizer.Add(self.gs, 1, wx.EXPAND | wx.TOP, 5)
@@ -1227,6 +1235,7 @@ class Config_window(wx.Frame):
         incognito_private_mode = self.rbox22.GetStringSelection()
         kill_stale = self.rbox23.GetStringSelection()
         browser_screenshots = self.rbox24.GetStringSelection()
+        network_data = self.rbox25.GetStringSelection()
         if extn_enabled == 'Yes' and headless_mode == 'Yes':
             self.error_msg.SetLabel("Extension Enable must be disabled when Headless Mode is enabled")
             self.error_msg.SetForegroundColour((255,0,0))
@@ -1273,6 +1282,7 @@ class Config_window(wx.Frame):
         data['incognito_private_mode']=incognito_private_mode.strip()
         data['kill_stale']=kill_stale.strip()
         data['browser_screenshots']=browser_screenshots.strip()
+        data['network_data']=network_data.strip()
         data['file_server_ip']=readconfig.configvalues["file_server_ip"]
         data['ice_Token']=readconfig.configvalues['ice_Token']
         data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
@@ -1851,14 +1861,14 @@ class ProxyConfig_window(wx.Frame):
             #------------------------------------Different co-ordinates for Windows and Mac
             if SYSTEM_OS=='Windows':
                 upload_fields= {
-                "Frame":[(300, 170),(400, 230)],
+                "Frame":[(300, 170),(400, 265)],
                 "disp_msg":[(12,18),(80, 28),(100,18), (310,-1),(415,18),(30, -1)],
-                "proxy_enable":[(17,7), (180,40)],
-                "proxy_url":[(17,67),(95, 50),(120,61), (245,-1)],
-                "username":[(17,97),(95, 20),(120,91), (245,-1)],
-                "passwd":[(17,128),(95, 20),(120,122), (245,-1)],
-                "Save":[(157, 153), (100, 28)],
-                "Close":[(264,153), (100, 28)]
+                "proxy_enable":[(17,0), (348,65)],
+                "proxy_url":[(17,77),(95, 50),(120,74), (245,-1)],
+                "username":[(17,107),(95, 20),(120,105), (245,-1)],
+                "passwd":[(17,138),(95, 20),(120,137), (245,-1)],
+                "Save":[(157, 175), (100, 28)],
+                "Close":[(265,175), (100, 28)]
             }
             elif SYSTEM_OS=='Darwin':
                 upload_fields={
@@ -1868,18 +1878,18 @@ class ProxyConfig_window(wx.Frame):
             }
             elif SYSTEM_OS=='Linux':
                 upload_fields= {
-                "Frame": [(300, 170), (420, 230)],
+                "Frame": [(300, 170), (420, 265)],
                 "disp_msg": [(12, 18), (80, 28), (100, 18), (310, -1), (415, 18), (30, -1)],
-                "proxy_enable": [(17, 7), (180, 40)],
-                "proxy_url": [(17, 67), (95, 50), (150, 61), (245, 25)],
-                "username": [(17, 97), (130, 40), (150, 91), (245, 25)],
-                "passwd": [(17, 128), (130, 50), (150, 122), (245, 25)],
-                "Save": [(157, 153), (100, 28)],
-                "Close": [(264, 153), (100, 28)]
+                "proxy_enable": [(17, 0), (348, 65)],
+                "proxy_url": [(17, 77), (95, 50), (150, 74), (245, 25)],
+                "username": [(17, 107), (130, 40), (150, 105), (245, 25)],
+                "passwd": [(17, 138), (130, 50), (150, 137), (245, 25)],
+                "Save": [(157, 175), (100, 28)],
+                "Close": [(264, 175), (100, 28)]
             }
             lblList = ['Enabled', 'Disabled']
             wx.Frame.__init__(self, parent, title=title,pos=upload_fields["Frame"][0], size=upload_fields["Frame"][1], style = wx.CAPTION|wx.CLIP_CHILDREN)
-            self.SetBackgroundColour('#e6e7e8')
+            self.SetBackgroundColour('#ffffff')
             self.iconpath = IMAGES_PATH + "avo.ico"
             self.wicon = wx.Icon(self.iconpath, wx.BITMAP_TYPE_ICO)
             self.SetIcon(self.wicon)
@@ -1889,24 +1899,24 @@ class ProxyConfig_window(wx.Frame):
             self.rbox1.SetToolTip(wx.ToolTip("Enable or Disable Proxy in Avo Assure Client"))
             self.rbox1.Bind(wx.EVT_RADIOBOX, self.radio_check)
             self.proxy_url_path=wx.StaticText(self.panel, label="Proxy URL", pos=upload_fields["proxy_url"][0],size=upload_fields["proxy_url"][1], style=0, name="")
-            self.proxy_url_path.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             self.proxy_url=wx.TextCtrl(self.panel, pos=upload_fields["proxy_url"][2], size=upload_fields["proxy_url"][3])
+            self.proxy_url.SetToolTip(wx.ToolTip("Proxy URL (must start with http:// or https://)"))
             if data != False:
                 self.proxy_url.SetValue(data['url'])
             else:
                 self.proxy_url.SetValue('')
 
-            self.proxy_user_path=wx.StaticText(self.panel, label="Proxy Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
-            self.proxy_user_path.SetToolTip(wx.ToolTip("Username for proxy authentication"))
+            self.proxy_user_path=wx.StaticText(self.panel, label="Username", pos=upload_fields["username"][0],size=upload_fields["username"][1], style=0, name="")
             self.proxy_user = wx.TextCtrl(self.panel, pos=upload_fields["username"][2], size=upload_fields["username"][3])
+            self.proxy_user.SetToolTip(wx.ToolTip("Username for proxy authentication"))
             if data != False:
                 self.proxy_user.SetValue(data['username'])
             else:
                 self.proxy_user.SetValue('')
 
-            self.proxy_pass_path=wx.StaticText(self.panel, label="Proxy Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
-            self.proxy_pass_path.SetToolTip(wx.ToolTip("Password for proxy authentication"))
-            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3])
+            self.proxy_pass_path=wx.StaticText(self.panel, label="Password", pos=upload_fields["passwd"][0],size=upload_fields["passwd"][1], style=0, name="")
+            self.proxy_pass=wx.TextCtrl(self.panel, pos=upload_fields["passwd"][2], size=upload_fields["passwd"][3], style=wx.TE_PASSWORD)
+            self.proxy_pass.SetToolTip(wx.ToolTip("AES Encrypted Password for proxy authentication"))
             if data != False:
                 self.proxy_pass.SetValue(data['password'])
             else:
@@ -1978,18 +1988,18 @@ class ProxyConfig_window(wx.Frame):
                 self.proxy_url_path.SetLabel('Proxy URL')
                 self.proxy_url_path.SetForegroundColour((0,0,0))
             if len(data['username']) == 0 and len(data['password']) != 0:
-                self.proxy_user_path.SetLabel('Proxy Username*')
+                self.proxy_user_path.SetLabel('Username*')
                 self.proxy_user_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_user_path.SetLabel('Proxy Username')
+                self.proxy_user_path.SetLabel('Username')
                 self.proxy_user_path.SetForegroundColour((0,0,0))
             if len(data['username']) != 0 and len(data['password']) == 0:
-                self.proxy_pass_path.SetLabel('Proxy Password*')
+                self.proxy_pass_path.SetLabel('Password*')
                 self.proxy_pass_path.SetForegroundColour((255,0,0))
                 nosave = True
             else:
-                self.proxy_pass_path.SetLabel('Proxy Password')
+                self.proxy_pass_path.SetLabel('Password')
                 self.proxy_pass_path.SetForegroundColour((0,0,0))
         if not nosave:
             self.jsonCreater(data)

@@ -34,6 +34,7 @@
     "licensetype": 4,
     "logFile_Path": "./logs/Avoclient.log",
     "max_retries_app_launch": "20",
+    "network_data": "No",
     "prediction_for_iris_objects": "No",
     "queryTimeOut": "3",
     "sample_application_urls": [

@@ -57,6 +57,8 @@ class StepDescription:
             return "Verify '"+ inputval[1]+"' is present in the file '"+ inputval[0]+"'"
         def getcontent():
             return "Get content from the file '"+ input+"' and save it in '"+ tsp.outputval+"'"
+        def getdelimitedvalue():
+            return "Get content from the file '"+ input+"' based on input and save it in '"+ tsp.outputval+"'"
         def comparefiles():
             return "Compared the contents of files '"+ inputval[0] + "' and '"+ inputval[1]+"'"
         def compareinputs():
@@ -903,7 +905,7 @@ class StepDescription:
         def unselectcheckbox():
             return 'Unselect '+ "'" + tsp.custname + "'"+'.'
 
-        #Application keywords(@Window keywords- 7 keywords)
+        #Application keywords(@Window keywords- 8 keywords)
         def launchapplication():
             return 'The application present in the path  '+"'"+ inputval[0]+"'"+ ' is launched.'
         def getpagetitle():
@@ -918,6 +920,8 @@ class StepDescription:
             return 'Perform maximize window operation on the window.'
         def minimizewindow():
             return 'Perform minimize window operation on the window.'
+        def closesubwindow():
+            return 'The subwindow is closed.'
 
         #Mail Related keywords(@Email keywords- 15 keywords)
         def getattachmentstatus():
@@ -983,7 +987,7 @@ class StepDescription:
         def sendsecurefunctionkeys():
             return 'Enter secure text ' +"'"+input + "'"+ ' in  ' + "'" + tsp.custname + "'"+ '.'
 
-        #Element keywords(7 keywords)
+        #Element keywords(10 keywords)
         def getelementtext():
             return 'Get the value present in ' + "'" + tsp.custname + "'" +' and save the value ' +"'"+ output +"'"+' in '+"'"+tsp_outputval+"'."
         def verifyelementdoesnotexists():
@@ -998,6 +1002,12 @@ class StepDescription:
             return 'Verify if the element '+ "'" + tsp.custname + "' exists."
         def press():
             return 'Press the ' +"'" + tsp.custname + "'"
+        def getelementcolor():
+            return 'Fetched element color'
+        def drag():
+            return 'Performed drag operation'
+        def drop():
+            return 'Performed drop operation'
 
         #Button Keywords(5 keywords)
         def click():
@@ -1434,6 +1444,8 @@ class StepDescription:
             return 'Clear the cache of browser'
         def refresh():
             return 'Refresh the web page'
+        def setbrowserzoomlevel():
+            return 'Zoom level changed'
 
         #Element keywords
         def gettooltiptext():

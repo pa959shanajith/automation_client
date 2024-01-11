@@ -29,7 +29,7 @@ from constants import *
 import requests
 import time
 import re
-import readconfig
+import readconfig, controller
 import logging
 import browserstack_web_keywords
 import json
@@ -210,6 +210,7 @@ class Dispatcher:
             'execute_js':local_Wd.browser_object.execute_js,
             'getbrowsername': local_Wd.browser_object.getBrowserName,
             'savefile': local_Wd.browser_object.save_file,
+            'setbrowserzoomlevel':  local_Wd.browser_object.set_zoom_level,
 
             # Combobox Keywords
             'cmbselectvaluebyindex':local_Wd.combobox_object.cmbSelectValueByIndex,
@@ -593,7 +594,7 @@ class Dispatcher:
                                         logger.print_on_console(err_msg)
                                         local_Wd.log.error(err_msg)
                                 else:
-                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
+                                    reference_element=self.getwebelement(driver,teststepproperty.parent_xpath,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers,input, keyword)
                                 local_Wd.log.debug('Reference_element ')
                                 local_Wd.log.debug(reference_element)
                                 if reference_element != None:
@@ -644,7 +645,7 @@ class Dispatcher:
                                     if teststepproperty.custname in v:
                                         objectname=v[teststepproperty.custname]
                                         UserObjectScrape.update_data[str(teststepproperty.stepnum)]=v
-                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers)
+                                webelement = self.getwebelement(driver,objectname,teststepproperty.stepnum,teststepproperty.custname, teststepproperty.identifiers,input, keyword)
                                 if(obj_flag!=False):
                                     import UserObjectScrape
                                     webscrape=UserObjectScrape.UserObject()
@@ -730,8 +731,10 @@ class Dispatcher:
                     xpath=teststepproperty.objectname.split(';')[0]
                     if(teststepproperty.name=="waitForElementVisible"):
                         input=xpath
+                    driver = web_keywords.local_wk.driver
                     driver.switch_to.default_content()
                     webelement=send_webelement_to_keyword(web_keywords.local_wk.driver,objectname,url)
+                    browser_Keywords.local_bk.driver_obj = web_keywords.local_wk.driver
                     result = self.sauce_web_dict[teststepproperty.name](webelement,input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in saucelabs execution.")
@@ -760,8 +763,10 @@ class Dispatcher:
                     xpath = teststepproperty.objectname.split(';')[0]
                     if (teststepproperty.name == "waitForElementVisible"):
                         input = xpath
+                    driver = browserstack_web_keywords.local_bwk.driver
                     driver.switch_to.default_content()
                     webelement = send_webelement_to_keyword(browserstack_web_keywords.local_bwk.driver, objectname, url)
+                    browser_Keywords.local_bk.driver_obj = browserstack_web_keywords.local_bwk.driver
                     result = self.sauce_web_dict[teststepproperty.name](webelement, input)
                 else:
                     logger.print_on_console(teststepproperty.name+" keyword is not supported in browserstack execution.")
@@ -846,6 +851,13 @@ class Dispatcher:
                             if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
                             else : result = self.web_dict[keyword](webelement,input,output)
                     else:
+                        if controller.get_browser_to_foreground == False and keyword != 'getbrowsertoforeground':
+                            try:
+                                spam_result = self.web_dict['getbrowsertoforeground'](None, [''], '')
+                                if spam_result[1] != 'False':
+                                    controller.get_browser_to_foreground = True
+                            except:
+                                pass
                         #sending identifier that found webelement in keywords
                         result= self.web_dict[keyword](webelement,input,finalIdentifier)
                     ## To terminate debug/execution if requested browser is not available in the system (Defect #846) 
@@ -1020,8 +1032,8 @@ class Dispatcher:
         webElement = None
         try:
             index = 0
-            driver.switch_to.default_content()
-            if identifiers_type == 'rxpath' or identifiers_type == 'xpath':
+            if identifiers_type == 'rxpath':
+                driver.switch_to.default_content()
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
                 if webElement==None:
@@ -1096,7 +1108,7 @@ class Dispatcher:
         else:
             return updated_identifiers
 
-    def getwebelement(self,driver,objectname,stepnum,custname,modified_identifiers):
+    def getwebelement(self,driver,objectname,stepnum,custname,modified_identifiers,table_inputs, keyword):
         global obj_flag,simple_debug_gwto
         obj_flag=False
         webElement = None
@@ -1118,12 +1130,16 @@ class Dispatcher:
                         identifiers_id = str(identifiers_index + 1)
                         if identifiers_index<len(identifiers):
                             webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
-                        if not(webElement):
+                        if (webElement and webElement.tag_name.lower() == 'table'):
+                            cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
+                            if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
+                                break
+                        elif not(webElement):
                             webElement=None
                             local_Wd.log.info(f'Webelement not found with Primary identifers "{identifiers_type}"')
                         else:
                             break
-                    if (webElement and webElement.is_enabled()):
+                    if (webElement and webElement.is_enabled() if not ('get' or 'verify') in keyword else True):
                         finalXpath = identifiers[0]     #finalXpath used in getCustomobject 
                         break
                     else:
@@ -1157,7 +1173,12 @@ class Dispatcher:
                                         if not(webElement):
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
-                    if (webElement and webElement.is_enabled()):
+                    #Table appears but the cell inside doesnt. So, waiting for cell to appear...
+                    if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1):
+                        cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
+                        if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
+                            break
+                    elif (webElement and webElement.is_enabled() if not ('get' or 'verify') in keyword else True):
                         break
                     else:
                         time.sleep(1)

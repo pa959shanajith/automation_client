@@ -496,6 +496,8 @@ JIRA_ACTION_4 = 'jiraLogin'
 
 JIRA_ACTION_5 = 'getJiraTestcases'
 
+JIRA_ACTION_6 = 'getJiraJSON'
+
 # Azure variables
 Azure_ACTION_1 = 'loginToAzure'
 

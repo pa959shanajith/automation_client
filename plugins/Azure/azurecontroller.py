@@ -47,6 +47,7 @@ class AzureWindow():
         data['projects'] = []
         data['issuetype'] = []
         azure = None
+        res = "invalidcredentials"
 
         try:
             #Azure changes
@@ -559,28 +560,29 @@ class AzureWindow():
                 data = ""
                 if isinstance(value['data'], dict):
                     data = value['data']['text']
-                elif value['name'] == 'Area Path' or value['name'] == 'Iteration Path':
+                elif 'name' in value and (value['name'] == 'Area Path' or value['name'] == 'Iteration Path'):
                     convert_str = value['data'].replace("/","\\")
                     # if(project_name != convert_str):
                     #    data = f'{project_name}\\' + convert_str
                     # else:
                     data = convert_str   
-                elif value['name'] == "Failed Retest" and value['data'].isdigit():
+                elif 'name' in value and value['name'] == "Failed Retest" and value['data'].isdigit():
                     convert_num = int(value['data'])
                     data =  convert_num      
                 else:
                     data = value['data']
 
-                if value['name'] == 'Repro Steps':
+                if 'name' in value and value['name'] == 'Repro Steps':
                     data = azure_input_dict['info']['reproSteps']['value']
-                patch_document.append(
-                     {
-                        "op": "add",
-                        # "path": "/fields/System.Title",
-                        "path": "/fields" + value['url'].split('fields',1)[1],
-                        "value": data
-                    }
-                )
+                if 'url' in value:        
+                    patch_document.append(
+                        {
+                            "op": "add",
+                            # "path": "/fields/System.Title",
+                            "path": "/fields" + value['url'].split('fields',1)[1],
+                            "value": data
+                        }
+                    )
             if 'mappedId' in azure_input_dict:
                 patch_document.append(
                         {

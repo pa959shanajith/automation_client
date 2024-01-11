@@ -90,6 +90,7 @@ update_obj = None
 termination_inprogress = False
 browsercheck_inprogress = False
 application_path = None
+execReq = None
 core_utils_obj = core_utils.CoreUtils() 
 
 
@@ -314,11 +315,12 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq
         wait_until_browsercheck()
         try:
             exec_data = args[0]
             batch_id = exec_data["batchId"]
+            execReq = exec_data
             if("integration" in exec_data):
                 if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
                     if(qcObject == None):
@@ -860,6 +862,11 @@ class MainNamespace(BaseNamespace):
                 data['project_selected']=args[2]
                 data['item_type']=args[3]
                 obj.get_testcases(data,socketIO)
+            elif args[0] == JIRA_ACTION_6:
+                data = args[1]
+                data['project_selected']=args[2]
+                data['item_type']=args[3]
+                obj.get_testcases_json(data,socketIO)    
         except Exception as e:
             err_msg='Error in JIRA operations'
             log.error(err_msg)
@@ -1346,7 +1353,7 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         if self.cicd_mode:
             check_browser()
-        global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress
+        global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress, execReq
         batch_id = None
         termination_inprogress = True
         try:
@@ -1436,6 +1443,7 @@ class TestThread(threading.Thread):
                     if self.test_status == 'pass' and status != COMPLETED: self.test_status = 'fail'
                     result = {"status":status, "batchId": batch_id, "testStatus": self.test_status}
                     if controller.manual_terminate_flag: result["userTerminated"] = True
+                    result['execReq'] = execReq
                     socketIO.emit('result_executeTestSuite', result)
         except Exception as e:
             log.error(e, exc_info=True)
@@ -1448,6 +1456,7 @@ class TestThread(threading.Thread):
                     elif self.action==EXECUTE:
                         result = {"status":status, "batchId": batch_id, "testStatus": 'fail'}
                         if controller.manual_terminate_flag: result["userTerminated"] = True
+                        result['execReq'] = execReq
                         socketIO.emit('result_executeTestSuite', result)
         if closeActiveConnection:
             closeActiveConnection = False
@@ -2386,7 +2395,7 @@ def check_browser():
     finally:
         logger.print_on_console('Browser compatibility check completed')
         browsercheck_inprogress = False
-    return browsercheckFlag 
+    return browsercheckFlag  
 
 def wait_until_browsercheck():
     if browsercheck_inprogress:
@@ -2493,6 +2502,11 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     else:
         result['mode'] = False
     result["host"] = readconfig.configvalues['server_ip']
+    token_obj = ICEToken()
+    ice_token = None
+    if token_obj.token:
+        ice_token = token_obj.token
+    result["icename"] = ice_token["icename"]
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 

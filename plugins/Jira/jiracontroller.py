@@ -362,34 +362,39 @@ class JiraWindow():
         res = "invalidcredentials"
         try:
             url=jira_input_dict['jira_serverlocation']+"/rest/api/3/project"
+            validate_cred_url = jira_input_dict['jira_serverlocation']+"/rest/auth/1/session"
             auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
             headers={"Accept":"application/json"}
-            respon=requests.request("GET",url,headers=headers,auth=auth)
-            if respon.status_code == 200:
-                JsonObject = respon.json()
-                if len(JsonObject)>0:
-                    res = {}
-                    res['projects']=[]
-                    for index,item in enumerate(JsonObject):
-                        res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
-            if(';' in jira_input_dict['jira_serverlocation']):
-                log.debug('Connecting to JIRA through proxy')
-                jira_server = jira_input_dict['jira_serverlocation'].split(';')[0]
-                jira_proxy = jira_input_dict['jira_serverlocation'].split(';')[1]
-                jira_options = {'server':jira_server,'verify':False}
-                jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']),proxies={'http':jira_proxy,'https':jira_proxy})
-            else:
-                jira_options = {'server': jira_input_dict['jira_serverlocation']}
-                jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']))
-            issue_types = jira.issue_types()
-            res['issue_types']=[]
-            for index,item in enumerate(issue_types):
-                if item.name.lower() in ['story', 'test case']:
-                        res['issue_types'].append({'id': item.id , 'name':item.name})
-            socket.emit('Jira_details',res)
+            validate_response = requests.get(validate_cred_url, headers=headers, auth=auth)
+            if validate_response.status_code == 200:
+                respon=requests.request("GET",url,headers=headers,auth=auth)
+                if respon.status_code == 200:
+                    JsonObject = respon.json()
+                    if len(JsonObject)>0:
+                        res = {}
+                        res['projects']=[]
+                        for index,item in enumerate(JsonObject):
+                            res['projects'].append({'id': item['id'] , 'name':item['name'], 'code':item['key']})
+                if(';' in jira_input_dict['jira_serverlocation']):
+                    log.debug('Connecting to JIRA through proxy')
+                    jira_server = jira_input_dict['jira_serverlocation'].split(';')[0]
+                    jira_proxy = jira_input_dict['jira_serverlocation'].split(';')[1]
+                    jira_options = {'server':jira_server,'verify':False}
+                    jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']),proxies={'http':jira_proxy,'https':jira_proxy})
+                else:
+                    jira_options = {'server': jira_input_dict['jira_serverlocation']}
+                    jira = JIRA(options=jira_options,basic_auth=(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd']))
+                issue_types = jira.issue_types()
+                res['issue_types']=[]
+                for index,item in enumerate(issue_types):
+                    if item.name.lower() in ['story', 'test case']:
+                            res['issue_types'].append({'id': item.id , 'name':item.name})
+                socket.emit('Jira_details',res)
+            elif validate_response.status_code == 401:
+                socket.emit('Jira_details',res)   
         except Exception as e:
             log.error(e)
-            if 'Invalid URL' in str(e):
+            if 'Invalid URL' or 'getaddrinfo failed' in str(e):
                 socket.emit('Jira_details','Invalid Url')
             elif 'Unauthorized' in str(e):
                 socket.emit('Jira_details','Invalid Credentials')
@@ -430,4 +435,39 @@ class JiraWindow():
                 socket.emit('auto_populate','Invalid Credentials')
             else:
                 socket.emit('auto_populate','Fail')
-            logger.print_on_console('Exception in login and populating testcases')
+            logger.print_on_console('Exception in login and populating testcases')            
+            
+    def get_testcases_json(self,jira_input_dict,socket):
+        """
+            Method to get the testcases based on project from jira
+            returns list of testcases
+        """
+        res = {}
+        res['testcases']=[]
+        try:
+            project=jira_input_dict['project_selected']['project']
+            key=jira_input_dict['project_selected']['key']
+            url=jira_input_dict['jira_serverlocation']+"/rest/api/2/search?jql=issueType="+'"'+jira_input_dict['item_type']+'"'+"&fields=id,key,project,summary"
+            auth = HTTPBasicAuth(jira_input_dict['jira_uname'],jira_input_dict['jira_pwd'])
+            headers={"Accept":"application/json"}
+            respon=requests.request("GET",url,headers=headers,auth=auth)
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                if 'issues' in JsonObject:
+                    for index,item in enumerate(JsonObject['issues']):
+                        if 'fields' in item:
+                            if 'project' in item['fields']:
+                                if project == item['fields']['project']['name'] and key == item['fields']['project']['key']:
+                                    # res['testcases'].append({'id': item['id'], 'code':item['key']})
+                                    # res['testcases'].append({'id': item['key'], 'code':item['fields']['summary']})
+                                    res['testcases'].append({'id': item['id'], 'code':item['key'], 'summary':item['fields']['summary']})
+            socket.emit('Jira_testcases_json',res)
+        except Exception as e:
+            log.error(e)
+            if 'Invalid URL' in str(e):
+                socket.emit('auto_populate','Invalid Url')
+            elif 'Unauthorized' in str(e):
+                socket.emit('auto_populate','Invalid Credentials')
+            else:
+                socket.emit('auto_populate','Fail')
+            logger.print_on_console('Exception in login and populating testcases')        

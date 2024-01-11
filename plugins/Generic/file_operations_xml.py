@@ -584,6 +584,12 @@ class FileOperationsXml:
                             if(output_res):
                                 num_diff, ch_lines = self.get_diff_count_json(output_res)
                                 output_res = name_list+output_res
+                            else:
+                                # files are similar
+                                flg = True
+                                optFlg = False
+                                logger.print_on_console("The JSON Files are similar.")
+                                log.info("The JSON Files are similar.")
                         else:
                             output_res = self.compare_texts(file1_lines,file2_lines)
                             if(output_res):
@@ -615,12 +621,12 @@ class FileOperationsXml:
                                 err_msg = ("Exception occurred while writing to output file in compareFile : " + str(ex))
                                 log.debug( err_msg )
                                 flg = False
-                            if(flg):
-                                status = TEST_RESULT_PASS
-                                result = TEST_RESULT_TRUE
-                                log.info("Comparision of files completed")
-                                if( optFlg ):
-                                    value = output_res
+                        if(flg):
+                            status = TEST_RESULT_PASS
+                            result = TEST_RESULT_TRUE
+                            log.info("Comparision of files completed")
+                            if( optFlg ):
+                                value = output_res
                     else:
                         err_msg = 'One or more files are empty'
                 else:

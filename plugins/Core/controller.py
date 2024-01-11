@@ -39,6 +39,7 @@ import requests
 local_cont = threading.local()
 import cicd_core
 from retryapis_cicd import Retryrequests
+import core
 #index for iterating the teststepproperty for executor
 ##i = 0
 terminate_flag=False
@@ -53,6 +54,7 @@ log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
 screen_testcase_map= {}
+get_browser_to_foreground = False
 class ThreadLogFilter(logging.Filter):
     """
     This filter only show log entries for specified thread name
@@ -1023,6 +1025,8 @@ class Controller():
         return res
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
+        #the flag 'get_browser_to_foreground'for: To bring the browser to foreground , and only for debugging
+        global get_browser_to_foreground
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
@@ -1110,12 +1114,18 @@ class Controller():
         log.info('***DEBUG COMPLETED***')
         logger.print_on_console('***DEBUG COMPLETED***')
         print('=======================================================================================================')
+        #Delete network_data.json after debug
+        networkpath = AVO_ASSURE_HOME + "/network_data.json"
+        if os.path.exists(networkpath):
+            os.remove(networkpath)
         #clearing of dynamic variables
         obj.clearList(self)
         #clearing dynamic variables at the end of execution to support dynamic variable at the scenario level
         obj.clear_dyn_variables()
         #clearing dynamic variables at the end of execution to support constant variable at the scenario level
         obj.clear_const_variables()
+        # making this flag as False, after complete debugging
+        get_browser_to_foreground = False
         return status
 
     def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
@@ -1527,6 +1537,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                             else:
+                                execute_result_data['execReq'] = core.execReq
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1563,6 +1574,7 @@ class Controller():
                                 # res = requests.post(server_url,json=data_dict, verify=False)  
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
                             else:
+                                execute_result_data['execReq'] = core.execReq
                                 socketIO.emit('result_executeTestSuite', execute_result_data)
                             obj.clearList(con)
                             sc_idx += 1
@@ -1788,6 +1800,7 @@ class Controller():
                             # res = requests.post(server_url,json=data_dict, verify=False)
                             res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                         else:
+                            execute_result_data['execReq'] = core.execReq
                             socketIO.emit('result_executeTestSuite', execute_result_data)
                         obj.clearList(con)
                         sc_idx += 1
@@ -1826,6 +1839,7 @@ class Controller():
                         # res = requests.post(server_url,json=data_dict, verify=False)
                         res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                     else:
+                        execute_result_data['execReq'] = core.execReq
                         socketIO.emit('result_executeTestSuite', execute_result_data)
                     obj.clearList(con)
                     sc_idx += 1
@@ -1957,6 +1971,7 @@ class Controller():
                 obj_reporting.save_report_json(filename,json_data,status_percentage)
                 execute_result_data["scenarioId"]=aws_scenario[sc_idx]
                 execute_result_data["reportData"] = obj_reporting.report_json
+                execute_result_data['execReq'] = core.execReq
                 socketIO.emit('result_executeTestSuite', execute_result_data)
                 sc_idx+=1
                 idx_t+=1

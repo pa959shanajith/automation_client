@@ -35,6 +35,7 @@ except ImportError:
 global server_certs
 auth_set= False
 log = logging.getLogger('wsdlgenerator.py')
+from zeep.transports import Transport
 
 ## This class will have the methods to generate request header and body of WSDL
 class WebservicesWSDL():
@@ -140,7 +141,7 @@ class BodyGenarator():
         self.wsdl = str(wsdl)
         self.operation_name=str(operation_name)
         self.soap_type = int(soap_type)
-        self.client_obj = zeep.Client(self.wsdl)
+        self.client_obj = zeep.Client(self.wsdl,transport = Transport(verify=False))
         self.client_obj.soaptype = None
         if not(serverCertificate=='' or serverCertificate==None or serverCerificate_pass=='' or serverCerificate_pass==None ) and  not(auth_uname=='' or auth_uname==None or auth_pass=='' or auth_pass==None):
             server_certs = self.server_certs(wsdl,operation_name,soap_type,serverCertificate,serverCerificate_pass,auth_uname,auth_pass)

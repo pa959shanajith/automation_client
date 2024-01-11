@@ -20,6 +20,8 @@ from constants import *
 import logging
 import core
 import platform
+import time
+from network_data import NetworkData
 if SYSTEM_OS == 'Windows':
     import win32gui
     import win32api
@@ -35,9 +37,11 @@ import fileinput
 import glob
 from sendfunction_keys import SendFunctionKeys as SF
 import cicd_core
+
 driver_pre = None
 drivermap = []
 linux_drivermap=[]
+browser_number = None
 local_bk = threading.local()
 
 #New Thread to navigate to given url for the keyword 'naviagteWithAut'
@@ -76,12 +80,13 @@ class BrowserKeywords():
         return err_msg
 
     def openBrowser(self,webelement,browser_num,*args):
-        global local_bk, driver_pre, drivermap,linux_drivermap
+        global local_bk, driver_pre, drivermap,linux_drivermap, browser_number
         status=webconstants.TEST_RESULT_FAIL
         result=webconstants.TEST_RESULT_FALSE
         output=OUTPUT_CONSTANT
         err_msg=None
-        self.browser_num=browser_num[0]
+        self.browser_num = browser_num[0]
+        browser_number = browser_num[0]
         configvalues = readconfig.configvalues
         try:
             obj = Singleton_DriverUtil()
@@ -321,10 +326,13 @@ class BrowserKeywords():
                             local_bk.driver_obj.execute_script("""document.getElementById('details-button').click();document.getElementById('proceed-link').click();""")
                 except Exception as k:
                     logger.print_on_console('Exception while ignoring the certificate')
+                #Network Data Capture    
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
-                result=webconstants.TEST_RESULT_TRUE
+                result=webconstants.TEST_RESULT_TRUE    
             else:
                 logger.print_on_console(webconstants.INVALID_INPUT)
         except Exception as e:
@@ -459,7 +467,10 @@ class BrowserKeywords():
                         local_bk.driver_obj.execute_script("""document.getElementById('overridelink').click();""")
                 except Exception as k:
                     local_bk.log.error(k)
-                    err_msg='Exception while ignoring the certificate'
+                    err_msg='Exception while ignoring the certificate'    
+                #Network Data Capture
+                network_operation = NetworkData(local_bk.driver_obj)
+                network_operation.network_data()
                 logger.print_on_console('Navigated to URL')
                 local_bk.log.info('Navigated to URL')
                 status=webconstants.TEST_RESULT_PASS
@@ -484,6 +495,9 @@ class BrowserKeywords():
             local_bk.driver_obj.execute_script("window.history.go(-1)")
             status=webconstants.TEST_RESULT_PASS
             result=webconstants.TEST_RESULT_TRUE
+            #Network Data Capture
+            network_operation = NetworkData(local_bk.driver_obj)
+            network_operation.network_data()
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,output,err_msg
@@ -965,6 +979,37 @@ class BrowserKeywords():
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,result,browsername,err_msg
+    
+    def set_zoom_level(self, webelement, inputval, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            zoom_percentage = inputval[0]
+            if not (zoom_percentage is None or zoom_percentage is ''):
+                zoom_percentage = int(zoom_percentage)/100
+                script = f'chrome.settingsPrivate.setDefaultZoom({zoom_percentage});'
+                name = local_bk.driver_obj.name
+                if name == 'msedge':
+                    local_bk.driver_obj.get('edge://settings/')
+                    local_bk.driver_obj.execute_script(script)
+                if name == 'chrome':
+                    local_bk.driver_obj.get('chrome://settings/')
+                    local_bk.driver_obj.execute_script(script)
+                logger.print_on_console("Changed zoom level to: ", zoom_percentage*100)
+                local_bk.log.info("Changed zoom level to: %s", zoom_percentage*100)
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                return status,methodoutput,output,err_msg
+            else:
+                logger.print_on_console(INVALID_INPUT)
+                err_msg=INVALID_INPUT
+                local_bk.log.error(INVALID_INPUT)           
+        except Exception as e:
+            err_msg=self.__web_driver_exception(e)
+        return status,methodoutput,output,err_msg
 
     def update_window_handles(self):
         global local_bk
@@ -1069,20 +1114,37 @@ class BrowserKeywords():
         err_msg=None
         local_bk.log.info(STATUS_METHODOUTPUT_LOCALVARIABLES)
         try:
-            input=input[0]
+            inputval=input[0]
+            #OEBS Web Configurator Fix(Parent Window Attach )
+            if inputval == "URL":
+                url = input[1]
+                exec_path = webconstants.CHROME_DRIVER_PATH
+                chrome_options = webdriver.ChromeOptions()
+                chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+                driver = webdriver.Chrome(executable_path=exec_path, options=chrome_options)
+                local_bk.log.info("Driver control gained")
+                for window_handle in driver.window_handles:
+                    driver.switch_to.window(window_handle)
+                    if url in driver.current_url:
+                        local_bk.driver_obj = driver
+                        local_bk.log.info("Assigned to existing driver and breaking")
+                        break
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+                return status,methodoutput,output,err_msg
             try:
-                to_window=int(input)
+                to_window=int(inputval)
             except Exception as e:
                 to_window = -1
-            if not(input is None or input is '' or to_window <0):
-                logger.print_on_console(INPUT_IS+input)
+            if not(inputval is None or inputval is '' or to_window <0):
+                logger.print_on_console(INPUT_IS+inputval)
                 local_bk.log.info('Switching to the window ')
                 local_bk.log.info(to_window)
                 self.update_window_handles()
                 window_handles=self.__get_window_handles()
                 ## Issue #190 Driver control won't switch back to parent window
                 if to_window>len(window_handles):
-                    err_msg='Window '+input+' not found'
+                    err_msg='Window '+inputval+' not found'
                     logger.print_on_console(err_msg)
                     local_bk.log.error(err_msg)
                 else:
@@ -1116,7 +1178,7 @@ class BrowserKeywords():
                         err_msg='Current window handle not found'
                         logger.print_on_console(err_msg)
                         local_bk.log.error(err_msg)
-            elif (input is None or input is ''):
+            elif (inputval is None or inputval is ''):
                 window_handles=self.__get_window_handles()
                 local_bk.log.info('Current window handles are ')
                 local_bk.log.info(window_handles)
@@ -1170,6 +1232,7 @@ class BrowserKeywords():
         err_msg=None        
         verb = None 
         flag_firefox = False
+        self.browser_num = browser_number
         try:
             if SYSTEM_OS != 'Darwin':
                 if (self.browser_num == '1'):

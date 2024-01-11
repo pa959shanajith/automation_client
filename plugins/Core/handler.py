@@ -15,6 +15,7 @@ import jumpTo
 from teststepproperty import TestStepProperty
 import if_step
 import for_step
+import re
 import getparam
 from collections import OrderedDict
 import constants
@@ -146,7 +147,7 @@ class Handler():
         browser_type=[]
         datatables=[]
         extract_path = None
-        if(data_param_path is not None and data_param_path != ''):
+        if(data_param_path is not None and data_param_path.strip() != ''):
             data_param_path_temp = str(data_param_path)
             extract_path = [data_param_path_temp]
         #Iterating through json array
@@ -539,7 +540,8 @@ class Handler():
                 #Currenlty implemented only for WEB and MobileWeb apptype
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
-                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)):
+                        #Handling url of pages having iframes and frames
+                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)) and not re.match('\d[if]\/',url):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
                         if(objectname.strip() != '' and not(objectname.startswith('@')) and len(objectname.split(';')) == 3):

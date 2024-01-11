@@ -189,7 +189,7 @@ class MobileDispatcher:
         'verifydoesnotexists': slider_util_keywords_object.verify_does_not_exists,
         'getdevices' : device_keywords_object.get_device_list,
         'invokedevice' : device_keywords_object.invoke_device,
-        'stopserver':install_and_launch_object.stop_server,
+        'stopserver':install_and_launch_object_bs.stopSession_browserStack,
         'hidesoftkeyboard':swipe_keywords_object.hide_soft_keyboard,
         'backpress':swipe_keywords_object.backPress,
         'setslidevalue': slider_util_keywords_object.set_slide_value,
@@ -389,7 +389,7 @@ class MobileDispatcher:
                             desired_caps['log_level'] = False
                             desired_caps['appium:waitForQuiescence'] = True 
                             desired_caps['sauce:options'] = {}
-                            desired_caps['sauce:options']['appiumVersion'] = '1.16.0'
+                            desired_caps['sauce:options']['appiumVersion'] = '2.0.0'
                             desired_caps['sauce:options']['username'] = self.sauce_conf['sauce_username']
                             desired_caps['sauce:options']['accessKey'] = self.sauce_conf['sauce_access_key']
                             desired_caps['sauce:options']['name'] = teststepproperty.testscript_name
