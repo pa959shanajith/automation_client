@@ -14,7 +14,7 @@ steps:
   inputs:
     buildType: 'specific'
     project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
-    pipeline: '173'
+    pipeline: '182'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
     artifactName: 'BranchName'
