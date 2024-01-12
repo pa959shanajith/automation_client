@@ -28,12 +28,12 @@ steps:
 - task: CmdLine@2
   inputs:
     script: |
-      BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
-      echo "Branch Name is:$BranchName"
+      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
+      echo "Branch Name is:%BranchName%"
       echo $(Build.SourceBranch)
       cd s/avoassure
       git checkout $BranchName
-      ls
+      dir
 
 - task: PythonScript@0
   displayName: 'Running build python script'
