@@ -3,6 +3,7 @@ trigger: none
 
 pool:
   name: Default
+  demands: Agent.Name -equals 136 Server 
 
 resources:
   pipelines:
