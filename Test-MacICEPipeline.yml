@@ -3,6 +3,8 @@ name: Test-MacICEPipeline
 trigger: none
 pool:
   name: MAC
+  demands:
+   - Agent.Name -equals Catalina
 resources:
   pipelines:
   - pipeline: Test-MacICEPipeline
