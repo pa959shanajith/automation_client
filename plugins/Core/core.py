@@ -2408,7 +2408,7 @@ def check_execution_lic(event):
         socketIO.emit(event,'ExecutionOnlyAllowed')
     return executionOnly
 
-def set_ICE_status(one_time_ping = False,connect=True,interval = 2000):
+def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     """
     def : set_ICE_status
     purpose : communicates Avo Assure Client status (availble/busy)
