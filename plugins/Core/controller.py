@@ -1892,6 +1892,10 @@ class Controller():
             log.info('---------------------------------------------------------------------')
             print('=======================================================================================================')
             suite_idx += 1
+        #Delete network_data.json after execution
+        networkpath = AVO_ASSURE_HOME + "/network_data.json"
+        if os.path.exists(networkpath):
+            os.remove(networkpath)
         del con
         del obj
         if status==TERMINATE:
