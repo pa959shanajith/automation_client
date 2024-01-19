@@ -30,6 +30,7 @@ import json
 import ast
 import time
 import keyboard
+import pyautogui
 ctrldownflag = False
 stopumpingmsgs = False
 obj_ref = None
@@ -137,9 +138,13 @@ class Scrape:
             """ The below code will try to connect to window based on window name
             which works fine in case of SAP logon but in case of SAP Business client it might fail to connect 
             as getattr method gives window name as "SAP" but works fine for subsequent screens """
-
-            app.connect(title=window_to_scrape.__getattr__("Text"))    
-            main_window = app.window(title=window_to_scrape.__getattr__("Text")).set_focus()
+            try:
+                app.connect(title=window_to_scrape.__getattr__("Text"))    
+                main_window = app.window(title=window_to_scrape.__getattr__("Text")).set_focus()
+            except:
+                window_name = "SAP GUI"
+                app.connect(title=window_name, found_index=1)    
+                main_window = app.window(title=window_name).set_focus()
 
             # Get the screen width and height
             screen_width, screen_height = pywinauto.win32functions.GetSystemMetrics(0), pywinauto.win32functions.GetSystemMetrics(1)
@@ -278,36 +283,52 @@ class Scrape:
                                 keywordOperation = ''
                                 if tag == "input":
                                     keywordOperation = "setText"
-                                if tag == "select":
+                                elif tag == "select":
                                     keywordOperation = "selectValueByText"
-                                if tag == "checkbox":
+                                elif tag == "checkbox":
                                     keywordOperation = "click"
-                                if tag == "button":
+                                elif tag == "button":
                                     keywordOperation = "click"
-                                if tag == "radiobutton":
+                                elif tag == "radiobutton":
                                     keywordOperation = "selectRadioButton"
-                                if tag == "GuiTab":
+                                elif tag == "GuiTab":
                                     keywordOperation = "click"
-                                if tag == "table":
-                                    keywordOperation = "click"
-                                if tag == "GuiOkCodeField":
+                                elif tag == "table":
+                                    keywordOperation = "getCellValue"
+                                elif tag == "gridview":
+                                    keywordOperation = "getCellText"
+                                elif tag == "GuiOkCodeField":
                                     keywordOperation = "setText"
+                                elif tag == "GuiMenubar":
+                                    keywordOperation = "click"
+                                elif tag == "GuiToolbar":
+                                    keywordOperation = "click"
+                                elif tag == "GuiTab":
+                                    keywordOperation = "click"
+                                else:
+                                    keywordOperation = "click"
+                                
                                 dict = {
-                                        'xpath': path,
-                                        'id': elem.__getattr__("Id"),
-                                        'text': elem.__getattr__("Text"),
-                                        'tag': tag,
-                                        'custname': custname,
-                                        'left': elem.__getattr__("ScreenLeft"),
-                                        'top': elem.__getattr__("ScreenTop"),
-                                        'height': elem.__getattr__("Height"),
-                                        'width': elem.__getattr__("Width"),
-                                        'operation': keywordOperation,
-                                        'window_name': wnd_title,
-                                        'tooltip': elem.__getattr__("ToolTip") if hasattr(elem, "ToolTip") else "",
-                                        'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else "",
-                                        'user_name': user_name
-                                    }
+                                    'xpath': path,
+                                    'id': elem.__getattr__("Id"),
+                                    'inputVal': elem.__getattr__("Text"),
+                                    'tag': tag,
+                                    'custname': custname,
+                                    'left': elem.__getattr__("ScreenLeft"),
+                                    'top': elem.__getattr__("ScreenTop"),
+                                    'height': elem.__getattr__("Height"),
+                                    'width': elem.__getattr__("Width"),
+                                    'keywordVal': keywordOperation,
+                                    'window_name': wnd_title,
+                                    'tooltip': elem.__getattr__("ToolTip") if hasattr(elem, "ToolTip") else "",
+                                    'defaulttooltip': elem.__getattr__("DefaultToolTip") if hasattr(elem, "DefaultToolTip") else "",
+                                    'user_name': user_name
+                                }
+
+                                if tag == "table" or tag == "gridview":
+                                    dict["inputVal"] == "0;0"
+                                if tag == "tree":
+                                    dict["inputVal"] == ""
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 logger.print_on_console(dict)
                                 view.append(dict)
@@ -358,11 +379,11 @@ class Scrape:
                                 elem = ses.FindById(id)
                                 if ( len(elem.__getattr__("Text")) > 0 ):
                                     text = elem.__getattr__("Text")
-                                    view[len(view) - 1]['text'] = str(text).strip()
+                                    view[len(view) - 1]['inputVal'] = str(text).strip()
                                     log.debug("Fetched Text of Element - " + str(text))
                                 else:
                                     text = text_typed[0]
-                                    view[len(view) - 1]['text'] = str(text).strip()
+                                    view[len(view) - 1]['inputVal'] = str(text).strip()
                                     log.debug("Fetched Text of Element - " + str(text))
                                 data = view[len(view) - 1]
                                 if "data_sent" in view[len(view) - 1] and view[len(view) - 1]['data_sent'] == "false":
@@ -374,7 +395,7 @@ class Scrape:
                                 logger.print_on_console( 'Error occured in GetdetailsThread' )
                                 data = view[len(view) - 1]
                                 if "data_sent" in view[len(view) - 1] and view[len(view) - 1]['data_sent'] == "false":
-                                    view[len(view) - 1]['text'] = text_typed[0]
+                                    view[len(view) - 1]['inputVal'] = text_typed[0]
                                     self.socket.emit("sap_scrape_data", data)
                                     view[len(view) - 1]['data_sent'] = "true"
                                     text_typed[0] = ""
@@ -422,6 +443,7 @@ class Scrape:
                                                     coordX = pos[0]
                                                     coordY = pos[1]
                                                     obj = OutlookThread(coordX, coordY, window_id)
+                                                    pyautogui.click(self.coordX, self.coordY)
                                                     return False
 
                             except Exception as e:
@@ -429,7 +451,7 @@ class Scrape:
                                 logger.print_on_console( 'Error occured while scraping' )
 
                             if ( self.stopumpingmsgs is True ):
-                                self.hm.UnhookKeyboard()
+                                # self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                             return True  # Returning True as we want the click to be performed on the application
@@ -444,7 +466,7 @@ class Scrape:
 
                         def OnKeyDown(event):
                             if ( self.stopumpingmsgs is True ):
-                                self.hm.UnhookKeyboard()
+                                # self.hm.UnhookKeyboard()
                                 self.hm.UnhookMouse()
                                 ctypes.windll.user32.PostQuitMessage(0)
                                 return True
@@ -468,7 +490,7 @@ class Scrape:
                             data = {
                                 'xpath': '',
                                 'id': '',
-                                'text': 'ENTER',
+                                'inputVal': 'ENTER',
                                 'tag': '',
                                 'custname': '@Generic',
                                 'left': '',
@@ -477,7 +499,7 @@ class Scrape:
                                 'width': '',
                                 'tooltip': '',
                                 'defaulttooltip': '',
-                                'operation': 'sendFunctionKeys',
+                                'keywordVal': 'sendFunctionKeys',
                                 'window_name': view[len(view) - 1]['window_name'],
                                 'data_sent': "true",
                                 'user_name': user_name
@@ -496,10 +518,10 @@ class Scrape:
                         get_obj = GetObject()
                         window_id, self.handle = get_obj.GetWindow()
                         self.hm = pyHook.HookManager()
-                        self.hm.KeyDown = OnKeyDown
-                        self.hm.KeyUp = OnKeyUp
+                        # self.hm.KeyDown = OnKeyDown
+                        # self.hm.KeyUp = OnKeyUp
                         self.hm.MouseLeftDown = OnMouseLeftDown
-                        self.hm.HookKeyboard()
+                        # self.hm.HookKeyboard()
                         self.hm.HookMouse()
                         keyboard.hook(on_key_event)
                         keyboard.on_press_key("enter", on_enter)
