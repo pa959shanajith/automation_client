@@ -191,6 +191,7 @@ class MainNamespace(BaseNamespace):
                     msg = ("Do Not Disturb" if dnd_mode else "Normal") + " Mode: Connection to the Avo Assure Server established"
                     logger.print_on_console(msg)
                     log.info(msg)
+                    set_ICE_status(False, True, 60000)
                     msg = "Avo Assure Client Name: " + root.ice_token["icename"]
                     logger.print_on_console(msg)
                     log.info(msg)
