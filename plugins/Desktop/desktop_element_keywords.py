@@ -337,52 +337,69 @@ class ElementKeywords():
         log.info( RETURN_RESULT )
         return status, result, output, err_msg
     
-    def drag(self, element, parent, *args):
+    def drag(self, element, parent, input_val, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
         err_msg = None
         Rect = ''
         try:
-            #----------get the element coordinates
-            try:
-                Rect = str(element.rectangle())
-            except:
-                pass
-            Rect = Rect[1:len(Rect)-1]
-            Rect = Rect.split(",")
-            Left = Rect[0].strip()#left
-            if ( "L" in Left ):
-                Left = int(Left[1:])
+            if ( len(input_val) >= 1 ):    #-----------Drag operation for table.
+                index = int(input_val[0])
+                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0] ):
+                    log.info( 'Valid row number' )
+                    c = element.children()
+                    const = 0
+                    for i in range(0,len(c)):
+                        if ( c[i].friendly_class_name().lower() == "scrollbar" ):
+                            const += 1
+                    if ( (len(c) - const - 1) >= index ):
+                        # rect = element.rectangle()
+                        c[const + index].click_input()
+                        pyautogui.mouseDown()
+                        pyautogui.move(0,1)
+                        status = desktop_constants.TEST_RESULT_PASS
+                        result = desktop_constants.TEST_RESULT_TRUE
             else:
-                Left = int(Left)
-            Top=Rect[1].strip()#top
-            if ( "T" in Top ):
-                Top = int(Top[1:])
-            else:
-                Top = int(Top)
-            Right = Rect[2].strip()#right
-            if ( "R" in Right ):
-                Right = int(Right[1:])
-            else:
-                Right = int(Right)
-            Bottom = Rect[3].strip()#bottom
-            if ( "B" in Bottom ):
-                Bottom = int(Bottom[1:])
-            else:
-                Bottom = int(Bottom)
-            #---------------------Finding height and width
-            height = Bottom - Top
-            width = Right - Left
-            #--------------------Finding X and Y co-ordinates
-            x = Left + width / 2
-            y = Top + height / 2
-            pywinauto.mouse.move(coords = (int(x), int(y)))
-            pywinauto.mouse.press(button='left', coords = (int(x), int(y)))
-            pywinauto.mouse.move(coords = (int(x+1), int(y+1)))
-            # pyautogui.mouseDown()
-            status = desktop_constants.TEST_RESULT_PASS
-            result = desktop_constants.TEST_RESULT_TRUE
+                #----------get the element coordinates
+                try:
+                    Rect = str(element.rectangle())
+                except:
+                    pass
+                Rect = Rect[1:len(Rect)-1]
+                Rect = Rect.split(",")
+                Left = Rect[0].strip()#left
+                if ( "L" in Left ):
+                    Left = int(Left[1:])
+                else:
+                    Left = int(Left)
+                Top=Rect[1].strip()#top
+                if ( "T" in Top ):
+                    Top = int(Top[1:])
+                else:
+                    Top = int(Top)
+                Right = Rect[2].strip()#right
+                if ( "R" in Right ):
+                    Right = int(Right[1:])
+                else:
+                    Right = int(Right)
+                Bottom = Rect[3].strip()#bottom
+                if ( "B" in Bottom ):
+                    Bottom = int(Bottom[1:])
+                else:
+                    Bottom = int(Bottom)
+                #---------------------Finding height and width
+                height = Bottom - Top
+                width = Right - Left
+                #--------------------Finding X and Y co-ordinates
+                x = Left + width / 2
+                y = Top + height / 2
+                pywinauto.mouse.move(coords = (int(x), int(y)))
+                pywinauto.mouse.press(button='left', coords = (int(x), int(y)))
+                pywinauto.mouse.move(coords = (int(x+1), int(y+1)))
+                # pyautogui.mouseDown()
+                status = desktop_constants.TEST_RESULT_PASS
+                result = desktop_constants.TEST_RESULT_TRUE
         except Exception as exception:
             err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
             log.error( err_msg )

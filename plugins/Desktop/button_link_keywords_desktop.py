@@ -90,7 +90,7 @@ class ButtonLinkKeyword():
                 if ( check ):
                     log.info( 'Parent matched' )
                     if ( element.is_enabled() ):
-                        element.click()
+                        element.click_input()
                         status = desktop_constants.TEST_RESULT_PASS
                         result = desktop_constants.TEST_RESULT_TRUE
                         log.info( STATUS_METHODOUTPUT_UPDATE )
