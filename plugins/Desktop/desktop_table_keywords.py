@@ -36,7 +36,7 @@ class Table_Keywords():
                 row = self.get_row_count(element, '', '', '')
                 if ( row[2] >= indexi > 0  and col[2] >= indexj > 0 ):
                     const = 0
-                    if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                    if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                         log.info( 'Valid row and col number' )
                         c = element.children()
                         for i in range(0, len(c)):
@@ -74,7 +74,7 @@ class Table_Keywords():
         verb = OUTPUT_CONSTANT
         err_msg = None
         try:
-            if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+            if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                 c = element.children()
                 const = 0
                 for i in range(0, len(c)):
@@ -101,7 +101,7 @@ class Table_Keywords():
         err_msg = None
         row_ele = None
         try:
-            if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+            if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                 c = element.children()
                 for i in range(0, len(c)):
                     if( str(c[i].friendly_class_name().lower()) != 'scrollbar' ):
@@ -130,7 +130,7 @@ class Table_Keywords():
         try:
             if ( len(input_val) >= 1 ):
                 index = int(input_val[0])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info( 'Valid row number' )
                     c = element.children()
                     const = 0
@@ -162,7 +162,7 @@ class Table_Keywords():
                 valuei = str(input_val[0])
                 const = 0
                 flag = 0
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info( 'Valid row number' )
                     c = element.children()
                     for i in range(0, len(c)):
@@ -214,7 +214,7 @@ class Table_Keywords():
                 valuei = str(input_val[0])
                 const = 0
                 flag = 0
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info( 'Valid row number' )
                     c = element.children()
                     for i in range(0,len(c)):
@@ -267,7 +267,7 @@ class Table_Keywords():
                 indexj = int(input_val[1])
                 valuei = str(input_val[2])
                 const = 0
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info( 'Valid row number' )
                     c = element.children()
                     for i in range(0,len(c)):
@@ -325,7 +325,7 @@ class Table_Keywords():
             if ( len(input_val) >= 2 ):
                 indexi = int(input_val[0])
                 indexj = int(input_val[1])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info('Valid row number')
                     c = element.children()
                     const = 0
@@ -356,7 +356,7 @@ class Table_Keywords():
             if( len(input_val) >= 2 ):
                 indexi = int(input_val[0])
                 indexj = int(input_val[1])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info('Valid row number')
                     c = element.children()
                     const = 0
@@ -387,7 +387,7 @@ class Table_Keywords():
             if ( len(input_val) >= 2 ):
                 indexi = int(input_val[0])
                 indexj = int(input_val[1])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info('Valid row number')
                     c = element.children()
                     const = 0
@@ -409,7 +409,7 @@ class Table_Keywords():
             log.error( err_msg )
         return status, result, verb, err_msg
     
-    def set_text(self, element, parent, input_val, *args):
+    def set_text_cell(self, element, parent, input_val, *args):
         status = desktop_constants.TEST_RESULT_FAIL
         result = desktop_constants.TEST_RESULT_FALSE
         verb = OUTPUT_CONSTANT
@@ -418,7 +418,7 @@ class Table_Keywords():
             if ( len(input_val) >= 2 ):
                 indexi = int(input_val[0])
                 indexj = int(input_val[1])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0]):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0])):
                     log.info('Valid row number')
                     c = element.children()
                     const = 0
