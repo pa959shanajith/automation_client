@@ -93,12 +93,12 @@ class api_request():
 
             if 'enabled' in self.proxy and self.proxy['enabled']=='Enabled':
 
-                response = requests.post(test_url, data=im_b64,proxies=self.proxies)
+                response = requests.post(test_url, data=data,proxies=self.proxies)
 
                 # response = requests.post(test_url, data=im_b64,proxies=self.proxies,auth=self.proxy_auth, timeout = 120)
 
             else:
-                response = requests.post(test_url, data=im_b64,verify = False , timeout = 120)
+                response = requests.post(test_url, data=data,verify = False , timeout = 120)
 
 
 
@@ -124,12 +124,12 @@ class api_request():
 
             if 'enabled' in self.proxy and self.proxy['enabled']=='Enabled':
 
-                response = requests.post(test_url, data=im_b64,proxies=self.proxies)
+                response = requests.post(test_url, data=data,proxies=self.proxies)
 
                 # response = requests.post(test_url, data=im_b64,proxies=self.proxies,auth=self.proxy_auth, timeout = 120)
 
             else:
-                response = requests.post(test_url, data=im_b64,verify = False , timeout = 120)
+                response = requests.post(test_url, data=data,verify = False , timeout = 120)
 
             # response = requests.post(test_url, data=data,verify = False , timeout = None)
             #logger.print_on_console(response)
