@@ -1030,7 +1030,7 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{SQL Server}',5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
+        dbNumber = {4:'{ODBC Driver 11 for SQL Server}',5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
         if not(dbtype == ''): 
             try:
@@ -1087,7 +1087,13 @@ class DatabaseOperation():
                     import psycopg2
                     self.cnxn = psycopg2.connect(host=ip,port=port,user=userName,password=password,database=dbName)
                 else:
-                    self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+                    if userName == '':
+                        try:
+                            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;Trusted_Connection=yes;' % ( dbNumber[dbtype], ip, port, dbName) )
+                        except Exception as e:
+                            log.error('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;Trusted_Connection=yes;' % ( dbNumber[dbtype], ip, port, dbName))
+                    else:
+                        self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
                 return self.cnxn
             except Exception as e:
                 self.processException(e)
