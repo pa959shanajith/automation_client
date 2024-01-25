@@ -756,6 +756,11 @@ class StepDescription:
             if(len(inputval)>1):
                 inp = '->'.join(inputval)
             return 'Select node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
+        def rightclicktreenode():
+            inp = input
+            if(len(inputval)>1):
+                inp = '->'.join(inputval)
+            return 'Right click node '+"'"+inp+"'"+' in '+"'"+tsp.custname+"'"+'.'
         def getnodenamebyindex():
             inp = input
             if(len(inputval)>1):

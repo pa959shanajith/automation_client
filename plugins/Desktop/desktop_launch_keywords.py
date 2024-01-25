@@ -346,6 +346,31 @@ class Launch_Keywords():
         term = None
         try:
             if not input_val[0] == '':
+                windowname = input_val[0]
+                if windowname == 'Crystal Report':
+                    job_tracker_pid = None
+                    def getAllWindows():
+                        handles = []
+                        def foreach_window(hwnd, lParam):
+                            if win32gui.IsWindowVisible(hwnd):
+                                handles.append({"window_handle": hwnd, "window_name": win32gui.GetWindowText(hwnd)})
+                            return True
+                        win32gui.EnumWindows(foreach_window, None)
+                        return handles
+                    all_windows = getAllWindows()
+                    for j in range(0, len(all_windows)):
+                        if "Job Tracker" in all_windows[j]["window_name"]:
+                            job_tracker_thread_id, job_tracker_pid = win32process.GetWindowThreadProcessId(all_windows[j]["window_handle"])
+                            break
+                    for i in range(0, len(all_windows)):
+                            crystal_report_window_info = all_windows[i]
+                            crystal_report_window_handle = crystal_report_window_info["window_handle"]
+                            crystal_report_window_name = crystal_report_window_info["window_name"]
+                            crystal_report_thread_id, crystal_report_pid = win32process.GetWindowThreadProcessId(crystal_report_window_handle)
+
+                            if crystal_report_pid == job_tracker_pid and (crystal_report_window_name == '' or len(crystal_report_window_name) == 0):
+                                win32gui.SetWindowText(crystal_report_window_handle, "Crystal Report")
+                                break
                 if ( len(input_val) == 2 ):
                     windowname = input_val[0]
                     # launch_time_out = input_val[1]
