@@ -547,7 +547,7 @@ class Dispatcher:
             'cmbselectvaluebytext': ['textbox','div','span']
         }
         custom_dict_element={'element':['getobjectcount','getobject','clickelement','doubleclick','rightclick','getelementtext','verifyelementtext','drag', 'drop','gettooltiptext','verifytooltiptext','verifyexists', 'verifydoesnotexists','verifyvisible', 'switchtotab','switchtowindow','setfocus','sendfunctionkeys', 'sendsecurefunctionkeys',
-            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile']}
+            'tab','waitforelementvisible','mousehover','press','verifyenabled','verifydisabled','verifyreadonly','getattributevalue','verifyattribute','getrowcount','getcolumncount','getcellvalue','verifycellvalue','getcelltooltip','verifycelltooltip','cellclick','getrownumbytext','getcolnumbytext','getinnertable','selectbyabsolutevalue','horizontalscroll','verticalscroll','click','uploadfile','dropfile','getstatus']}
 
         result=[TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,err_msg]
 
@@ -609,7 +609,7 @@ class Dispatcher:
                                             absMatch=False
                                             if input[-1]=='abs':
                                                 absMatch=True
-                                            webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch)
+                                            webelement=local_Wd.custom_object.getCustomobject(reference_element,input[0],input[1],input[2],teststepproperty.url,absMatch, keyword)
                                             local_Wd.log.debug(MSG_CUSTOM_FOUND)
                                             if getObjectFlag:
                                                 input.pop()
@@ -1032,12 +1032,12 @@ class Dispatcher:
         webElement = None
         try:
             index = 0
-            if identifiers_type == 'rxpath':
-                driver.switch_to.default_content()
+            if identifiers_type == 'rxpath' and '@id' not in identifier:
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
                 if webElement==None:
                     # webelement might be in same origin iframe or xpath might have changed.
+                    driver.switch_to.default_content()
                     iframes = driver.find_elements_by_tag_name('iframe')
                     for iframe in iframes:
                         driver.switch_to.frame(iframe)
@@ -1060,7 +1060,7 @@ class Dispatcher:
                     identifier = '.'+identifier.replace(' ','.')
                     identifiers_type = 'css_selector'
                 webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
-                if len(webElement) > index:
+                if '[' and ']' in identifier:
                     webElement = [webElement[index]]
             elif identifiers_type == "href":
                 webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
@@ -1130,16 +1130,16 @@ class Dispatcher:
                         identifiers_id = str(identifiers_index + 1)
                         if identifiers_index<len(identifiers):
                             webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
-                        if (webElement and webElement.tag_name.lower() == 'table'):
+                        if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1): #for normal table only
                             cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
-                            if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
+                            if (cell and cell.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                                 break
                         elif not(webElement):
                             webElement=None
                             local_Wd.log.info(f'Webelement not found with Primary identifers "{identifiers_type}"')
                         else:
                             break
-                    if (webElement and webElement.is_enabled() if not ('get' or 'verify') in keyword else True):
+                    if (webElement and webElement.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                         finalXpath = identifiers[0]     #finalXpath used in getCustomobject 
                         break
                     else:
@@ -1176,9 +1176,9 @@ class Dispatcher:
                     #Table appears but the cell inside doesnt. So, waiting for cell to appear...
                     if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1):
                         cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
-                        if (cell and cell.is_enabled() if not ('get' or 'verify') in keyword else True):
+                        if (cell and cell.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                             break
-                    elif (webElement and webElement.is_enabled() if not ('get' or 'verify') in keyword else True):
+                    elif (webElement and webElement.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                         break
                     else:
                         time.sleep(1)

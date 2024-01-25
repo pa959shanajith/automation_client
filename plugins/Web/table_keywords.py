@@ -51,6 +51,8 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -132,6 +134,8 @@ class TableOperationKeywords():
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -225,6 +229,8 @@ class TableOperationKeywords():
                             lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
                         except:
                             lightning = False
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -246,11 +252,19 @@ class TableOperationKeywords():
                                 
                                 #handling for table made with div and role as grid
                                 try:
-                                    rows = webElement.find_elements_by_xpath(".//div[@role='row']")
-                                    row = rows[row_number]
-                                    cells = row.find_elements_by_xpath(".//div[@role='cell']")
-                                    cell = cells[col_number]
-                                    cellVal = local_tk.driver.execute_script('return arguments[0].textContent',cell)
+                                    if row_number==0:
+                                        role='columnheader'
+                                    else:
+                                        role='gridcell'
+                                    cell = local_tk.driver.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]+1).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]+1).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",webElement,row_number,col_number,role)#webElement.find_elements_by_xpath(".//div[(@role='gridcell' or @role='columnheader') and @aria-colindex="+str(col_number+1)+"]")[row_number]
+                                    if cell==None:
+                                        rows = webElement.find_elements_by_xpath(".//div[@role='row']")
+                                        row = rows[row_number]
+                                        cells = row.find_elements_by_xpath(".//div[@role='gridcell']") or row.find_elements_by_xpath(".//div[@role='cell']")
+                                        cell = cells[col_number]
+                                    cellVal = local_tk.driver.execute_script('return arguments[0].textContent',cell).strip()
+                                    local_tk.log.info('Got the result : %s',str(cellVal))
+                                    logger.print_on_console('Cell value is : ',str(cellVal))
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
                                 except:
@@ -413,6 +427,8 @@ class TableOperationKeywords():
                             lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
                         except:
                             lightning = False
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -432,6 +448,22 @@ class TableOperationKeywords():
                                     row_number=input_val[0]
                                     col_number=input_val[1]
                                 if body:
+                                    if row_number==0:
+                                        role='columnheader'
+                                    else:
+                                        role='gridcell'
+                                    cell=local_tk.driver.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]+1).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]+1).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",webElement,row_number,col_number,role)
+                                    if (cell and cell.text.strip()==input_val[2]):
+                                        status=TEST_RESULT_PASS
+                                        methodoutput=TEST_RESULT_TRUE
+                                        return status,methodoutput,output_res,err_msg
+                                    elif cell:
+                                        local_tk.log.info(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        #err_msg = ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH']
+                                        logger.print_on_console(ERROR_CODE_DICT['ERR_VALUES_DOESNOT_MATCH'])
+                                        logger.print_on_console('Actual value is : ',str(cell.text))
+                                        logger.print_on_console('Expected value is : ',str(input_val[2]))
+                                        return status,methodoutput,output_res,err_msg
                                     if right:
                                         try:
                                             container = webElement.find_element_by_xpath(".//div[contains(@class,'ag-body-container')]")
@@ -821,6 +853,8 @@ class TableOperationKeywords():
                             lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
                         except:
                             lightning = False
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             body = True
                             right = True
@@ -840,10 +874,17 @@ class TableOperationKeywords():
                                     row_number=input_arr[0]
                                     col_number=input_arr[1]
                                 try:
-                                    rows = webElement.find_elements_by_xpath(".//div[@role='row']")
-                                    row = rows[row_number]
-                                    cells = row.find_elements_by_xpath(".//div[@role='cell']")
-                                    cell = cells[col_number]
+                                    if row_number==0:
+                                        role='columnheader'
+                                    else:
+                                        role='gridcell'
+                                    cell = webElement.find_elements_by_xpath(".//div[@role='"+role+"' and @aria-colindex="+str(col_number+1)+"]")[row_number-1]
+                                    if cell == None:
+                                        rows = webElement.find_elements_by_xpath(".//div[@role='row']")
+                                        row = rows[row_number]
+                                        cells = row.find_elements_by_xpath(".//div[@role='cell']") or row.find_elements_by_xpath(".//div[@role='gridcell']")
+                                        cell = cells[col_number]
+                                    cell = cell.find_element_by_xpath('.//a') or cell.find_element_by_xpath('.//input')
                                     cell.click()
                                     status=TEST_RESULT_PASS
                                     methodoutput=TEST_RESULT_TRUE
@@ -1427,6 +1468,16 @@ class TableOperationKeywords():
                             else:
                                 logger.print_on_console(ERROR_CODE_DICT['INVALID_TABLE_INDEX'])
                                 err_msg = ERROR_CODE_DICT['INVALID_TABLE_INDEX']
+                        else:
+                            if (webElement.get_attribute('role') != 'grid'):
+                                webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
+                            row_number=int(input_arr[0])-1
+                            col_number=int(input_arr[1])-1
+                            cell = webElement.find_elements_by_xpath(".//div[@role='gridcell' and @aria-colindex="+str(col_number+1)+"]")[row_number]
+                            local_tk.log.debug('performing double click')
+                            webdriver.ActionChains(browser_Keywords.local_bk.driver_obj).move_to_element(cell).double_click(cell).perform()
+                            status=webconstants.TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                     except Exception as e:
                         local_tk.log.error(e)
                         logger.print_on_console(ERROR_CODE_DICT['ERR_WEB_DRIVER_EXCEPTION'])
@@ -1463,8 +1514,11 @@ class TableOperationKeywords():
                         except:
 
                             lightning = False
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() == 'div' and webElement.get_attribute('role') == 'grid':
-                            cell = webElement.find_element_by_xpath(".//div[@role='cell']/*[text()='"+text+"']").find_element_by_xpath("..")
+                            cell = local_tk.driver.execute_script(""" debugger; var cellIterator = document.evaluate('//div[@role="grid"]//*[contains(text(),"'+arguments[1]+'")]',arguments[0],null,XPathResult.ANY_TYPE,null), cell=cellIterator.iterateNext();  while(cell.getBoundingClientRect().height*cell.getBoundingClientRect().width==0) cell=cellIterator.iterateNext(); return cell;""",webElement,text)
+                            cell = local_tk.driver.execute_script("""debugger; var cell=arguments[0]; while(cell.role!='gridcell' && cell.role!='columnheader') cell=cell.parentElement; return cell;""",cell) or webElement.find_element_by_xpath(".//div[@role='cell']/*[text()='"+text+"']").find_element_by_xpath("..")
                             row = cell.find_element_by_xpath("..")
                             row_number = row.get_attribute('aria-rowindex')
                             status=TEST_RESULT_PASS
@@ -1583,7 +1637,18 @@ class TableOperationKeywords():
                             lightning = len(webElement.find_elements_by_xpath('.//ancestor::lightning-datatable'))>0
                         except:
                             lightning = False
+                        if (webElement.get_attribute('role') != 'grid' and webElement.tag_name.lower() != 'table'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
+                            cellWithText = local_tk.driver.execute_script(""" debugger; var cellIterator = document.evaluate('//*[contains(text(),"'+arguments[1]+'")]',arguments[0],null,XPathResult.ANY_TYPE,null), cell=cellIterator.iterateNext();  while(cell.getBoundingClientRect().height*cell.getBoundingClientRect().width==0) cell=cellIterator.iterateNext(); return cell;""",webElement,text) #local_tk.driver.execute_script(""" debugger; return document.evaluate('//*[contains(text(),"'+arguments[1]+'")]',arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",webElement,text)
+                            if cellWithText:
+                                cellWithText = local_tk.driver.execute_script("""debugger; var cell=arguments[0]; while(cell.role!='gridcell' && cell.role!='columnheader') cell=cell.parentElement; return cell;""",cellWithText)
+                                col_number = cellWithText.get_attribute('aria-colindex')
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                local_tk.log.info('Got the result : %s',str(col_number))
+                                logger.print_on_console('Got the result : ',str(col_number))
+                                return status,methodoutput,col_number,err_msg
                             body = True
                             right = True
                             if len(input_val)>=3:
@@ -2050,6 +2115,8 @@ function dropdowncallie(op) {
                 try:
                     local_tk.log.debug('checking for element')
                     if webElement!=None:
+                        if (webElement.get_attribute('role') != 'grid'):
+                            webElement = webElement.find_element_by_xpath(".//div[@role='grid']") or webElement
                         if webElement.tag_name.lower() != 'table' and webElement.get_attribute('role') == 'grid':
                             direction = input[0]
                             try:
