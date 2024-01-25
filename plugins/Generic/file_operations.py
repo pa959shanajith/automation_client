@@ -1894,36 +1894,17 @@ class FileOperations:
             if(len(input)==2):
                 filename=input[0]
                 folderpath=input[1]
-                if filename.lower() == 'latest':
-                    from pathlib import Path
-                    path = Path(folderpath)
-                    # Get a list of all files in the specified path
-                    all_files = [f for f in path.iterdir() if f.is_file()]
-                    # Sort the files by modification time (newest first)
-                    sorted_files = sorted(all_files, key=lambda f: f.stat().st_mtime, reverse=True)
-                    if sorted_files:
-                        # Return the path to the latest downloaded file
-                        log.info(f"The latest downloaded file is: {sorted_files[0]}")
-                        logger.print_on_console('File location is fetched')
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
-                        output = [str(sorted_files[0]).replace('\\','/')]
-                    else:
-                        # Return None if no files are found
-                        log.info('File does not exist inside '+folderpath)
-                        logger.print_on_console('File does not exist inside '+folderpath)
+                for root, dirs, files in os.walk(folderpath):
+                    if filename in files:
+                        output.append(os.path.join(root,filename).replace('\\','/'))
+                if(output==[]):
+                    log.info('File does not exist inside '+folderpath)
+                    logger.print_on_console('File does not exist inside '+folderpath)
                 else:
-                    for root, dirs, files in os.walk(folderpath):
-                        if filename in files:
-                            output.append(os.path.join(root,filename).replace('\\','/'))
-                    if(output==[]):
-                        log.info('File does not exist inside '+folderpath)
-                        logger.print_on_console('File does not exist inside '+folderpath)
-                    else:
-                        log.info('File location is fetched')
-                        logger.print_on_console('File location is fetched')
-                        status = TEST_RESULT_PASS
-                        methodoutput = TEST_RESULT_TRUE
+                    log.info('File location is fetched')
+                    logger.print_on_console('File location is fetched')
+                    status = TEST_RESULT_PASS
+                    methodoutput = TEST_RESULT_TRUE
             else:
                 err_msg="Invalid number of inputs"
         except Exception as e:
