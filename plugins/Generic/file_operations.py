@@ -902,6 +902,24 @@ class FileOperations:
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                    else:
+                        if len(args) > 0:
+                            row = int(args[0])
+                        else:
+                            row = None
+                        if row != None and row != '':
+                            with open(input_path, "r") as file1:
+                                content = file1.readlines()
+                            if row < len(content):
+                                content = content[row]
+                            else:
+                                err_msg = 'row length is out of index.'
+                        else:
+                            with open(input_path, "r") as file1:
+                                content = file1.read()
+                        if content is not None:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=generic_constants.NOT_SUPPORTED
             else:
@@ -2603,11 +2621,11 @@ class FileOperations:
                 with open(filePath, "r") as file1:
                     read_content = file1.readlines()
                 if row != None and row != '':
-                    if row < len(read_content):
+                    if row <= len(read_content):
                         if delimiter != None and delimiter != '':
                             content = read_content[row].split(delimiter)
                             if col != None and col != '':
-                                if col < len(content):
+                                if col <= len(content):
                                     value = content[col-1]
                                     logger.print_on_console(f"Value: {value}")
                                     status=TEST_RESULT_PASS

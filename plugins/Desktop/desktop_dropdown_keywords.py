@@ -534,7 +534,10 @@ class Dropdown_Keywords():
                                 if ( item_text != '' or item_text != None ):
                                     if ( element.is_enabled() ):
                                         if ( element.backend.name == 'win32' ):
-                                            selected_text = element.selected_text()
+                                            try:
+                                                selected_text = element.selected_text()
+                                            except Exception as e:
+                                                selected_text = None
                                         elif ( element.backend.name == 'uia' ):
                                             try:
                                                 selected_text = element.selected_text()

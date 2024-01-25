@@ -352,6 +352,10 @@ class DesktopDispatcher:
                 """checking for backend process"""
                 xname = x_var[3]
                 backend = x_var[4].strip()
+            else:
+                # backend is always the last index in xpath
+                xname = x_var[3]
+                backend = x_var[len(x_var)-1].strip()
         else:
             xpath = xPath
             prev_flag = True # setting prev_flag to True since the xpath recieved is of an old test case.
