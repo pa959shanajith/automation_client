@@ -330,7 +330,6 @@ class Scrape:
                                 if tag == "tree":
                                     dict["inputVal"] == ""
                             if ( dict not in view ):#------------to handle duplicate elements from backend
-                                logger.print_on_console(dict)
                                 view.append(dict)
 
                             # if len(view) == 0:
@@ -484,7 +483,6 @@ class Scrape:
                         
                         # Callback function to send the  data when Enter is pressed
                         def on_enter(event):
-                            logger.print_on_console("enter pressed!!")
                             get_details_thread = GetdetailsThread(socket)
                             get_details_thread.join()
                             data = {
@@ -508,11 +506,30 @@ class Scrape:
 
                         def on_key_event(e):
                             global text_typed
+                            function_keys = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10", "f11", "f12"]
                             if e.event_type == keyboard.KEY_DOWN:
                                 key = e.name
-                                if len(key) == 1:
+                                if str(key).lower() in function_keys:
+                                    data = {
+                                        'xpath': '',
+                                        'id': '',
+                                        'inputVal': str(key),
+                                        'tag': '',
+                                        'custname': '@Generic',
+                                        'left': '',
+                                        'top': '',
+                                        'height': '',
+                                        'width': '',
+                                        'tooltip': '',
+                                        'defaulttooltip': '',
+                                        'keywordVal': 'sendFunctionKeys',
+                                        'window_name': view[len(view) - 1]['window_name'],
+                                        'data_sent': "true",
+                                        'user_name': user_name
+                                    }
+                                    self.socket.emit("sap_scrape_data", data)
+                                elif len(key) == 1:
                                     text_typed[0] += key
-                                    logger.print_on_console(f"{text_typed[0]}")
 
                         global window_id
                         get_obj = GetObject()
