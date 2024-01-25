@@ -127,7 +127,7 @@ class DesktopDispatcher:
         'clickcell' : table_keywords_obj.click_cell,
         'doubleclickcell' : table_keywords_obj.double_click_cell,
         'rightclickcell' : table_keywords_obj.right_click_cell,
-        'settext' : table_keywords_obj.set_text,
+        'settextcell' : table_keywords_obj.set_text_cell,
         'verifycellvalue' : table_keywords_obj.verify_cell_value,
         'getemail' : outook_obj.GetEmail,
         'getfrommailid' : outook_obj.GetFromMailId,
