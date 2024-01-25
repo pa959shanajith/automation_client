@@ -117,6 +117,7 @@ class DesktopDispatcher:
         'getdate' : date_control_keywords_obj.getDate,
         'setdate' : date_control_keywords_obj.setDate,
         'selecttreenode' : tree_keywords_obj.click_tree_element,
+        'rightclicktreenode': tree_keywords_obj.right_click_tree_element,
         'getnodenamebyindex' : tree_keywords_obj.getElementTextByIndex,
         'getcellvalue' : table_keywords_obj.get_cell_value,
         'getcolcount' : table_keywords_obj.get_col_count,

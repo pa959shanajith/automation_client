@@ -159,8 +159,23 @@ class ElementKeywords():
                 log.debug( check )
                 if ( check ):
                     log.info( 'Parent matched' )
-                    handle = element.handle
-                    output = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
+                    if element.backend.name == "win32":
+                        output = element.texts()
+                        if isinstance(output, list) and len(output) > 0:
+                            output = output[0]
+
+                        if output != None and len(output) == 0:
+                            output = element.element_info.rich_text
+                            if output != None and len(output) == 0:
+                                output = element.element_info.name
+                    elif element.backend.name == "uia":
+                        output = element.element_info.rich_text
+                        if output != None and len(output) == 0:
+                            output = element.element_info.name
+
+                    if output != None and len(output) == 0:
+                        handle = element.handle
+                        output = pywinauto.uia_element_info.UIAElementInfo(handle_or_elem = handle, cache_enable = False).name
                     status = desktop_constants.TEST_RESULT_PASS
                     result = desktop_constants.TEST_RESULT_TRUE
                     log.info( STATUS_METHODOUTPUT_UPDATE )

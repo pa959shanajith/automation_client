@@ -658,3 +658,157 @@ class Tree_View_Keywords():
             logger.print_on_console( err_msg )
             log.error( err_msg )
         return status, result, verb, err_msg
+
+    def right_click_tree_element(self, element , parent , input_val , *args):
+        status = desktop_constants.TEST_RESULT_FAIL
+        result = desktop_constants.TEST_RESULT_FALSE
+        verb = OUTPUT_CONSTANT
+        err_msg = None
+        flag = False
+        tree_elm = ''
+        path = ''
+        counter = 0
+        #-----------------------custom element check
+        """Following operations need to be performed for custom:
+        1.Check is input is > 3
+        2.Check if input_val[0] is a tree object type
+        3.Check if input type of inputval[2] is an integer
+        4.If above conditions are matched then object is a custom object of tree type at position input_val[1] from parent object
+        5.Since inputs start from the 4th input_val assign these values to a variable and proceed"""
+        if ( len(input_val) > 3 and (input_val[0]).lower()=='tree' and int(input_val[2])==True):
+            input_val = input_val[3:]
+            log.info('Custom object of type "tree" with input : ' + str(input_val))
+        #-------------------------------------------
+
+        if ( len(input_val) == 1 ):
+            if ( input_val[0] == '' ):
+                flag = True
+        
+        if ( flag != True ):
+            try:
+                def iterate_through_tree(element, input_path, path, counter):
+                    if element.backend.name == 'win32':
+                        tree_element = element.item(path, exact = True)
+                        child_elements = tree_element.children()
+                        for child in child_elements:
+                            if input_path[counter] in child.text():
+                                path = path + "\\" + str(child.text())
+                                counter = counter + 1
+                                break
+                        else:
+                            return False
+                    elif element.backend.name == 'uia':
+                        tree_element = element.get_item(path, exact = True)
+                        child_elements = tree_element.children()
+                        for child in child_elements:
+                            if input_path[counter] in child.element_info.name or input_path[counter] in child.element_info.rich_text:
+                                path = path + "\\" + str(child.element_info.name or child.element_info.rich_text)
+                                counter = counter + 1
+                                break
+                        else:
+                            return False
+                        
+                    if len(input_path) == counter:
+                        return path
+                    else:
+                        return iterate_through_tree(element, input_path, path, counter)
+                    
+                if ( desktop_launch_keywords.window_name != None ):
+                    verify_obj = Text_Box()
+                    log.info( 'Recieved element from the desktop dispatcher' )
+                    check = verify_obj.verify_parent(element, parent)
+                    log.debug( 'Parent of element while scraping' )
+                    log.debug( parent )
+                    log.debug( 'Parent check status' )
+                    log.debug( check )
+                    if ( check ):
+                        log.info('Parent matched')
+                        if( element.is_enabled() ):
+                                if ( element.backend.name == 'win32' ):
+                                    root_element = element.roots()
+                                    for list_item in root_element:
+                                        if input_val[counter] in list_item.text():
+                                            path = "\\" + str(list_item.text())
+                                            counter = counter + 1
+                                            break
+
+                                    if len(path) == 0:
+                                        err_msg = 'Element not present on the page where operation is trying to be performed'
+                                    else:
+                                        tree_path = iterate_through_tree(element, input_val, path, counter)
+                                        if tree_path == False:
+                                            err_msg = 'Element not present on the page where operation is trying to be performed'
+                                        else:
+                                            tree_elm = element.item(tree_path, exact = True)
+                                            tree_elm.click_input(button = 'right', double = False, wheel_dist = 0, where = 'text', pressed = '')
+                                elif ( element.backend.name == 'uia' ):
+                                    root_element = element.roots()
+                                    for list_item in root_element:
+                                        if input_val[counter] in list_item.element_info.name or input_val[counter] in list_item.element_info.rich_text:
+                                            path = "\\" + str(list_item.element_info.name or list_item.element_info.rich_text)
+                                            counter = counter + 1
+                                            break
+
+                                    if len(path) == 0:
+                                        err_msg = 'Element not present on the page where operation is trying to be performed'
+                                    else:
+                                        tree_path = iterate_through_tree(element, input_val, path, counter)
+                                        if tree_path == False:
+                                            err_msg = 'Element not present on the page where operation is trying to be performed'
+                                        else:
+                                            tree_elm = element.get_item(tree_path, exact = True)
+                                            tree_elm.click_input(button = 'right', double = False, wheel_dist = 0, pressed = '')    
+                                status = desktop_constants.TEST_RESULT_PASS
+                                result = desktop_constants.TEST_RESULT_TRUE
+                        else:
+                            err_msg = 'Element state does not allow to perform the operation'
+                    else:
+                       err_msg = 'Element not present on the page where operation is trying to be performed'
+                if ( err_msg ):
+                    log.info( err_msg )
+                    logger.print_on_console( err_msg )
+            except Exception as exception:
+                err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+                log.error( err_msg )
+                logger.print_on_console( err_msg )
+        elif ( flag == True ):
+            Rect = ''
+            try:
+                #----------get the element coordinates
+                Rect = str(element.rectangle())
+                Rect = Rect[1 : len(Rect) - 1]
+                Rect = Rect.split(",")
+                Left = Rect[0].strip()#left
+                if ( "L" in Left ):
+                    Left = int(Left[1:])
+                else:
+                    Left = int(Left)
+                Top = Rect[1].strip()#top
+                if ( "T" in Top ):
+                    Top = int(Top[1:])
+                else:
+                    Top = int(Top)
+                Right = Rect[2].strip()#right
+                if ( "R" in Right ):
+                    Right = int(Right[1:])
+                else:
+                    Right = int(Right)
+                Bottom = Rect[3].strip()#bottom
+                if ( "B" in Bottom ):
+                    Bottom = int(Bottom[1:])
+                else:
+                    Bottom = int(Bottom)
+                #---------------------Finding height and width
+                height = Bottom - Top
+                width = Right - Left
+                #--------------------Finding X and Y co-ordinates
+                x = Left + width / 2
+                y = Top + height / 2
+                pywinauto.mouse.click(button = 'right', coords = (int(x), int(y)))
+                status = desktop_constants.TEST_RESULT_PASS
+                result = desktop_constants.TEST_RESULT_TRUE
+            except Exception as exception:
+                err_msg = desktop_constants.ERROR_MSG + ' : ' + str(exception)
+                log.error( err_msg )
+                logger.print_on_console( err_msg )
+        return status, result, verb, err_msg
