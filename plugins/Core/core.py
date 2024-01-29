@@ -2440,7 +2440,9 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
     ice_token = None
     if token_obj.token:
         ice_token = token_obj.token
-    result["icename"] = ice_token["icename"]
+        result["icename"] = ice_token["icename"]
+    else:
+        result["icename"] = ''
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 
