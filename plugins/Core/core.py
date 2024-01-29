@@ -2442,7 +2442,7 @@ def set_ICE_status(one_time_ping = False,connect=True,interval = 60000):
         ice_token = token_obj.token
         result["icename"] = ice_token["icename"]
     else:
-        result["icename"] = ''
+        result["icename"] = socket.gethostname()
     if socketIO is not None:
         socketIO.emit('ICE_status_change',result)
 
