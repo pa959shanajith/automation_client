@@ -326,9 +326,9 @@ class Scrape:
                                 }
 
                                 if tag == "table" or tag == "gridview":
-                                    dict["inputVal"] == "0;0"
+                                    dict["inputVal"] = "0;0"
                                 if tag == "tree":
-                                    dict["inputVal"] == ""
+                                    dict["inputVal"] = ""
                             if ( dict not in view ):#------------to handle duplicate elements from backend
                                 view.append(dict)
 
