@@ -1575,7 +1575,7 @@ class Singleton_DriverUtil():
                         break
         elif browserType == '8':
             for i in drivermap:
-                if isinstance(i, webdriver.Edge) and i.name=='msedge':
+                if isinstance(i, webdriver.Edge) and i.name=='MicrosoftEdge':
                     try:
                         if len (i.window_handles) == 0:
                             d = 'stale'
