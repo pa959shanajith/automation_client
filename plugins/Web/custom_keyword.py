@@ -98,11 +98,15 @@ class CustomKeyword:
             logger.print_on_console(err_msg)
 
     def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index,absMatch,reference_ele):
-        if ele_type=='gridcell':
-            row_num = int(ele_index.split(',')[0])
-            col_num = int(ele_index.split(',')[1])
-            cell = browser_Keywords.local_bk.driver_obj.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",reference_ele,row_num,col_num,ele_type)
-            return cell
+        if ',' in ele_type:
+            ele_parent = ele_type.split(',')[0]
+            ele_child = ele_type.split(',')[1]
+
+            if ele_parent=='gridcell' or ele_parent=='columnheader':
+                row_num = int(ele_index.split(',')[0])
+                col_num = int(ele_index.split(',')[1])
+                cell = browser_Keywords.local_bk.driver_obj.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",reference_ele,row_num,col_num,ele_parent)
+                return cell.find_element_by_tag_name(ele_child)
         return_list=browser_Keywords.local_bk.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index,absMatch)
         if return_list[0] == 'null':
             return None
@@ -177,9 +181,9 @@ class CustomKeyword:
             #ele_xpath=self.getElementXPath(reference_ele)
             #logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
             try:
-                if ele_type!='gridcell':
+                if ',' not in ele_index:
                     ele_index=int(ele_index)
-                if ele_type!='gridcell' and ele_index<0:
+                if isinstance(ele_index,int) and ele_index<0:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_NEGATIVE_ELEMENT_INDEX'])
                 else:
                     ele_type=ele_type.lower()

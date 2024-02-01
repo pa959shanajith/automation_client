@@ -631,6 +631,16 @@ class RadioCheckboxKeywords():
                                     err_msg='Object not found inside the cell'
                                     local_rco.log.error(err_msg)
                                     logger.print_on_console(err_msg)
+                    else:   #Toggle buttons
+                        if len(webelement.find_elements_by_tag_name('input')): #If there is an input element for toggle button.
+                            output = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.TOGGLE_CHECK_THROUGH_PROPERTY,webelement.find_element_by_tag_name('input'))
+                        elif webelement.tag_name == 'input':
+                            output = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.TOGGLE_CHECK_THROUGH_PROPERTY,webelement)
+                        else: #Scraping the blob. If the toggle button is off, blob and it's slider will have same x coordinate.
+                            output = browser_Keywords.local_bk.driver_obj.execute_script(webconstants.TOGGLE_CHECK_THROUGH_POSITION,webelement)
+                        status=TEST_RESULT_PASS
+                        methodoutput=TEST_RESULT_TRUE
+                        logger.print_on_console('Result obtained is: ',output)
                     if status==None and webelement!=None and err_msg == None:
                         output=self.__fetch_status(webelement)
                         status=TEST_RESULT_PASS
