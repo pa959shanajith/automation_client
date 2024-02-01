@@ -207,6 +207,11 @@ class ZephyrWindow():
                 if updateflag: res["parentids"] = self.get_modules(filePath["parentFetchList"],[])
             relative_path = "/testcase/planning/"+str(treeid)+"?pagesize=0&isascorder=true"
             respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
+
+            if respon.status_code == 500:
+                relative_path = "/testcase/planning/"+str(treeid)+"?offset=0&pagesize=1&order=&isascorder=true&tcname="
+                respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
+                
             if respon.status_code == 200:
                 JsonObject = respon.json()
                 # Fetch testcases
@@ -216,16 +221,19 @@ class ZephyrWindow():
                     for i in results:
                         if 'rts' in i:
                             name_err = False
-                            req_id = i['testcase']['requirementIds']
+                            if 'tcrTreeTestcase' in i['rts'] and 'testcase' in i['rts']['tcrTreeTestcase'] and 'requirementIds' in i['rts']['tcrTreeTestcase']['testcase']:
+                                req_id = i['rts']['tcrTreeTestcase']['testcase']['requirementIds']
+                            else:
+                                req_id = i['testcase']['requirementIds']
                             requirement_details = self.get_requirement_details(req_id)
                             tc = {
-                                'id':i['testcase']['testcaseId'],
+                                'id': i['rts']['tcrTreeTestcase']['testcase']['testcaseId'] if 'tcrTreeTestcase' in i['rts'] and 'testcase' in i['rts']['tcrTreeTestcase'] and 'testcaseId' in i['rts']['tcrTreeTestcase']['testcase'] else i['testcase']['testcaseId'],
                                 'cyclePhaseId': i['rts']['cyclePhaseId'],
                                 'parentId': treeid,
                                 'reqdetails': requirement_details,
                             }
                             try:
-                                tc['name']=i['testcase']['name']
+                                tc['name'] = i['rts']['tcrTreeTestcase']['testcase']['name'] if 'tcrTreeTestcase' in i['rts'] and 'testcase' in i['rts']['tcrTreeTestcase'] and 'name' in i['rts']['tcrTreeTestcase']['testcase'] else i['testcase']['name']
                             except Exception as excname:
                                 name_err = True
                                 err_msg = 'Due to no name, Zephyr Testcase with id:'+str(tc['id'])+'  was not displayed.'
