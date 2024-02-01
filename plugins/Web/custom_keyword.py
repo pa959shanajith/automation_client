@@ -102,7 +102,7 @@ class CustomKeyword:
             ele_parent = ele_type.split(',')[0]
             ele_child = ele_type.split(',')[1]
 
-            if ele_parent=='gridcell':
+            if ele_parent=='gridcell' or ele_parent=='columnheader':
                 row_num = int(ele_index.split(',')[0])
                 col_num = int(ele_index.split(',')[1])
                 cell = browser_Keywords.local_bk.driver_obj.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",reference_ele,row_num,col_num,ele_parent)
@@ -183,7 +183,7 @@ class CustomKeyword:
             try:
                 if ',' not in ele_index:
                     ele_index=int(ele_index)
-                if ',' not in ele_index and ele_index<0:
+                if isinstance(ele_index,int) and ele_index<0:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_NEGATIVE_ELEMENT_INDEX'])
                 else:
                     ele_type=ele_type.lower()

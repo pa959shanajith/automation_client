@@ -1053,14 +1053,16 @@ class Dispatcher:
                     return webElement
                 
             elif identifiers_type == "classname" :
+                indexFlag = 0
                 if '[' and ']' in identifier:
+                    indexFlag = 1
                     index = int(identifier.split('[')[1].split(']')[0])
                     identifier = identifier.split('[')[0]
                 if ' ' in identifier.strip():
                     identifier = '.'+identifier.replace(' ','.')
                     identifiers_type = 'css_selector'
                 webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
-                if '[' and ']' in identifier:
+                if indexFlag == 1:
                     webElement = [webElement[index]]
             elif identifiers_type == "href":
                 webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
@@ -1130,7 +1132,7 @@ class Dispatcher:
                         identifiers_id = str(identifiers_index + 1)
                         if identifiers_index<len(identifiers):
                             webElement=self.element_locator(driver,identifiers_type,identifiers[identifiers_index],identifiers_id)
-                        if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1): #for normal table only
+                        if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1 and table_inputs[0].isdigit() and table_inputs[0].isdigit()): #for normal table only
                             cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
                             if (cell and cell.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                                 break
@@ -1174,7 +1176,7 @@ class Dispatcher:
                                             webElement=None
                                             local_Wd.log.info("Weblement not found with Primary identifers")
                     #Table appears but the cell inside doesnt. So, waiting for cell to appear...
-                    if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1):
+                    if (webElement and webElement.tag_name.lower() == 'table' and len(table_inputs)>1 and table_inputs[0].isdigit() and table_inputs[1].isdigit()):
                         cell = driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,int(table_inputs[0])-1,int(table_inputs[1])-1)
                         if (cell and cell.is_enabled() if not ('get' in keyword or 'verify' in keyword) else True):
                             break
