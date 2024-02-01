@@ -535,7 +535,16 @@ class Controller():
                         #ex:displayVariableValue _a_
                         x=self.constant_var_handler_obj.get_constant_value(x)
                     else:
-                        x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
+                        if ',' in x:
+                            x1=''
+                            for var in x.split(','):
+                                if '{' in var:
+                                    x1+=self.dynamic_var_handler_obj.replace_dynamic_variable(var,keyword,self)+','
+                                else:
+                                    x1+=var+','
+                            x=x1[:-1]
+                        else:
+                            x=self.dynamic_var_handler_obj.replace_dynamic_variable(x,keyword,self)
                 inpval.append(x)
         return inpval,ignore_status
 

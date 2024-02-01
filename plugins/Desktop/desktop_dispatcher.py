@@ -117,6 +117,7 @@ class DesktopDispatcher:
         'getdate' : date_control_keywords_obj.getDate,
         'setdate' : date_control_keywords_obj.setDate,
         'selecttreenode' : tree_keywords_obj.click_tree_element,
+        'rightclicktreenode': tree_keywords_obj.right_click_tree_element,
         'getnodenamebyindex' : tree_keywords_obj.getElementTextByIndex,
         'getcellvalue' : table_keywords_obj.get_cell_value,
         'getcolcount' : table_keywords_obj.get_col_count,
@@ -126,6 +127,8 @@ class DesktopDispatcher:
         'selectrow' : table_keywords_obj.select_row,
         'clickcell' : table_keywords_obj.click_cell,
         'doubleclickcell' : table_keywords_obj.double_click_cell,
+        'rightclickcell' : table_keywords_obj.right_click_cell,
+        'settextcell' : table_keywords_obj.set_text_cell,
         'verifycellvalue' : table_keywords_obj.verify_cell_value,
         'getemail' : outook_obj.GetEmail,
         'getfrommailid' : outook_obj.GetFromMailId,
@@ -349,6 +352,10 @@ class DesktopDispatcher:
                 """checking for backend process"""
                 xname = x_var[3]
                 backend = x_var[4].strip()
+            else:
+                # backend is always the last index in xpath
+                xname = x_var[3]
+                backend = x_var[len(x_var)-1].strip()
         else:
             xpath = xPath
             prev_flag = True # setting prev_flag to True since the xpath recieved is of an old test case.

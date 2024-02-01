@@ -902,6 +902,24 @@ class FileOperations:
                         if res:
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
+                    else:
+                        if len(args) > 0:
+                            row = int(args[0])
+                        else:
+                            row = None
+                        if row != None and row != '':
+                            with open(input_path, "r") as file1:
+                                content = file1.readlines()
+                            if row < len(content):
+                                content = content[row]
+                            else:
+                                err_msg = 'row length is out of index.'
+                        else:
+                            with open(input_path, "r") as file1:
+                                content = file1.read()
+                        if content is not None:
+                            status=TEST_RESULT_PASS
+                            methodoutput=TEST_RESULT_TRUE
                 else:
                     err_msg=generic_constants.NOT_SUPPORTED
             else:
@@ -1894,17 +1912,36 @@ class FileOperations:
             if(len(input)==2):
                 filename=input[0]
                 folderpath=input[1]
-                for root, dirs, files in os.walk(folderpath):
-                    if filename in files:
-                        output.append(os.path.join(root,filename).replace('\\','/'))
-                if(output==[]):
-                    log.info('File does not exist inside '+folderpath)
-                    logger.print_on_console('File does not exist inside '+folderpath)
+                if filename.lower() == 'latest':
+                    from pathlib import Path
+                    path = Path(folderpath)
+                    # Get a list of all files in the specified path
+                    all_files = [f for f in path.iterdir() if f.is_file()]
+                    # Sort the files by modification time (newest first)
+                    sorted_files = sorted(all_files, key=lambda f: f.stat().st_mtime, reverse=True)
+                    if sorted_files:
+                        # Return the path to the latest downloaded file
+                        log.info(f"The latest downloaded file is: {sorted_files[0]}")
+                        logger.print_on_console('File location is fetched')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
+                        output = [str(sorted_files[0]).replace('\\','/')]
+                    else:
+                        # Return None if no files are found
+                        log.info('File does not exist inside '+folderpath)
+                        logger.print_on_console('File does not exist inside '+folderpath)
                 else:
-                    log.info('File location is fetched')
-                    logger.print_on_console('File location is fetched')
-                    status = TEST_RESULT_PASS
-                    methodoutput = TEST_RESULT_TRUE
+                    for root, dirs, files in os.walk(folderpath):
+                        if filename in files:
+                            output.append(os.path.join(root,filename).replace('\\','/'))
+                    if(output==[]):
+                        log.info('File does not exist inside '+folderpath)
+                        logger.print_on_console('File does not exist inside '+folderpath)
+                    else:
+                        log.info('File location is fetched')
+                        logger.print_on_console('File location is fetched')
+                        status = TEST_RESULT_PASS
+                        methodoutput = TEST_RESULT_TRUE
             else:
                 err_msg="Invalid number of inputs"
         except Exception as e:
@@ -2584,11 +2621,11 @@ class FileOperations:
                 with open(filePath, "r") as file1:
                     read_content = file1.readlines()
                 if row != None and row != '':
-                    if row < len(read_content):
+                    if row <= len(read_content):
                         if delimiter != None and delimiter != '':
                             content = read_content[row].split(delimiter)
                             if col != None and col != '':
-                                if col < len(content):
+                                if col <= len(content):
                                     value = content[col-1]
                                     logger.print_on_console(f"Value: {value}")
                                     status=TEST_RESULT_PASS

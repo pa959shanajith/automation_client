@@ -97,7 +97,16 @@ class CustomKeyword:
             local_ck.log.error(err_msg)
             logger.print_on_console(err_msg)
 
-    def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index,absMatch):
+    def find_object(self,array_index, ele_type, visible_text, url, ele_index,local_index,absMatch,reference_ele):
+        if ',' in ele_type:
+            ele_parent = ele_type.split(',')[0]
+            ele_child = ele_type.split(',')[1]
+
+            if ele_parent=='gridcell' or ele_parent=='columnheader':
+                row_num = int(ele_index.split(',')[0])
+                col_num = int(ele_index.split(',')[1])
+                cell = browser_Keywords.local_bk.driver_obj.execute_script("""debugger; return document.evaluate(".//div[@role='row' and @aria-rowindex='"+(arguments[1]).toString()+"']/div[(@role='"+arguments[3]+"') and @aria-colindex='"+(arguments[2]).toString()+"']",arguments[0],null,XPathResult.ANY_TYPE,null).iterateNext()""",reference_ele,row_num,col_num,ele_parent)
+                return cell.find_element_by_tag_name(ele_child)
         return_list=browser_Keywords.local_bk.driver_obj.execute_script(CUSTOM_JS,'', array_index, ele_type, visible_text, ele_index,local_index,absMatch)
         if return_list[0] == 'null':
             return None
@@ -121,7 +130,7 @@ class CustomKeyword:
         return self.find_object(return_list[3], ele_type, visible_text, url, ele_index,return_list[2],absMatch)
 
 
-    def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url,absMatch):
+    def getCustomobject(self,reference_ele,ele_type,visible_text,ele_index,url,absMatch, keyword):
         import web_dispatcher
         finalXpath = web_dispatcher.finalXpath
         custom_element=None
@@ -133,8 +142,9 @@ class CustomKeyword:
         msg3='Index is '+str(ele_index)
         logger.print_on_console(msg1)
         local_ck.log.info(msg1)
-        logger.print_on_console(msg2)
-        local_ck.log.info(msg2)
+        if visible_text:
+            logger.print_on_console(msg2)
+            local_ck.log.info(msg2)
         logger.print_on_console(msg3)
         local_ck.log.info(msg3)
         #Checking the URL for dectecting salseforce component. Custom keyword for dropdowns and comboboxes for salesforce.
@@ -171,15 +181,22 @@ class CustomKeyword:
             #ele_xpath=self.getElementXPath(reference_ele)
             #logger.print_on_console('Debug: reference_ele_xpath is'+str(ele_xpath))
             try:
-                ele_index=int(ele_index)
-                if ele_index<0:
+                if ',' not in ele_index:
+                    ele_index=int(ele_index)
+                if isinstance(ele_index,int) and ele_index<0:
                     logger.print_on_console(ERROR_CODE_DICT['ERR_NEGATIVE_ELEMENT_INDEX'])
                 else:
                     ele_type=ele_type.lower()
                     if ele_type in list(self.tagtype.keys()):
                         ele_type=self.tagtype.get(ele_type)
                     array_index=browser_Keywords.local_bk.driver_obj.execute_script(FIND_INDEX_JS,reference_ele)
-                    custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0,absMatch);
+                    delayconst = int(readconfig.configvalues['element_load_timeout'])
+                    for i in range(delayconst):
+                        custom_element=self.find_object(array_index, ele_type, visible_text, url, ele_index,0,absMatch,reference_ele) or browser_Keywords.local_bk.driver_obj.execute_script(FIND_CUSTOM_ELEMENT,reference_ele, ele_type, ele_index, visible_text)
+                        if (custom_element and custom_element.is_enabled() if not ('get' in keyword or 'verify'in keyword) else True):
+                            break
+                        else:
+                            time.sleep(1)
                     if custom_element is not None:
                         logger.print_on_console(MSG_CUSTOM_FOUND)
                         local_ck.log.info(MSG_CUSTOM_FOUND)
