@@ -4,6 +4,7 @@ import time
 import logger
 from datetime import datetime,timedelta
 import controller
+import readconfig
 log = logging.getLogger('retryapis_cicd.py')
 
 class Retryrequests:
@@ -17,6 +18,10 @@ class Retryrequests:
     def retry_cicd_apis(self,server_url,data_dict):
         loop_timelimit = datetime.now() + timedelta(minutes=30)
         retry_flag = 1
+        if readconfig.proxies:
+            verify_flag = True
+        else:
+            verify_flag = False
         while retry_flag:
             current_time = datetime.now()
             try:
@@ -26,7 +31,7 @@ class Retryrequests:
                     log.info("Something went wrong. Sorry, we're unable to reach the server right now")
                     res = None
                     break
-                res = requests.post(server_url, json = data_dict, verify = False, timeout = 120)
+                res = requests.post(server_url, json = data_dict, verify = verify_flag,  proxies = readconfig.proxies, timeout = 120)
                 if res.status_code != 200:
                     log.info("Unable to connect to server retrying after 10 seconds. Status code is: %s",
                         res.status_code)
