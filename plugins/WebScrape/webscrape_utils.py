@@ -1174,6 +1174,11 @@ class WebScrape_Utils:
                     }
                 }
                 for (var path = ''; e &&(e.nodeName=='#document-fragment'|| e.nodeType == 1); e = e.assignedSlot||e.parentNode) {
+                    if (e.tagName.indexOf(':')!=-1) {
+                        if (!(path[0]=='/' && path[1]=='/'))
+                            path = '/' + path;
+                    continue;
+                    }
                     if (e.nodeName=='#document-fragment')
                         e=e.host;
                     var predicate = [];
