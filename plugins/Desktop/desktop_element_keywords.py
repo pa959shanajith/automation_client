@@ -359,9 +359,9 @@ class ElementKeywords():
         err_msg = None
         Rect = ''
         try:
-            if ( len(input_val) >= 1 ):    #-----------Drag operation for table.
+            if input_val != [''] and ( len(input_val) >= 1 ):    #-----------Drag operation for table.
                 index = int(input_val[0])
-                if ( element.friendly_class_name() == 'Table' and element.texts()[0] == 'DataGridView' or 'RadGridView' == element.texts()[0] ):
+                if ( element.friendly_class_name() == 'Table' and (element.texts()[0] == 'DataGridView' or 'RadGridView' in element.texts()[0])):
                     log.info( 'Valid row number' )
                     c = element.children()
                     const = 0
