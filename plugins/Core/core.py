@@ -89,6 +89,7 @@ status_ping_thread = None
 update_obj = None
 termination_inprogress = False
 browsercheck_inprogress = False
+application_path = None
 execReq = None
 core_utils_obj = core_utils.CoreUtils() 
 
@@ -1155,7 +1156,76 @@ class MainNamespace(BaseNamespace):
             err_msg='Error occured in Checking Mobile Client'
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            log.error(e,exc_info=True)   
+            log.error(e,exc_info=True)
+
+    def on_LAUNCH_SAP_GENIUS(self, *args):
+        try:
+            if check_execution_lic("scrape"):
+                return None
+            elif bool(cw.scrapewindow):
+                return None
+
+            global application_path, sapScrapeFlag
+            application_path = args[0]
+            app_details = []
+            file_location = application_path.split(';')[0]
+            window_name = application_path.split(';')[1]
+            server_name = [application_path.split(';')[2]]
+            app_details.append(file_location)
+            app_details.append(window_name)
+            core_utils.get_all_the_imports('SAP')
+            import sap_launch_keywords
+            obj = sap_launch_keywords.Launch_Keywords()
+            launch_status = obj.launch_application(app_details)
+            server_connect_status = obj.serverConnect(server_name)
+            sapScrapeFlag=True
+        except Exception as error:
+            err_msg='Error while launching SAP application through Genius'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(error,exc_info=True)
+
+    def on_START_SCRAPE_SAP_GENIUS(self, *args):
+        try:
+            if check_execution_lic("scrape"):
+                return None
+            elif bool(cw.scrapewindow):
+                return None
+
+            global sapScrapeFlag
+            core_utils.get_all_the_imports('SAP')
+            import sap_scraping_genius
+            sap_scraping_obj = sap_scraping_genius.Scrape()
+            sap_scraping_obj.clickandadd('STARTCLICKANDADD', socketIO, args[1])
+            sapScrapeFlag=True
+        except Exception as error:
+            err_msg='Error while Scraping SAP application through Genius'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(error,exc_info=True)
+
+    def on_STOP_SCRAPE_SAP_GENIUS(self, *args):
+        try:
+            if check_execution_lic("scrape"):
+                return None
+            elif bool(cw.scrapewindow):
+                return None
+
+            global sapScrapeFlag
+            core_utils.get_all_the_imports('SAP')
+            import sap_scraping_genius
+            import sap_launch_keywords
+            sap_scraping_obj = sap_scraping_genius.Scrape()
+            sap_scraping_obj.clickandadd('STOPCLICKANDADD', socketIO, args[1])
+            sap_launch_keywords_obj = sap_launch_keywords.Launch_Keywords()
+            sap_launch_keywords_obj.close_window()
+            sapScrapeFlag=True
+        except Exception as error:
+            err_msg='Error while Scraping SAP application through Genius'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(error,exc_info=True)
+
 
 class ConnectionThread(threading.Thread):
     """Socket Connection Thread Class."""
