@@ -973,15 +973,17 @@ class Dispatcher:
                 if urls!=[] and urlparse(urls[0]).netloc == "ntp.msn.com":
                     urls=[]
                 if urls != []:
+                    get_entries_js_script = "return window.performance.getEntries()"
+                    url_name = browser_Keywords.local_bk.driver_obj.execute_script(get_entries_js_script)[0]['name']
                     headers = {'User-Agent': 'AvoAssure/' + os.getenv('AVO_ASSURE_VERSION')}
                     try:
                         response=requests.get(urls[0], headers=headers, verify=False, proxies=readconfig.proxies)
                         status_code=response.status_code
-                    except Exception as e:
-                        status_code = None
-                        logger.print_on_console('Not able to access application URL')
-                        local_Wd.log.info('Not able to access application URL')
-                        local_Wd.log.error(e)
+                        if status_code in STATUS_CODE_DICT and urls[0] == url_name:
+                            status_code = browser_Keywords.local_bk.driver_obj.execute_script(get_entries_js_script)[0]['responseStatus']
+                    except:
+                        if urls[0] == url_name:
+                            status_code = browser_Keywords.local_bk.driver_obj.execute_script(get_entries_js_script)[0]['responseStatus']
                     local_Wd.log.info(status_code)
                     if status_code in STATUS_CODE_DICT:
                         value=STATUS_CODE_DICT[status_code]
