@@ -83,7 +83,7 @@ class SapUtilKeywords:
 
             delay_constant = int(configvalues["element_load_timeout"])
             if sap_object_indentification_order == "1":
-                logger.print_on_console('Finding the SAP element by ID')
+                log.info('Finding the SAP element by ID')
                 for _ in range(delay_constant):
                     try:
                         # check element exists or not using find by id
@@ -91,7 +91,7 @@ class SapUtilKeywords:
                         break
                     except Exception as e:
                         # logic to find the id by co-ordinate or position
-                        logger.print_on_console('Finding the SAP element by ID failed so finding the element by position')
+                        log.info('Finding the SAP element by ID failed so finding the element by position')
                         if len(args) >= 1:
                             cord_value = args[0]
                         else:
@@ -109,7 +109,7 @@ class SapUtilKeywords:
                             time.sleep(1)
             else:
                 # logic to find the id by co-ordinate or position
-                logger.print_on_console('Finding the SAP element by POSITION')
+                log.info('Finding the SAP element by POSITION')
                 for _ in range(delay_constant):
                     try:
                         if len(args) >= 1:
@@ -124,7 +124,7 @@ class SapUtilKeywords:
                         ses.FindById(id)
                         break
                     except Exception as e:
-                        logger.print_on_console('Finding the SAP element by POSITION failed so finding the element by ID')
+                        log.info('Finding the SAP element by POSITION failed so finding the element by ID')
                         id = temp_id
 
                         try:

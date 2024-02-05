@@ -312,7 +312,7 @@ class OebsDispatcher:
                         oebs_object_indentification_order = configvalues["oebs_object_indentification_order"]
                     if oebs_object_indentification_order == "1":
                         for _ in range(delay_constant):
-                            logger.print_on_console('Finding the OEBS element by XPATH')
+                            log.info('Finding the OEBS element by XPATH')
                             accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
                             if accessContext and str(accessContext) != 'fail':
                                 if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
@@ -324,7 +324,7 @@ class OebsDispatcher:
                                     err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
                                 break
                             else:
-                                logger.print_on_console('Finding the OEBS element by XPATH failed so finding the element by POSITION')
+                                log.info('Finding the OEBS element by XPATH failed so finding the element by POSITION')
                                 accessContext, visible, active_parent =  self.utilities_obj.object_generator_using_coordinates(*message)
                                 if accessContext and str(accessContext) != 'fail':
                                     if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
@@ -341,7 +341,7 @@ class OebsDispatcher:
                                     time.sleep(1)
                     else:
                         for _ in range(delay_constant):
-                            logger.print_on_console('Finding the OEBS element by POSITION')
+                            log.info('Finding the OEBS element by POSITION')
                             accessContext, visible, active_parent =  self.utilities_obj.object_generator_using_coordinates(*message)
                             if accessContext and str(accessContext) != 'fail':
                                 if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
@@ -353,7 +353,7 @@ class OebsDispatcher:
                                     err_msg = oebs_constants.ERROR_CODE_DICT['err_object_background']
                                 break
                             else:
-                                logger.print_on_console('Finding the OEBS element by POSITION failed so finding the element by XPATH')
+                                log.info('Finding the OEBS element by POSITION failed so finding the element by XPATH')
                                 accessContext, visible, active_parent =  self.utilities_obj.object_generator(*message)
                                 if accessContext and str(accessContext) != 'fail':
                                     if (keyword in self.required_on_top and active_parent) or (keyword not in self.required_on_top):
