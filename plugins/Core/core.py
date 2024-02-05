@@ -1287,6 +1287,7 @@ class TestThread(threading.Thread):
         # This is the code executing in the new thread.
         if self.cicd_mode:
             check_browser()
+            cicd_integration_obj(self.json_data)
         global execution_flag, closeActiveConnection, connection_Timer, termination_inprogress, execReq
         batch_id = None
         termination_inprogress = True
@@ -2453,3 +2454,33 @@ def stop_ping_thread():
         time.sleep(0.5)
         status_ping_thread = None
 
+def cicd_integration_obj(*args):
+    global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq
+    try:
+        log.debug("Inside cicd_integration_obj")
+        exec_data = args[0]
+        batch_id = exec_data["batchId"]
+        execReq = exec_data
+        if("integration" in exec_data):
+            if("alm" in exec_data["integration"] and exec_data["integration"]["alm"]["url"] != ""):
+                if(qcObject == None):
+                    core_utils.get_all_the_imports('Qc')
+                    import QcController
+                    qcObject = QcController.QcWindow()
+            if("qtest" in exec_data["integration"] and exec_data["integration"]["qtest"]["url"] != ""):
+                if(qtestObject == None):
+                    core_utils.get_all_the_imports('QTest')
+                    import QTestController
+                    qtestObject = QTestController.QTestWindow()
+            if("zephyr" in exec_data["integration"] and exec_data["integration"]["zephyr"]["url"] != ""):
+                if(zephyrObject == None):
+                    core_utils.get_all_the_imports('Zephyr')
+                    import ZephyrController
+                    zephyrObject = ZephyrController.ZephyrWindow()
+            if("azure" in exec_data["integration"] and exec_data["integration"]["azure"]["url"] != ""):
+                if(azureObject == None):
+                    core_utils.get_all_the_imports('Azure')
+                    import azurecontroller
+                    azureObject = azurecontroller.AzureWindow()
+    except Exception as e:
+        log.error(e, exc_info=True)
