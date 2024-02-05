@@ -1026,7 +1026,7 @@ class TableOperationKeywords():
                             row_number=int(input_arr[0])-1
                             col_number=int(input_arr[1])-1
                             if webElement.tag_name.lower() == 'table':
-                                cell = local_tk.driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]]""",webElement,row_number,col_number)
+                                cell = local_tk.driver.execute_script("""debugger; return arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('td')[arguments[2]] || arguments[0].getElementsByTagName('tr')[arguments[1]].getElementsByTagName('th')[arguments[2]]""",webElement,row_number,col_number)
                             else:
                                 cell=self.javascriptExecutor(webElement,row_number,col_number)
                             element_list=cell.find_elements_by_xpath('.//*')
@@ -1100,6 +1100,11 @@ class TableOperationKeywords():
                             counter = 1
                             local_tk.log.debug('finding the cell with given inputs')
                             cell=self.javascriptExecutor(webElement,row_number,col_number)
+                            if len(cell.find_elements_by_tag_name(tag))>=index:
+                                cell.find_elements_by_tag_name(tag)[index-1].click()
+                                status=TEST_RESULT_PASS
+                                methodoutput=TEST_RESULT_TRUE
+                                return status,methodoutput,output_val,err_msg
                             element_list=cell.find_elements_by_xpath('.//*')
                             #---------------------------condition when element list returns empty
                             if len(element_list)==0:
