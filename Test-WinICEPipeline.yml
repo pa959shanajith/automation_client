@@ -10,16 +10,26 @@ resources:
   - pipeline: Test-WinICEPipeline  
     source: Test-Parent-Pipeline
     trigger: true
+
+
 steps:
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
-    project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
-    pipeline: '182'
+    project: '95f9a2e6-4c17-42c9-825f-524aff8a66fe'
+    pipeline: '180'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
-    artifactName: 'BranchName'
+    artifactName: 'dependencies'
     downloadPath: '$(System.ArtifactsDirectory)'
+
+- script: |
+    #unzip -j $(Build.ArtifactStagingDirectory)/dependencies/dependencies.zip -d $(Build.ArtifactStagingDirectory)
+    expand -F:* "$(Build.ArtifactStagingDirectory)\dependencies\dependencies.zip" "$(Build.ArtifactStagingDirectory)"
+    #rm -rf dependencies
+    rmdir /s /q "$(Build.ArtifactStagingDirectory)\dependencies"
+    #ls $(System.ArtifactsDirectory)
+    dir $(System.ArtifactsDirectory)
 
 - checkout: git://$(System.TeamProject)/ICE  #####
   persistCredentials: true
@@ -28,7 +38,8 @@ steps:
 - task: CmdLine@2
   inputs:
     script: |
-      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
+      copy "$(System.ArtifactsDirectory)/BranchName.txt" "s/avoassure/"
+      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName.txt)
       echo "Branch Name is:%BranchName%"
       echo $(Build.SourceBranch)
       cd s/avoassure
@@ -65,5 +76,3 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/AvoAssure.7z'
     ArtifactName: dist
-
-
