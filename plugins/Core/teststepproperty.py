@@ -15,7 +15,7 @@ import constants
 log = logging.getLogger('teststepproperty.py')
 class TestStepProperty(): 
 
-    def __init__(self,name,index,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,testcase_num,remark,testcase_details,cord,original_device_height,original_device_width,top,left,width,height):
+    def __init__(self,name,index,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,testcase_num,remark,testcase_details,cord,code,language,original_device_height,original_device_width,top,left,width,height):
         self.name=name
         self.index=index
         self.apptype=apptype
@@ -36,6 +36,8 @@ class TestStepProperty():
         self.remarks=remark
         self.testcase_details=testcase_details
         self.cord=cord
+        self.code=code
+        self.language=language
         self.original_device_height = original_device_height
         self.original_device_width = original_device_width
         self.browser_type = None
