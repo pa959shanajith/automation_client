@@ -90,6 +90,7 @@ class Dispatcher:
         }
 
         self.web_dict={
+            'customkeyword':local_Wd.util_object.custom_keyword,
             'getobjectcount':local_Wd.custom_object.get_object_count,
             'getobject':local_Wd.custom_object.get_object,
             'click': local_Wd.button_link_object.click,
@@ -685,6 +686,8 @@ class Dispatcher:
 
         try:
             browsername = ''
+            if teststepproperty.code!='' and teststepproperty.code!=None:
+                keyword = "customkeyword"
             if browser_Keywords.local_bk.driver_obj is not None:
                 browsername = BROWSER_NAME_MAP[browser_Keywords.local_bk.driver_obj.name.strip()]
             if self.action == DEBUG and keyword != 'openbrowser':
@@ -850,6 +853,8 @@ class Dispatcher:
                         else:
                             if (keyword.lower() == 'getstatusiris') : result = self.web_dict[keyword](webelement,input,output,teststepproperty.objectname.split(';')[-2])
                             else : result = self.web_dict[keyword](webelement,input,output)
+                    elif keyword == "customkeyword":
+                        result= self.web_dict["customkeyword"](webelement,input,teststepproperty.code,teststepproperty.language,finalIdentifier)
                     else:
                         if controller.get_browser_to_foreground == False and keyword != 'getbrowsertoforeground':
                             try:

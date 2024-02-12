@@ -486,7 +486,7 @@ class Handler():
                 logger.print_on_console('Commented step '+str(step['stepNo']))
         return flag
 
-    def create_step(self,index,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,top,left,width,height,extract_path=None):
+    def create_step(self,index,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,code,language,original_device_height,original_device_width,top,left,width,height,extract_path=None):
         """
         def : create_step
         purpose : creates an object of each step
@@ -552,7 +552,7 @@ class Handler():
                                 objectname = left_part+';'+xpath_string[1]+';'+right_part
                     except Exception as e:
                         local_handler.log.error(e)
-                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,original_device_height,original_device_width,top,left,width,height)
+                tsp_step=TestStepProperty(keyword,index,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,code,language,original_device_height,original_device_width,top,left,width,height)
         except Exception as e:
             logger.print_on_console(e)
             local_handler.log.error(e)
@@ -588,6 +588,8 @@ class Handler():
             cord=step['cord']
         else:
             cord=None
+        code = step['code'] if 'code' in step else None
+        language = step['language'] if 'language' in step else None
         remark=''
         testcase_details=''
         if 'remarks' in step:
@@ -620,7 +622,7 @@ class Handler():
         #check if the step is commented before adding to the tsplist
         if not (len(outputArray)>=1 and  '##' == outputArray[-1] ):
             local_handler.tspIndex2+=1
-            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord, original_device_height, original_device_width,top,left,width,height,extract_path)
+            return self.create_step(local_handler.tspIndex2,keyword,apptype,inputval,objectname,identifiers,outputval,stepnum,url,custname,testscript_name,additionalinfo,i,remark,testcase_details,cord,code,language, original_device_height, original_device_width,top,left,width,height,extract_path)
         return None
 
 

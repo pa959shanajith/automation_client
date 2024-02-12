@@ -1801,3 +1801,26 @@ return isVisible(s);"""
         except Exception as e:
             err_msg=self.__web_driver_exception(e)
         return status,methodoutput,output,err_msg
+
+    def custom_keyword(self, webelement, input_value, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        custome_result = False
+        try:
+            if len(args)>1:
+                if args[1].lower() == 'javascript':
+                    code = args[0].replace("element", "arguments[0]")
+                    custom_result = browser_Keywords.local_bk.driver_obj.execute_script(code,webelement)
+                elif args[1].lower() == 'python':
+                    code = args[0].replace("driver", "browser_Keywords.local_bk.driver_obj")
+                    custom_result = exec(code)
+                if custom_result is not None:
+                    logger.print_on_console("Custom Keyword Result: ", custom_result)                 
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            local_uo.log.info("error in custom keywords: ", e)
+            logger.print_on_console("Custom Keyword Exception:")
+            logger.print_on_console(e.msg.split('\n')[0])
