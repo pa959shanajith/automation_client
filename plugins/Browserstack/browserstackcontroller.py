@@ -76,7 +76,10 @@ class BrowserstackWindow():
                         continue       
                     os_name = browser_version["os"]
                     os_version = browser_version["os_version"]
-                    browser_version_str = browser_version["browser_version"] 
+                    if browser_version["browser_version"] is not None:
+                        browser_version_str = browser_version["browser_version"] 
+                    else:
+                        pass
                     if 'beta' in browser_version_str:
                         continue
                     browser_version_num = float(browser_version_str)
