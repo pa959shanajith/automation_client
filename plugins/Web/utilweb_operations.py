@@ -1814,13 +1814,15 @@ return isVisible(s);"""
                     code = args[0].replace("element", "arguments[0]")
                     custom_result = browser_Keywords.local_bk.driver_obj.execute_script(code,webelement)
                 elif args[1].lower() == 'python':
-                    code = args[0].replace("driver", "browser_Keywords.local_bk.driver_obj")
+                    code = args[0]
                     custom_result = exec(code)
                 if custom_result is not None:
-                    logger.print_on_console("Custom Keyword Result: ", custom_result)                 
+                    logger.print_on_console("Custom Keyword Result: ", custom_result)
+                output = custom_result              
                 status=TEST_RESULT_PASS
                 methodoutput=TEST_RESULT_TRUE
         except Exception as e:
             local_uo.log.info("error in custom keywords: ", e)
             logger.print_on_console("Custom Keyword Exception:")
             logger.print_on_console(e.msg.split('\n')[0])
+        return status,methodoutput,output,err_msg
