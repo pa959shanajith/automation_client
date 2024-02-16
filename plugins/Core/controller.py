@@ -1301,6 +1301,7 @@ class Controller():
                             zephyr_projectid=zephyr_sceanrio_data['projectid']
                             zephyr_treeid=zephyr_sceanrio_data['treeid']
                             zephy_testid=zephyr_sceanrio_data['testid']
+                            zephyr_selectiontype = zephyr_sceanrio_data['selectiontype'] if 'selectiontype' in zephyr_sceanrio_data else "NA"
                             if 'parentid' in zephyr_sceanrio_data: zephyr_parentid=zephyr_sceanrio_data['parentid']
                             else: zephyr_parentid=''
 
@@ -1733,6 +1734,7 @@ class Controller():
                                 zephyr_status['zephyr_username']=zephyr_username
                                 zephyr_status['zephyr_apitoken']=zephyr_apitoken
                                 zephyr_status['zephyr_authtype']=zephyr_authtype
+                                zephyr_status['selectiontype'] = zephyr_selectiontype
                                 zephyr_update_status=zephyr_status_over['overallstatus']
                                 if(zephyr_update_status.lower()=='pass'):
                                     zephyr_status['status']='1'

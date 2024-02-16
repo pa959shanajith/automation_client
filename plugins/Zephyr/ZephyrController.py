@@ -34,7 +34,10 @@ class ZephyrWindow():
             'cyclephase': self.get_cycle_phases,
             'mapcyclephase': self.get_mapped_cycle_phases,
             'testcase': self.get_testcases,
-            'maptestcase': self.get_mapped_testcases
+            'maptestcase': self.get_mapped_testcases,
+            'projectrepo': self.get_project_repository,
+            'repodetails': self.get_all_repos,
+            'repotestcase': self.get_repo_testcases
         }
         self.baseURL = None
         self.zephyrURL = None
@@ -42,6 +45,7 @@ class ZephyrWindow():
         self.zephyrPassword = None
         self.headers = None
         self.release_id = None
+        self.project_id = None
 
     def login(self,filePath):
         res = "invalidcredentials"
@@ -360,6 +364,14 @@ class ZephyrWindow():
             testcaseid = data["testid"]
             status_tc = data["status"]
             parentid = data["parentid"]
+            selection_type = data["selectiontype"]
+            if selection_type != "Release":
+                projectid = data["projectId"][0]
+                releaseid_latest = self.get_latest_release(projectid)
+                cyclephaseid_latest = self.get_latest_cycle_phases(self.release_id)
+                releaseid = [releaseid_latest for i in range(len(releaseid))]
+                cyclephaseid = [cyclephaseid_latest for i in range(len(cyclephaseid))]
+                parentid = ['-1' for i in range(len(parentid))]
             for index in range(len(cyclephaseid)):
                 if parentid[index]=='-1':
                     relative_path = "/execution/user/project?cyclephaseid="+str(cyclephaseid[index])+"&releaseid="+str(releaseid[index])
@@ -437,3 +449,138 @@ class ZephyrWindow():
             logger.print_on_console("ERROR:SSLverify flag as False. Disabled TLS Certificate and Hostname Verification.")
             #by default sending false(if this fuction met exception).you can modify this default return and above logger message.
             return False 
+        
+    def get_project_repository(self, data):
+        res = {}
+        try:
+            # get all cycles, phases
+            project_id = data["projectId"]
+            repo_id = data["repoId"]
+            self.project_id = project_id
+            relative_path = "/testcasetree/projectrepository/"+str(project_id)
+            response = requests.get(self.zephyrURL+relative_path, headers = self.headers,proxies = readconfig.proxies, verify = self.send_tls_security())
+            if response.status_code == 200:
+                json_object = response.json()
+                for repo in json_object:
+                    if repo["id"] == repo_id:
+                        repo_name = repo["name"]
+                        for category in repo["categories"]:
+                            repo_obj={}
+                            if repo_name in res.keys():
+                                repo_obj[category["id"]] = category["name"]
+                                res[repo_name].append(repo_obj)
+                            else:
+                                repo_obj[category["id"]] = category["name"]
+                                res[repo_name] = [repo_obj]
+        except Exception as eproject:
+            err_msg = 'Error while fetching cycles from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
+    
+    def get_all_repos(self, data):
+        res = []
+        try:
+            # get all repo
+            project_id = data["projectId"]
+            self.project_id = project_id
+            relative_path = "/testcasetree/projectrepository/"+str(project_id)
+            response = requests.get(self.zephyrURL+relative_path, headers = self.headers,proxies = readconfig.proxies, verify = self.send_tls_security())
+            if response.status_code == 200:
+                json_object = response.json()
+                res = [{'id':i['id'],'name':i['name']} for i in json_object]
+        except Exception as eproject:
+            err_msg = 'Error while fetching releases from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
+    
+    def get_repo_testcases(self, data):
+        res = {"modules" : [],"testcases": [], "release": 0, "cycle": 0}
+        try:
+            # get all testcases
+            tree_id = data["treeId"]
+            relative_path = "/testcasetree?type=Module&releaseid=&revisionid=&parentid="+str(tree_id)+"&isShared="
+            response = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
+            if response.status_code == 200:
+                json_object = response.json()
+                if len(json_object) != 0:
+                    for i in range(len(json_object)):
+                        phase_obj = {json_object[i]["id"]:json_object[i]["name"]}
+                        res["modules"].append(phase_obj)
+
+            relative_path = "/testcase/tree/"+str(tree_id)+"?pagesize=0&isascorder=true"
+            response = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
+                
+            if response.status_code == 200:
+                josn_object = response.json()
+                # Fetch testcases
+                if josn_object["resultSize"] != 0:
+                    results = josn_object["results"]
+                    # Fetch requirement details of testcases
+                    for i in results:
+                        name_err = False
+                        if 'testcase' in i and 'requirementIds' in i['testcase']:
+                            req_id = i['testcase']['requirementIds']
+                        else:
+                            req_id = ""
+                        requirement_details = self.get_requirement_details(req_id)
+                        tc = {
+                            'id': i['testcase']['testcaseId'],
+                            'cyclePhaseId': i['testcase']['testcaseId'],
+                            'parentId': tree_id,
+                            'reqdetails': requirement_details,
+                        }
+                        try:
+                            tc['name'] = i['testcase']['name']
+                        except Exception as excname:
+                            name_err = True
+                            err_msg = 'Due to no name, Zephyr Testcase with id:'+str(tc['id'])+'  was not displayed.'
+                            log.error(err_msg)
+                            logger.print_on_console(err_msg)
+                            log.error(excname, exc_info=True)
+                        if not name_err: res["testcases"].append(tc)
+        except Exception as eproject:
+            err_msg = 'Error while fetching testcases from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
+    
+    def get_latest_release(self, project_id):
+        res = 0
+        try:
+            relative_path = "/release/project/"+str(project_id)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers, proxies = readconfig.proxies, verify = self.send_tls_security())
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                result = [i['id'] for i in JsonObject]
+                res = max(result)
+                self.release_id = res
+        except Exception as eproject:
+            err_msg = 'Error while fetching releases from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
+    
+    def get_latest_cycle_phases(self, release_id):
+        res = 0
+        try:
+            relative_path = "/cycle/release/"+str(release_id)
+            respon = requests.get(self.zephyrURL+relative_path, headers = self.headers,proxies = readconfig.proxies, verify = self.send_tls_security())
+            if respon.status_code == 200:
+                JsonObject = respon.json()
+                for cycle in JsonObject:
+                    cyclename = cycle["name"]
+                    for phase in cycle["cyclePhases"]:
+                        if res < phase["id"]:
+                            res = phase["id"]
+        except Exception as eproject:
+            err_msg = 'Error while fetching cycles from Zephyr'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(eproject, exc_info=True)
+        return res
