@@ -1276,7 +1276,6 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
-                        print(qc_creds,'qc creds',scenario["qcdetails"],'qc details')
                         if("alm" in qc_creds and qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
