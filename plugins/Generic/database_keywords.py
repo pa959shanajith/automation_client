@@ -295,6 +295,7 @@ class DatabaseOperation():
         except Exception as e:
             err_msg = self.processException(e)
         finally:
+            if cursor is not None: cursor.close()
             if cnxn is not None: cnxn.close()
         return status,result,details,err_msg
 
@@ -1030,7 +1031,7 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : connection object
         """
-        dbNumber = {4:'{ODBC Driver 11 for SQL Server}',5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
+        dbNumber = {4:'{SQL Server}', 5:'{Microsoft ODBC for Oracle}'}#,2:'{IBM DB2 ODBC DRIVER}'}
         err_msg=None
         if not(dbtype == ''): 
             try:
@@ -1087,13 +1088,19 @@ class DatabaseOperation():
                     import psycopg2
                     self.cnxn = psycopg2.connect(host=ip,port=port,user=userName,password=password,database=dbName)
                 else:
-                    if userName == '':
+                    driver_names = [x for x in pyodbc.drivers() if x.endswith('SQL Server')]
+                    for driver in driver_names:
                         try:
-                            self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;Trusted_Connection=yes;' % ( dbNumber[dbtype], ip, port, dbName) )
+                            if userName == '':
+                                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;Trusted_Connection=yes;' % (driver, ip, port, dbName))
+                            else:
+                                self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % (driver, ip, port, dbName, userName, password))
+                            # If connection succeeds, break out of loop
+                            break
                         except Exception as e:
-                            log.error('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;Trusted_Connection=yes;' % ( dbNumber[dbtype], ip, port, dbName))
-                    else:
-                        self.cnxn = pyodbc.connect('driver=%s;SERVER=%s;PORT=%s;DATABASE=%s;UID=%s;PWD=%s' % ( dbNumber[dbtype], ip, port, dbName, userName ,password ) )
+                            log.error(f"Error connecting with driver: {driver}")
+                            log.error(f"{e}")
+                            continue
                 return self.cnxn
             except Exception as e:
                 self.processException(e)
