@@ -447,7 +447,7 @@ class Scrape:
 
                             except Exception as e:
                                 log.error( 'Error occured : ' + str(e) )
-                                logger.print_on_console( 'Error occured while scraping' )
+                                # logger.print_on_console( 'Error occured while scraping' )
 
                             if ( self.stopumpingmsgs is True ):
                                 # self.hm.UnhookKeyboard()
