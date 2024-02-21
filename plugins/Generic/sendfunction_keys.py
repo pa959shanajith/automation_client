@@ -32,41 +32,39 @@ class SendFunctionKeys:
         output_res=OUTPUT_CONSTANT
 
         try:
-            if not (cicd_core.iscicd): # For cicd, it returns default values as fail {status=TEST_RESULT_FAIL,
-                                        # methodoutput=TEST_RESULT_FALS, Eerr_msg=None, output_res=OUTPUT_CONSTANT}
-                self.bring_to_foreground() # For bringing the browser to foreground
-                log.debug('reading the inputs')
-                input=str(input)
-                if not(input is None or input is '' or input == 'None'):
-                    count=self.get_args(args)
-                    if count[1] == 'type':
-                        log.debug('sending the keys in input')
-                        configvalues = readconfig.readConfig().readJson()
-                        for i in range(count[0]):
-                            self.type(input, float(configvalues['delay_stringinput']))
+            self.bring_to_foreground() # For bringing the browser to foreground
+            log.debug('reading the inputs')
+            input=str(input)
+            if not(input is None or input is '' or input == 'None'):
+                count=self.get_args(args)
+                if count[1] == 'type':
+                    log.debug('sending the keys in input')
+                    configvalues = readconfig.readConfig().readJson()
+                    for i in range(count[0]):
+                        self.type(input, float(configvalues['delay_stringinput']))
+                    status=TEST_RESULT_PASS
+                    methodoutput=TEST_RESULT_TRUE
+                else:
+                    if '+' in input:
+                        keys_list=input.split('+')
+                        log.debug('sending multiple  keys')
+                        self.press_multiple_keys(keys_list,count[0])
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE
+
                     else:
-                        if '+' in input:
-                            keys_list=input.split('+')
-                            log.debug('sending multiple  keys')
-                            self.press_multiple_keys(keys_list,count[0])
+                        log.debug('sending the keys in input')
+                        try:
+                            self.execute_key(input,count[0])
                             status=TEST_RESULT_PASS
                             methodoutput=TEST_RESULT_TRUE
-
-                        else:
-                            log.debug('sending the keys in input')
-                            try:
-                                self.execute_key(input,count[0])
-                                status=TEST_RESULT_PASS
-                                methodoutput=TEST_RESULT_TRUE
-                            except Exception as e:
-                                log.error(e)
-                                log.debug('Invalid input')
-                                err_msg = "Function key '{}' is not recognized.".format(input)
-                else:
-                    log.debug('Invalid input')
-                    err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
+                        except Exception as e:
+                            log.error(e)
+                            log.debug('Invalid input')
+                            err_msg = "Function key '{}' is not recognized.".format(input)
+            else:
+                log.debug('Invalid input')
+                err_msg = ERROR_CODE_DICT['ERR_INVALID_INPUT']
 
         except Exception as e:
             log.error(e)
