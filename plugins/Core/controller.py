@@ -1137,7 +1137,7 @@ class Controller():
         get_browser_to_foreground = False
         return status
 
-    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,cicd_mode,aws_mode,browserno='0',threadName=''):
+    def invoke_execution(self,mythread,json_data,socketIO,wxObject,configvalues,qcObject,qtestObject,zephyrObject,azureObject,testrailObject,cicd_mode,aws_mode,browserno='0',threadName=''):
         global terminate_flag, status_percentage, browserstack_count,saucelabs_count, screen_testcase_map
         qc_url=''
         qc_password=''
@@ -1151,6 +1151,12 @@ class Controller():
         azure_password=''
         azure_username=''
         azure_url=''
+
+        testrail_url = ''
+        testrail_username = ''
+        testrail_apitoken = ''
+        testrail_runId = ''
+        testrail_mappedDetails = []
 
         con = Controller()
         obj = handler.Handler()
@@ -1270,6 +1276,7 @@ class Controller():
 
                         # if('integrationType' in qc_creds and qc_creds['integrationType'] == 'ALM'):
                         integ = 0
+                        print(qc_creds,'qc creds',scenario["qcdetails"],'qc details')
                         if("alm" in qc_creds and qc_creds["alm"]["url"] != "" and len(scenario["qcdetails"]) > integ and scenario['qcdetails'][integ][0]["type"] == "ALM"):
                             qc_username=qc_creds['alm']['username']
                             qc_password=qc_creds['alm']['password']
@@ -1319,6 +1326,13 @@ class Controller():
                             azure_test_case_id=azure_sceanrio_data['TestCaseId']
                             if 'parentid' in azure_sceanrio_data: azure_parentid=azure_sceanrio_data['parentid']
                             else: azure_parentid=''
+
+                        if("testrail" in qc_creds and qc_creds["testrail"]["url"] != ""  and len(scenario["qcdetails"]) > integ):
+                            testrail_url = qc_creds['testrail']['url']
+                            testrail_username = qc_creds['testrail']['username']
+                            testrail_apitoken = qc_creds['testrail']['apitoken']
+                            testrail_mappedDetails = scenario["qcdetails"][integ]
+                            # testrail_runId = qc_creds['testrail']['runId']
 
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
@@ -1786,6 +1800,28 @@ class Controller():
                                 log.error('Error in Updating Azure details '+str(e))
                                 logger.print_on_console('Error in Updating Azure details')
 
+                        if len(scenario["qcdetails"]) > integ and 'testrail' in qc_creds and qc_creds['testrail']['url'] != '':
+                            try:
+                                status_code = 0
+                                if report_json['overallstatus'].lower() == 'pass':
+                                    status_code = 1
+                                elif report_json['overallstatus'].lower() == 'fail':
+                                    status_code = 5
+                                elif report_json['overallstatus'].lower() == 'terminate':
+                                    status_code = 2
+                                logger.print_on_console('****Updating Testrail Details****')
+                                if testrailObject is not None:
+                                    testrail_update = testrailObject.updateResult(testrail_url,testrail_username,testrail_apitoken,testrail_mappedDetails,status_code)
+                                    if testrail_update['status'] == 1:
+                                        logger.print_on_console(f"****Updated {testrail_update['successCount']} out of {testrail_update['totalCount']} test cases of testrail****")
+                                    else :
+                                        logger.print_on_console('****Failed to Update Testrail Details****')
+                                else:
+                                    logger.print_on_console('****Failed to Update Testrail Details****')
+                            except Exception as e:
+                                print(e,'error')
+                                log.error('Error in Updating testrail details '+str(e))
+                                logger.print_on_console('Error in Updating Testrail details')
 
                         if local_cont.module_stop:
                             break
@@ -1994,7 +2030,7 @@ class Controller():
             logger.print_on_console("Exception in aws_report")
             log.error("Exception in aws_report. Error: " + str(e))
 
-    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,azure_soc,cicd_mode,*args):
+    def invoke_controller(self,action,mythread,debug_mode,runfrom_step,json_data,root_obj,socketIO,qc_soc,qtest_soc,zephyr_soc,azure_soc,testrail_soc,cicd_mode,*args):
         status = COMPLETED
         global socket_object
         self.conthread=mythread
@@ -2017,9 +2053,9 @@ class Controller():
                     self.disable_screen_timeout()
                     reset_sys_screenoff = True
                 if self.execution_mode == SERIAL:
-                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,aws_mode,cicd_mode)
+                    status=self.invoke_execution(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,testrail_soc,aws_mode,cicd_mode)
                 elif self.execution_mode == PARALLEL:
-                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,aws_mode,cicd_mode)
+                    status = self.invoke_parralel_exe(mythread,json_data,socketIO,wxObject,self.configvalues,qc_soc,qtest_soc,zephyr_soc,azure_soc,testrail_soc,aws_mode,cicd_mode)
                 # Remove all the added custom handlers. Handler at 0 index is main one. So we start removing from 1st index.
                 for _ in range(len(log.root.handlers)-1):
                     log.root.handlers[1].writeManifest()
