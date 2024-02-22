@@ -26,6 +26,12 @@ class testrailWindow():
         self.baseUrl = None
         self.testrailUsername = None
         self.testrailApiToken = None
+        self.verify_flag = False
+        self.proxies = None
+        if readconfig.proxies:
+            self.proxies = readConfig.proxies
+            self.verify_flag = True
+        
     def getProjects(self,data):
         try:
             # Set your TestRail base URL, username, and API key
@@ -42,7 +48,8 @@ class testrailWindow():
             url = f"{base_url}{endpoint}"
             headers = {"Content-Type": "application/json"}
             auth = (username, api_key)
-            response = requests.get(url, headers=headers, auth=auth)
+            
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
             
             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -50,9 +57,9 @@ class testrailWindow():
                 log.info(projects)
                 return projects
             elif response.status_code == 429:
-                    return 'API rate limit exceeded'
+                return 'API rate limit exceeded'
             elif response.status_code == 401:
-                    return 'Invalid Credentials'
+                return 'Invalid Credentials'
             else:
                 return 'failed to fetch data from testrail'
         except Exception as e:
@@ -69,7 +76,7 @@ class testrailWindow():
             headers = {"Content-Type": "application/json"}
             auth = (self.testrailUsername, self.testrailApiToken)
             
-            response = requests.get(url, headers=headers, auth=auth)
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
             
             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -80,9 +87,9 @@ class testrailWindow():
                 else :
                     return suites
             elif response.status_code == 429:
-                    return 'API rate limit exceeded'
+                return 'API rate limit exceeded'
             elif response.status_code == 401:
-                    return 'Invalid Credentials'
+                return 'Invalid Credentials'
             else:
                 return 'failed to fetch data from testrail'
         except Exception as e:
@@ -98,7 +105,7 @@ class testrailWindow():
             headers = {"Content-Type": "application/json"}
             auth = (self.testrailUsername, self.testrailApiToken)
                 # # requesting testrail for getting the testcases
-            response = requests.get(url, headers=headers, auth=auth)
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
                 
             # # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -117,7 +124,6 @@ class testrailWindow():
                 
         
         except Exception as e:
-            print(e)
             return [{'section_id':data['sectionId'],'message':'error'}]
         
     
@@ -134,7 +140,7 @@ class testrailWindow():
             testRunsUrl = f"{self.baseUrl}/index.php?/api/v2/get_runs/{data['projectId']}"
             auth = (self.testrailUsername, self.testrailApiToken)
             # # requesting testrail for getting the testplans
-            testPlans = requests.get(testPlansUrl, headers=headers, auth=auth)
+            testPlans = requests.get(testPlansUrl, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
              # Check if the request was successful (HTTP status code 200)
             if testPlans.status_code == 200:
                 response = testPlans.json()
@@ -166,7 +172,7 @@ class testrailWindow():
             headers = {"Content-Type": "application/json"}
             auth = (self.testrailUsername, self.testrailApiToken)
             # # requesting testrail for getting the testcases
-            response = requests.get(url, headers=headers, auth=auth)
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
                 
              # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -191,7 +197,7 @@ class testrailWindow():
             headers = {"Content-Type": "application/json"}
             auth = (self.testrailUsername, self.testrailApiToken)
             # # requesting testrail for getting the testcases
-            response = requests.get(url, headers=headers, auth=auth)
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
             
              # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
@@ -208,54 +214,52 @@ class testrailWindow():
             else:
                 return [{'suite_id':data['suiteId'],'message':'failed to fetch data from testrail'}]
         except Exception as e:
-            print(e,'error')
             return 'error'
 
 
     def updateResult(self,baseurl,username,apitoken,mappedDetails,status):
-       try:
-        print('I am inside update resulty')
-        print(mappedDetails)
-        headers = {"Content-Type": "application/json"}
-        auth = (username, apitoken)
-        
-        request = []
-        projectId = mappedDetails[-1]['projectid'][-1]
-        print(projectId,'projectid')
+        try:
+            headers = {"Content-Type": "application/json"}
+            auth = (username, apitoken)
+            
+            request = []
+            projectId = mappedDetails[-1]['projectid'][-1]
+            
+            testPlansUrl = f"{baseurl}/index.php?/api/v2/get_plans/{projectId}"
 
-        testPlansUrl = f"{baseurl}/index.php?/api/v2/get_plans/{projectId}"
+            testPlans = requests.get(testPlansUrl,headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
 
-        testPlans = requests.get(testPlansUrl,headers=headers, auth=auth)
+            plans = testPlans.json()['plans']
+            
+            testPlanId = plans[0]['id']
+            
+            testRunsUrl =  f"{baseurl}/index.php?/api/v2/get_plan/{testPlanId}"
 
-        print(testPlans.json(),'test plans')
-        plans = testPlans.json()['plans']
-      
-        testPlanId = plans[0]['id']
-        
-        testRunsUrl =  f"{baseurl}/index.php?/api/v2/get_plan/{testPlanId}"
-        testRuns = requests.get(testRunsUrl,headers=headers, auth=auth)
-        runs = testRuns.json()['entries']
-        
-        testRunId = runs[-1]['runs'][-1]['id']
-        
-        endpoint = f"{baseurl}/index.php?/api/v2/add_results_for_cases/{testRunId}"
-        successCount = 0
-        totalCount = 0
-        # constructing the endpoint
-        for i in range(len(mappedDetails)):
-            for j in range(len(mappedDetails[i]["testid"])):
-                request = [{
-                    "case_id":mappedDetails[i]['testid'][j],
-                    "status_id":status
-                }]
-                
-                response = requests.post(endpoint, headers=headers, auth=auth,json = {"results":request})
-                totalCount += 1
-                if response.status_code == 200:
-                    successCount += 1
-                
-      
-        return {'status':1,'successCount':successCount,'totalCount':totalCount}
-       except Exception as e:
-            print(e,'error')
+            testRuns = requests.get(testRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
+
+            runs = testRuns.json()['entries']
+            
+            testRunId = runs[-1]['runs'][-1]['id']
+            
+            endpoint = f"{baseurl}/index.php?/api/v2/add_results_for_cases/{testRunId}"
+
+            successCount = 0
+
+            totalCount = 0
+            # constructing the endpoint
+            for i in range(len(mappedDetails)):
+                for j in range(len(mappedDetails[i]["testid"])):
+                    request = [{
+                        "case_id":mappedDetails[i]['testid'][j],
+                        "status_id":status
+                    }]
+                    
+                    response = requests.post(endpoint, headers=headers, auth=auth,json = {"results":request},verify = self.verify_flag,  proxies = self.proxies)
+                    totalCount += 1
+                    if response.status_code == 200:
+                        successCount += 1
+                    
+            
+            return {'status':1,'successCount':successCount,'totalCount':totalCount}
+        except Exception as e:
             return {'status':0}

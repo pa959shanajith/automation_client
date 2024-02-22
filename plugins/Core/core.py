@@ -1253,13 +1253,11 @@ class MainNamespace(BaseNamespace):
         except KeyError:
             err_msg = 'Invalid testrail operation'
         except Exception as e:
-            print(e,'error')
             err_msg = e
             log.error(e, exc_info=True)
         if err_msg is not None:
             log.error(err_msg)
             logger.print_on_console(err_msg)
-            print(err_msg,'error msg')
             error = 'testrail Operations'
             try: socketIO.emit('qcresponse',f'Error:{error}')
             except: pass

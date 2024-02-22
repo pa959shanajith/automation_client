@@ -1818,7 +1818,6 @@ class Controller():
                                 else:
                                     logger.print_on_console('****Failed to Update Testrail Details****')
                             except Exception as e:
-                                print(e,'error')
                                 log.error('Error in Updating testrail details '+str(e))
                                 logger.print_on_console('Error in Updating Testrail details')
 
