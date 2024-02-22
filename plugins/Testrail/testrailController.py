@@ -29,7 +29,7 @@ class testrailWindow():
         self.verify_flag = False
         self.proxies = None
         if readconfig.proxies:
-            self.proxies = readConfig.proxies
+            self.proxies = readconfig.proxies
             self.verify_flag = True
         
     def getProjects(self,data):
