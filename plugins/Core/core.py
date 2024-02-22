@@ -58,6 +58,7 @@ zephyrdata = None
 qcObject = None
 qtestObject = None
 zephyrObject = None
+testrailObject = None
 azureObject = None
 soc=None
 browsercheckFlag=False
@@ -316,7 +317,7 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq,testrailObject
         wait_until_browsercheck()
         try:
             exec_data = args[0]
@@ -343,6 +344,11 @@ class MainNamespace(BaseNamespace):
                         core_utils.get_all_the_imports('Azure')
                         import azurecontroller
                         azureObject = azurecontroller.AzureWindow()
+                if("testrail" in exec_data["integration"] and exec_data["integration"]["testrail"]["url"] != ""):
+                    if(testrailObject == None):
+                        core_utils.get_all_the_imports('Testrail')
+                        import testrailController
+                        testrailObject = testrailController.testrailWindow()
             aws_mode=False
             if len(args)>0 and args[0]['apptype']=='MobileApp':
                 if args[0]['suitedetails'][0]['browserType'][0]=='2':
@@ -1226,6 +1232,36 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(error,exc_info=True)
 
+    def on_testraillogin(self, *args):
+        global testrailObject
+        err_msg = None
+        try:
+            wait_until_browsercheck()
+            if testrailObject is None:
+                core_utils.get_all_the_imports('Testrail')
+                import testrailController
+                testrailObject = testrailController.testrailWindow()
+            data = args[0]
+            response = testrailObject.testrail_dict[data['testrailAction']](data)
+            
+            if data['testrailAction'] == 'getTestCases':
+                socketIO.emit(f'qcresponse{response[0]["section_id"]}', response)
+            elif data['testrailAction'] == 'getSections':
+                socketIO.emit(f'qcresponse{response[0]["suite_id"]}', response)
+            else:
+                socketIO.emit('qcresponse', response)
+        except KeyError:
+            err_msg = 'Invalid testrail operation'
+        except Exception as e:
+            err_msg = e
+            log.error(e, exc_info=True)
+        if err_msg is not None:
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            error = 'testrail Operations'
+            try: socketIO.emit('qcresponse',f'Error:{error}')
+            except: pass
+
 
 class ConnectionThread(threading.Thread):
     """Socket Connection Thread Class."""
@@ -1315,7 +1351,7 @@ class ConnectionThread(threading.Thread):
             log.error(err)
             if root.gui: wx.CallAfter(cw.connectbutton.Enable)
 
-
+    
 class TestThread(threading.Thread):
     """Test Worker Thread Class."""
 
@@ -1401,13 +1437,13 @@ class TestThread(threading.Thread):
             #     logger.print_on_console('This app type is not part of the license.')
             #     status=TERMINATE
             # else:
-                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
+                status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,testrailObject,self.aws_mode,self.cicd_mode)
             else:
                 if apptype.lower() not in plugins_list:
                     logger.print_on_console('This app type is not part of the license.')
                     status=TERMINATE
                 else:
-                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,self.aws_mode,self.cicd_mode)
+                    status = self.con.invoke_controller(self.action,self,self.debug_mode,runfrom_step,self.json_data,self.main,socketIO,qcObject,qtestObject,zephyrObject,azureObject,testrailObject,self.aws_mode,self.cicd_mode)
 
             logger.print_on_console('Execution status '+status)
             if status==TERMINATE:
