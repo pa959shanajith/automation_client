@@ -390,8 +390,7 @@ class Scrape:
                                     view[len(view) - 1]['data_sent'] = "true"
                                     text_typed[0] = ""
                             except Exception as e:
-                                log.error( 'Error occured : ' + str(e) )
-                                logger.print_on_console( 'Error occured in GetdetailsThread' )
+                                log.error('Error occured in GetdetailsThread: ' + str(e))
                                 data = view[len(view) - 1]
                                 if "data_sent" in view[len(view) - 1] and view[len(view) - 1]['data_sent'] == "false":
                                     view[len(view) - 1]['inputVal'] = text_typed[0]
@@ -446,8 +445,7 @@ class Scrape:
                                                     return False
 
                             except Exception as e:
-                                log.error( 'Error occured : ' + str(e) )
-                                # logger.print_on_console( 'Error occured while scraping' )
+                                log.error('Error occured while scraping: ' + str(e))
 
                             if ( self.stopumpingmsgs is True ):
                                 # self.hm.UnhookKeyboard()
