@@ -41,7 +41,8 @@ class Dispatcher:
                   'setoauth2.0': self.webservice.setOAuth2,
                   'setparam':self.webservice.setParam,
                   'setparamvalue':self.webservice.setParamValue,
-                  'executerequesttemplate' : self.webservice.executeRequestTemplate
+                  'executerequesttemplate' : self.webservice.executeRequestTemplate,
+                  'setbearertoken':self.webservice.setBearerToken
                 }
             if keyword in ws_dict.keys():
                 if keyword in ['settagvalue','settagattribute','setparamvalue']:

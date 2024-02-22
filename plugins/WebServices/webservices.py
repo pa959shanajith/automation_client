@@ -1229,6 +1229,31 @@ class WSkeywords:
         return status,methodoutput,output,err_msg
     
 
+    def setBearerToken(self,token):
+        status = ws_constants.TEST_RESULT_FAIL
+        methodoutput = ws_constants.TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        log.debug(STATUS_METHODOUTPUT_LOCALVARIABLES)
+        try:
+            if (not(token == '' and token == None)):
+                    self.baseReqHeader['Authorization'] = f'Bearer {token}'
+                    log.debug(STATUS_METHODOUTPUT_UPDATE)
+                    logger.print_on_console('Bearer token added.')
+                    status = ws_constants.TEST_RESULT_PASS
+                    methodoutput = ws_constants.TEST_RESULT_TRUE
+            else:
+                log.info(ws_constants.METHOD_INVALID_INPUT)
+                err_msg = ws_constants.METHOD_INVALID_INPUT
+                logger.print_on_console(ws_constants.METHOD_INVALID_INPUT)
+        except Exception as e:
+            log.error(e)
+            err_msg = e
+            logger.print_on_console(e)
+        log.info(RETURN_RESULT)
+        return status,methodoutput,output,err_msg
+    
+
     def setOAuth2(self,token_url,client_id,client_secret,scope,grant_type):
         status = ws_constants.TEST_RESULT_FAIL
         methodoutput = ws_constants.TEST_RESULT_FALSE
