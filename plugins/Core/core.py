@@ -1334,7 +1334,7 @@ class ConnectionThread(threading.Thread):
                 'http_session': prepare_http_session(kw_args),
                 'ssl_verify': kw_args.get('verify', True)
             }
-            # Added by Ravi Kant Dwivedi to import default socketio library and commented overriden library call
+            # Added by Ravi Kant Dwivedi to import default socketio library and commented overridden library call
             socketIO = socketio.Client(**kw)
             # socketIO = SocketIO(**kw)
             socketIO.register_namespace(MainNamespace())
