@@ -53,6 +53,9 @@ browserstack_count = 0
 log = logging.getLogger("controller.py")
 status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
 process_ids = []
+debugger_action = None
+debugger_points_list = []
+debugger_result_data = []
 screen_testcase_map= {}
 get_browser_to_foreground = False
 class ThreadLogFilter(logging.Filter):
@@ -353,9 +356,8 @@ class Controller():
             while self.conthread.paused:
                 self.conthread.pause_cond.wait()
 
-
-    def methodinvocation(self,index,execution_env,datatables=[],*args):
-        global pause_flag
+    def methodinvocation(self,index,execution_env,socketIO,datatables=[],*args):
+        global pause_flag,debugger_points_list,debugger_result_data,debugger_action
         result=(TEST_RESULT_FAIL,TEST_RESULT_FALSE,OUTPUT_CONSTANT,None)
 		#COmapring breakpoint with the step number of tsp instead of index - (Sushma)
         tsp = handler.local_handler.tspList[index]
@@ -368,6 +370,9 @@ class Controller():
             log.info('***Test case name: '+str(tsp.testscript_name)+'***')
             print('-------------------------------------------------------------------------------------------------------')
             log.info('---------------------------------------------------------------------')
+        ## logic to handle advance debugger breakpoints
+        if debugger_points_list is not None and (len(debugger_points_list)>0 and (debugger_points_list[0] -1) == index):
+            pause_flag = True
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
             #logic to handle run from setp debug
@@ -408,6 +413,16 @@ class Controller():
                         start_time_string=start_time.strftime(TIME_FORMAT)
                         log.info('Step Execution start time is : '+start_time_string)
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
+                        if debugger_points_list is not None and len(debugger_points_list)>0:
+                            debugger_result_data.append({'index':index, 'custname':tsp.custname, 'result':result})
+                            if (debugger_points_list[0] -1) == index:
+                                if debugger_action is None:
+                                    socketIO.emit('result_debugTestCase', debugger_result_data)
+                                elif debugger_action == 'playDebug':
+                                    socketIO.emit('result_playDebug_listener', debugger_result_data)
+                                elif debugger_action == 'moveToNextStep':
+                                    socketIO.emit('result_moveToNextStep_listener', debugger_result_data)
+                                debugger_result_data = []
                     else:
                         keyword_flag=False
                         start_time = datetime.now()
@@ -884,7 +899,7 @@ class Controller():
         else:
             return index,TERMINATE
 
-    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,*args,datatables=[], accessibility_testing = False):
+    def executor(self,tsplist,action,last_tc_num,debugfrom_step,mythread,execution_env,socketIO,*args,datatables=[], accessibility_testing = False):
         global status_percentage, screen_testcase_map
         status_percentage = {TEST_RESULT_PASS:0,TEST_RESULT_FAIL:0,TERMINATE:0,"total":0}
         i=0
@@ -921,7 +936,7 @@ class Controller():
                     index = i
                     # if(action != DEBUG):    
                     #     log.root.handlers[hn].starttsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
-                    i = self.methodinvocation(i,execution_env,datatables)
+                    i = self.methodinvocation(i,execution_env,socketIO,datatables)
                     # if(action != DEBUG):
                     #     log.root.handlers[hn].stoptsp(tsplist[index],execution_env['scenario_id'],execution_env['browser'])
                     #Check wether accessibility testing has to be executed
@@ -1033,14 +1048,15 @@ class Controller():
         res = dispatcher_obj.dispatcher(teststepproperty, inputval)
         return res
 
-    def invoke_debug(self,mythread,runfrom_step,json_data):
+    def invoke_debug(self,mythread,runfrom_step,json_data,socketIO):
         #the flag 'get_browser_to_foreground'for: To bring the browser to foreground , and only for debugging
-        global get_browser_to_foreground
+        global get_browser_to_foreground,debugger_points_list
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
         handler.local_handler.tspList=[]
         scenario=[json_data]
+        debugger_points_list = scenario[0][2]['debuggerPoints'] if 'debuggerPoints' in scenario[0][2] else None
         print('=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
@@ -1105,7 +1121,7 @@ class Controller():
             if start_debug:
                 self.conthread=mythread
                 execution_env = {'env':'default'}
-                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,datatables=datatables, accessibility_testing = False)
+                status,_,_ = self.executor(tsplist,DEBUG,last_tc_num,runfrom_step,mythread,execution_env,socketIO,datatables=datatables, accessibility_testing = False)
         else:
             logger.print_on_console('Invalid script')
         temp={}
@@ -2064,7 +2080,7 @@ class Controller():
                 self.debug_choice=wxObject.choice
                 self.debug_mode=debug_mode
                 self.wx_object=wxObject
-                status=self.invoke_debug(mythread,runfrom_step,json_data)
+                status=self.invoke_debug(mythread,runfrom_step,json_data,socketIO)
             if status != TERMINATE:
                 status=COMPLETED
         except Exception as e:
