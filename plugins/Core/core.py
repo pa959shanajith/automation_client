@@ -317,7 +317,7 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_executeTestSuite(self, *args):
-        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq,testrailObject
+        global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq, testrailObject
         wait_until_browsercheck()
         try:
             exec_data = args[0]
@@ -2561,7 +2561,7 @@ def stop_ping_thread():
         status_ping_thread = None
 
 def cicd_integration_obj(*args):
-    global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq
+    global cw, execution_flag, qcObject, qtestObject, zephyrObject, azureObject, execReq, testrailObject
     try:
         log.debug("Inside cicd_integration_obj")
         exec_data = args[0]
@@ -2588,5 +2588,10 @@ def cicd_integration_obj(*args):
                     core_utils.get_all_the_imports('Azure')
                     import azurecontroller
                     azureObject = azurecontroller.AzureWindow()
+            if("testrail" in exec_data["integration"] and exec_data["integration"]["testrail"]["url"] != ""):
+                if(testrailObject == None):
+                    core_utils.get_all_the_imports('Testrail')
+                    import testrailController
+                    testrailObject = testrailController.testrailWindow()
     except Exception as e:
         log.error(e, exc_info=True)
