@@ -236,10 +236,21 @@ class testrailWindow():
             testRunsUrl =  f"{baseurl}/index.php?/api/v2/get_plan/{testPlanId}"
 
             testRuns = requests.get(testRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
-
-            runs = testRuns.json()['entries']
             
-            testRunId = runs[-1]['runs'][-1]['id']
+            runs = testRuns.json()['entries']
+
+            allTestRunsUrl = f"{baseurl}/index.php?/api/v2/get_runs/{projectId}"
+
+            allTestRuns = requests.get(allTestRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
+
+            latestTestRun = allTestRuns.json()['runs'][0]
+            
+            testRunId = 0
+
+            if latestTestRun['created_on'] > plans[0]['created_on']:
+                testRunId = latestTestRun['id']
+            else:
+                testRunId = runs[-1]['runs'][-1]['id']
             
             endpoint = f"{baseurl}/index.php?/api/v2/add_results_for_cases/{testRunId}"
 
