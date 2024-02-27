@@ -1050,10 +1050,11 @@ class Controller():
 
     def invoke_debug(self,mythread,runfrom_step,json_data):
         #the flag 'get_browser_to_foreground'for: To bring the browser to foreground , and only for debugging
-        global get_browser_to_foreground,debugger_points_list
+        global get_browser_to_foreground,debugger_points_list,debugger_action
         status=COMPLETED
         obj = handler.Handler()
         self.action=DEBUG
+        debugger_action = None
         handler.local_handler.tspList=[]
         scenario=[json_data]
         debugger_points_list = scenario[0][2]['debuggerPoints'] if 'debuggerPoints' in scenario[0][2] else None
