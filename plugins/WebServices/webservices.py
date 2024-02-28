@@ -1277,6 +1277,7 @@ class WSkeywords:
                         if response.status_code == 200:
                             generated_token = json.loads(response.text)['access_token']
                             output = generated_token
+                            self.baseReqHeader['Authorization'] = f'Bearer {generated_token}'
                             status = ws_constants.TEST_RESULT_PASS
                             methodoutput = ws_constants.TEST_RESULT_TRUE
                     else:
