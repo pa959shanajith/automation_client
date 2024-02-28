@@ -13,11 +13,6 @@ resources:
     trigger: true
 steps:
 
-- script: |
-    # Clean up working directory
-    sudo rm -rf s/avoassure ArtifactsFolder.txt BranchName.txt version.txt
-  displayName: 'Clean Working Directory'
-
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
