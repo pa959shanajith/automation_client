@@ -541,7 +541,7 @@ class Handler():
                 if(apptype.lower() == constants.APPTYPE_WEB or apptype.lower() == constants.APPTYPE_MOBILE ):
                     try:
                         #Handling url of pages having iframes and frames
-                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)) and not re.match('\d[if]\/',url):
+                        if len(url.strip())!=0 and (not ("https" in url or "http" in url)) and not re.match('\d[if]\/*',url):
                             url_dec=self.utils_obj.scrape_unwrap(url)
                             if url is not None: url = url_dec
                         if(objectname.strip() != '' and not(objectname.startswith('@')) and len(objectname.split(';')) == 3):
