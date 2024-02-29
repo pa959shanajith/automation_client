@@ -513,7 +513,7 @@ class Dispatcher:
 
         local_Wd.log.info('In Web dispatcher')
         custom_dict={
-            'getstatus': ['radio','checkbox'],
+            'getstatus': ['radio','checkbox','input'],
             'selectradiobutton': ['radio'],
             'selectcheckbox': ['checkbox'],
             'unselectcheckbox': ['checkbox'],
