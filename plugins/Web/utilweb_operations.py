@@ -1368,6 +1368,29 @@ return isVisible(s);"""
             local_uo.log.error(e)
         return status,methodoutput,output,err_msg
     
+    def date_select(self, webelement, input, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        err_msg=None
+        output=OUTPUT_CONSTANT
+        try:
+            if webelement.is_enabled()==False:
+                local_uo.log.error(ERR_DISABLED_OBJECT)
+                err_msg=ERROR_CODE_DICT['ERR_DISABLED_OBJECT']
+                logger.print_on_console(ERR_DISABLED_OBJECT)  
+            else:
+                if webelement.tag_name.lower() != 'input':
+                    webelement = webelement.find_element_by_tag_name('input')
+                browser_Keywords.local_bk.driver_obj.execute_script("arguments[0].value = arguments[1]",webelement,input)
+                logger.print_on_console("Date selected successfully.")
+                methodoutput = TEST_RESULT_TRUE
+                status = TEST_RESULT_PASS
+        except Exception as e:
+            err_msg = 'Error occured while fetching element'
+            logger.print_on_console(err_msg)
+            local_uo.log.error(e)
+        return status,methodoutput,output,err_msg
+        
     def get_element_count(self, webelement, input, *args):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
