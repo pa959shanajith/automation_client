@@ -188,6 +188,7 @@ class Dispatcher:
             'verifyattribute': local_Wd.util_object.verify_attribute,
             'verifystyle': local_Wd.util_object.verify_style,
             'getelementcount': local_Wd.util_object.get_element_count,
+            'dateselect': local_Wd.util_object.date_select,
 
             'openbrowser':local_Wd.browser_object.openBrowser,
             'getbrowsertoforeground':local_Wd.browser_object.get_foreground_window,
@@ -1045,7 +1046,7 @@ class Dispatcher:
         webElement = None
         try:
             index = 0
-            if identifiers_type == 'rxpath' and '@id' not in identifier:
+            if 'xpath' in identifiers_type and identifier[0:2] == '//' and '@id' not in identifier:     #only for relative xpath
                 webElement = driver.execute_script(GET_ELEMENT_BY_XPATH_JS,identifier)
                 
                 if webElement==None:
@@ -1070,16 +1071,14 @@ class Dispatcher:
                     return webElement
                 
             elif identifiers_type == "classname" :
-                indexFlag = 0
                 if '[' and ']' in identifier:
-                    indexFlag = 1
                     index = int(identifier.split('[')[1].split(']')[0])
                     identifier = identifier.split('[')[0]
                 if ' ' in identifier.strip():
                     identifier = '.'+identifier.replace(' ','.')
                     identifiers_type = 'css_selector'
                 webElement=getattr(driver,self.identifier_dict[identifiers_type])(identifier)
-                if indexFlag == 1:
+                if len(webElement) > index:
                     webElement = [webElement[index]]
             elif identifiers_type == "href":
                 webElement = getattr(driver,self.identifier_dict[identifiers_type])(f'[href^="{identifier}"]')
