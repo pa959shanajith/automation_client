@@ -1089,7 +1089,7 @@ class Controller():
                 starting_val_end_range = first_step_val + 1
                 if first_step_val > 0 and first_step_val <= tsplist[-1].stepnum:
                     if last_step_val > first_step_val and last_step_val <= tsplist[-1].stepnum:
-                        testcase_details=testcase[-2]['testcase']
+                        testcase_details=testcase[-3]['testcase']
                         no_of_steps=(last_step_val-first_step_val)+1
                         comment_step_count=0
                         tdlist=testcase_details[first_step_val-1:last_step_val]
