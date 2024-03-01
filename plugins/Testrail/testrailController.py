@@ -57,7 +57,7 @@ class testrailWindow():
                 if isinstance(projects, list):
                     log.info(projects)
                     return {'projects':projects}
-                else :
+                else:
                     return projects
             elif response.status_code == 429:
                 return 'API rate limit exceeded'
@@ -117,9 +117,9 @@ class testrailWindow():
                     log.info(testcases)
                     if len(testcases) == 0:
                         return [{'section_id':data['sectionId'],'message': []}]
-                    else :
+                    else:
                         return [{'section_id':data['sectionId'],'message': testcases}]
-                else :
+                else:
                     log.info(testcases['cases'])
                     if len(testcases['cases']) == 0:
                         return [{'section_id':data['sectionId'],'message': []}]
@@ -216,9 +216,9 @@ class testrailWindow():
                     log.info(testSections)
                     if len(testSections) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
-                    else :
+                    else:
                         return [{'suite_id':data['suiteId'],'message':testSections}]
-                else :
+                else:
                     log.info(testSections['sections'])
                     if len(testSections['sections']) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
@@ -248,7 +248,7 @@ class testrailWindow():
 
             if isinstance(testPlans.json(), list) and len(testPlans.json()) > 0:
                 plans = testPlans.json()
-            elif isinstance(testPlans.json().get('plans'), list) and len(testPlans.json()['plans']) > 0 :
+            elif isinstance(testPlans.json().get('plans'), list) and len(testPlans.json()['plans']) > 0:
                 plans = testPlans.json()['plans']
             
             if plans is not None:
