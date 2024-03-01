@@ -1,4 +1,4 @@
-name: Test-MacICEPipeline
+name: MacICEPipeline
 trigger: none
 
 pool:
@@ -8,8 +8,8 @@ pool:
 
 resources:
   pipelines:
-  - pipeline: Test-MacICEPipeline
-    source: Test-Parent-Pipeline
+  - pipeline: MacICEPipeline
+    source: Build-AvoAssure
     trigger: true
 steps:
 
