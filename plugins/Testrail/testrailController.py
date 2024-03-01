@@ -54,8 +54,11 @@ class testrailWindow():
             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 projects = response.json()
-                log.info(projects)
-                return projects
+                if isinstance(projects, list):
+                    log.info(projects)
+                    return {'projects':projects}
+                else :
+                    return projects
             elif response.status_code == 429:
                 return 'API rate limit exceeded'
             elif response.status_code == 401:
@@ -110,11 +113,18 @@ class testrailWindow():
             # # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 testcases = response.json()
-                log.info(testcases['cases'])
-                if len(testcases['cases']) == 0:
-                    return [{'section_id':data['sectionId'],'message': []}]
-                else:
-                    return [{'section_id':data['sectionId'],'message': testcases['cases']}]
+                if isinstance(testcases, list):
+                    log.info(testcases)
+                    if len(testcases) == 0:
+                        return [{'section_id':data['sectionId'],'message': []}]
+                    else :
+                        return [{'section_id':data['sectionId'],'message': testcases}]
+                else :
+                    log.info(testcases['cases'])
+                    if len(testcases['cases']) == 0:
+                        return [{'section_id':data['sectionId'],'message': []}]
+                    else:
+                        return [{'section_id':data['sectionId'],'message': testcases['cases']}]
             elif response.status_code == 429:
                 return [{'section_id':data['sectionId'],'message':'API rate limit exceeded'}]
             elif response.status_code == 401:
@@ -202,11 +212,18 @@ class testrailWindow():
              # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 testSections = response.json()
-                log.info(testSections['sections'])
-                if len(testSections['sections']) == 0:
-                    return [{'suite_id':data['suiteId'],'message':[]}]
-                else:
-                    return [{'suite_id':data['suiteId'],'message':testSections['sections']}]
+                if isinstance(testSections, list):
+                    log.info(testSections)
+                    if len(testSections) == 0:
+                        return [{'suite_id':data['suiteId'],'message':[]}]
+                    else :
+                        return [{'suite_id':data['suiteId'],'message':testSections}]
+                else :
+                    log.info(testSections['sections'])
+                    if len(testSections['sections']) == 0:
+                        return [{'suite_id':data['suiteId'],'message':[]}]
+                    else:
+                        return [{'suite_id':data['suiteId'],'message':testSections['sections']}]
             elif response.status_code == 429:
                 return [{'suite_id':data['suiteId'],'message':'API rate limit exceeded'}]
             elif response.status_code == 401:
@@ -221,35 +238,42 @@ class testrailWindow():
         try:
             headers = {"Content-Type": "application/json"}
             auth = (username, apitoken)
-            
             request = []
+            plans = None
+            runs = None
+            latestTestRun = None
             projectId = mappedDetails[-1]['projectid'][-1]
-            
             testPlansUrl = f"{baseurl}/index.php?/api/v2/get_plans/{projectId}"
-
             testPlans = requests.get(testPlansUrl,headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
 
-            plans = testPlans.json()['plans']
+            if isinstance(testPlans.json(), list) and len(testPlans.json()) > 0:
+                plans = testPlans.json()
+            elif isinstance(testPlans.json().get('plans'), list) and len(testPlans.json()['plans']) > 0 :
+                plans = testPlans.json()['plans']
             
-            testPlanId = plans[0]['id']
-            
-            testRunsUrl =  f"{baseurl}/index.php?/api/v2/get_plan/{testPlanId}"
-
-            testRuns = requests.get(testRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
-            
-            runs = testRuns.json()['entries']
+            if plans is not None:
+                testPlanId = plans[0]['id']
+                testRunsUrl =  f"{baseurl}/index.php?/api/v2/get_plan/{testPlanId}"
+                testRuns = requests.get(testRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
+                runs = testRuns.json()['entries']
 
             allTestRunsUrl = f"{baseurl}/index.php?/api/v2/get_runs/{projectId}"
-
             allTestRuns = requests.get(allTestRunsUrl,headers=headers, auth=auth, verify = self.verify_flag,  proxies = self.proxies)
-
-            latestTestRun = allTestRuns.json()['runs'][0]
+            if isinstance(allTestRuns.json(), list) and len(allTestRuns.json()) > 0:
+                latestTestRun = allTestRuns.json()[0]
+            elif isinstance(allTestRuns.json().get('runs'), list) and len(allTestRuns.json()['runs']) > 0:
+                latestTestRun = allTestRuns.json()['runs'][0]
             
             testRunId = 0
-
-            if latestTestRun['created_on'] > plans[0]['created_on']:
+            
+            if latestTestRun is not None and runs is not None:
+                if latestTestRun['created_on'] > plans[0]['created_on']:
+                    testRunId = latestTestRun['id']
+                else:
+                    testRunId = runs[-1]['runs'][-1]['id']
+            elif latestTestRun is not None and runs is None:
                 testRunId = latestTestRun['id']
-            else:
+            elif runs is not None and latestTestRun is None:
                 testRunId = runs[-1]['runs'][-1]['id']
             
             endpoint = f"{baseurl}/index.php?/api/v2/add_results_for_cases/{testRunId}"
