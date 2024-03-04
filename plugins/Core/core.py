@@ -1251,7 +1251,7 @@ class MainNamespace(BaseNamespace):
             sap_scraping_obj.clickandadd('STOPCLICKANDADD', socketIO, args[1])
             sap_launch_keywords_obj = sap_launch_keywords.Launch_Keywords()
             sap_launch_keywords_obj.close_window()
-            sapScrapeFlag=True
+            sapScrapeFlag=False
         except Exception as error:
             err_msg='Error while Scraping SAP application through Genius'
             log.error(err_msg)
