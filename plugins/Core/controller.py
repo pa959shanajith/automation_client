@@ -1348,8 +1348,7 @@ class Controller():
                             testrail_username = qc_creds['testrail']['username']
                             testrail_apitoken = qc_creds['testrail']['apitoken']
                             testrail_mappedDetails = scenario["qcdetails"][integ]
-                            # testrail_runId = qc_creds['testrail']['runId']
-
+                            testrail_runId = qc_creds['testrail']['runId']
                         #Iterating through each test case in the scenario
                         for testcase in [eval(scenario[scenario_id])]:
                             #For every unique screen in list of test cases, store screen data
@@ -1827,7 +1826,7 @@ class Controller():
                                     status_code = 2
                                 logger.print_on_console('****Updating Testrail Details****')
                                 if testrailObject is not None:
-                                    testrail_update = testrailObject.updateResult(testrail_url,testrail_username,testrail_apitoken,testrail_mappedDetails,status_code)
+                                    testrail_update = testrailObject.updateResult(testrail_url,testrail_username,testrail_apitoken,testrail_mappedDetails,status_code,testrail_runId)
                                     if testrail_update['status'] == 1:
                                         logger.print_on_console(f"****Updated {testrail_update['successCount']} out of {testrail_update['totalCount']} test cases of testrail****")
                                     else :

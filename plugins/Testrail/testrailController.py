@@ -222,13 +222,13 @@ class testrailWindow():
                     if len(testSections) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
                     else:
-                        return [{'suite_id':data['suiteId'],'message':[]}]
+                        return [{'suite_id':data['suiteId'],'message':testSections}]
                 else:
                     log.info(testSections['sections'])
                     if len(testSections['sections']) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
                     else:
-                        return [{'suite_id':data['suiteId'],'message':[]}]
+                        return [{'suite_id':data['suiteId'],'message':testSections['sections']}]
             elif response.status_code == 429:
                 return [{'suite_id':data['suiteId'],'message':'API rate limit exceeded'}]
             elif response.status_code == 401:
@@ -291,6 +291,7 @@ class testrailWindow():
             successCount = 0
 
             totalCount = 0
+            
             # constructing the endpoint
             for i in range(len(mappedDetails)):
                 for j in range(len(mappedDetails[i]["testid"])):
