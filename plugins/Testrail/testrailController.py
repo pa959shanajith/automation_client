@@ -187,21 +187,19 @@ class testrailWindow():
             headers = {"Content-Type": "application/json"}
             auth = (self.testrailUsername, self.testrailApiToken)
             # # requesting testrail for getting the testcases
-            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
-                
-             # Check if the request was successful (HTTP status code 200)
+            response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 testPlanDetails = response.json()
                 log.info(testPlanDetails)
-                return testPlanDetails['entries']
+                return [{'testplanid':data['testPlanId'],'message':testPlanDetails['entries']}]
             elif response.status_code == 429:
-                return 'API rate limit exceeded'
+                return [{'testplanid':data['testPlanId'],'message':'API rate limit exceeded'}]
             elif response.status_code == 401:
-                return 'Invalid Credentials'
+                return [{'testplanid':data['testPlanId'],'message':'Invalid Credentials'}]
             else:
-                return 'failed to fetch data from testrail'
+                return [{'testplanid':data['testPlanId'],'message':'failed to fetch data from testrail'}]
         except Exception as e:
-            return 'error'
+            return [{'testplanid':data['testPlanId'],'message':'error'}]
     
     def getSections(self,data):
         res = "invalidcredentials"
@@ -213,7 +211,6 @@ class testrailWindow():
             auth = (self.testrailUsername, self.testrailApiToken)
             # # requesting testrail for getting the testcases
             response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
-            
              # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 testSections = response.json()
