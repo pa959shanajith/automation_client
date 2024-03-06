@@ -1269,11 +1269,12 @@ class MainNamespace(BaseNamespace):
                 testrailObject = testrailController.testrailWindow()
             data = args[0]
             response = testrailObject.testrail_dict[data['testrailAction']](data)
-            
             if data['testrailAction'] == 'getTestCases':
                 socketIO.emit(f'qcresponse{response[0]["section_id"]}', response)
             elif data['testrailAction'] == 'getSections':
                 socketIO.emit(f'qcresponse{response[0]["suite_id"]}', response)
+            elif data['testrailAction'] == 'getTestPlanDetails':
+                socketIO.emit(f'qcresponse{response[0]["testplanid"]}', response)
             else:
                 socketIO.emit('qcresponse', response)
         except KeyError:
