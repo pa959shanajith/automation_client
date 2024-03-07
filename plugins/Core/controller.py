@@ -1074,7 +1074,8 @@ class Controller():
         debugger_action = None
         handler.local_handler.tspList=[]
         scenario=[json_data]
-        debugger_points_list = scenario[0][2]['debuggerPoints'] if 'debuggerPoints' in scenario[0][2] else None
+        if len(scenario[0]) > 2:
+            debugger_points_list = scenario[0][2]['debuggerPoints'] if 'debuggerPoints' in scenario[0][2] else None
         print('=======================================================================================================')
         log.info('***DEBUG STARTED***')
         logger.print_on_console('***DEBUG STARTED***')
