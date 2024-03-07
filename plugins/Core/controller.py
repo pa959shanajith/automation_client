@@ -371,7 +371,9 @@ class Controller():
             print('-------------------------------------------------------------------------------------------------------')
             log.info('---------------------------------------------------------------------')
         ## logic to handle advance debugger breakpoints
-        if debugger_points_list is not None and (len(debugger_points_list)>0 and (debugger_points_list[0] -1) == index):
+        if debugger_points_list is not None and (len(debugger_points_list)>0 and index+1 in debugger_points_list):
+            if debugger_action == 'moveToNextStep':
+                del debugger_points_list[-1]
             pause_flag = True
         #logic to handle step by step debug
         if self.debug_mode and tsp.testcase_num==self.last_tc_num:
@@ -415,13 +417,15 @@ class Controller():
                         index,result = self.keywordinvocation(index,inpval,self.reporting_obj,execution_env,*args)
                         if debugger_points_list is not None and len(debugger_points_list)>0:
                             debugger_result_data.append({'index':index, 'custname':tsp.custname, 'result':result})
-                            if (debugger_points_list[0] -1) == index:
+                            if index+1 in debugger_points_list:
                                 if debugger_action is None:
                                     socket_object.emit('result_debugTestCase', debugger_result_data)
                                 elif debugger_action == 'playDebug':
                                     socket_object.emit('result_playDebug_listener', debugger_result_data)
-                                elif debugger_action == 'moveToNextStep':
-                                    socket_object.emit('result_moveToNextStep_listener', debugger_result_data)
+                                debugger_result_data = []
+                            elif debugger_action == 'moveToNextStep':
+                                socket_object.emit('result_moveToNextStep_listener', debugger_result_data)
+                                debugger_points_list.append(index+1)
                                 debugger_result_data = []
                     else:
                         keyword_flag=False
@@ -442,6 +446,19 @@ class Controller():
                                 self.jumpto_previousindex.append(index+1)
                                 index,counter = tsp.invoke_jumpto(inpval,self.reporting_obj,self.counter)
                                 self.counter.append(counter)
+                            if debugger_points_list is not None and len(debugger_points_list)>0:
+                                if tsp.name != 'endFor':
+                                    debugger_result_data.append({'index':index, 'custname':tsp.apptype, 'result':('Pass','True','9cc33d6fe25973868b30f4439f09901a',None)})
+                                if index+1 in debugger_points_list:
+                                    if debugger_action is None:
+                                        socket_object.emit('result_debugTestCase', debugger_result_data)
+                                    elif debugger_action == 'playDebug':
+                                        socket_object.emit('result_playDebug_listener', debugger_result_data)
+                                    debugger_result_data = []
+                                elif debugger_action == 'moveToNextStep':
+                                    socket_object.emit('result_moveToNextStep_listener', debugger_result_data)
+                                    debugger_points_list.append(index+1)
+                                    debugger_result_data = []
             else:
                 index= TERMINATE
                 self.status=index
