@@ -144,9 +144,24 @@ class ExcelFile:
                             sheet=wb.get_sheet_by_name(sheetname)
                             del wb,sheet
                         else:
-                            wb = open_workbook(self.excel_path)
-                            sheet = wb.sheet_by_name(sheetname)
-                            del wb,sheet
+                            try:
+                                wb = open_workbook(self.excel_path)
+                                sheet = wb.sheet_by_name(sheetname)
+                                del wb,sheet
+                            except:
+                                # Handling xlrd error for xls file: xlrd unsupported format, or corrupt file.
+                                import win32com.client as win32
+                                fname = input_path
+                                excel = win32.gencache.EnsureDispatch('Excel.Application')
+                                wb = excel.Workbooks.Open(fname)
+                                wb.SaveAs(fname+"x", FileFormat = 51)    #FileFormat = 51 is for .xlsx extension #FileFormat = 56 is for .xls extension
+                                wb.Close()                               #Excel Application must not be running in the backgroud.
+                                excel.Application.Quit()
+                                input_path = input_path+'x'
+                                self.excel_path=input_path
+                                wb = open_workbook(self.excel_path)
+                                sheet = wb.sheet_by_name(sheetname)
+                                del wb,sheet
                         self.sheetname=sheetname
                         status=TEST_RESULT_PASS
                         methodoutput=TEST_RESULT_TRUE

@@ -180,7 +180,11 @@ class GenericKeywordDispatcher:
     def fetch_data(self,input):
         output=None
         try:
-            output=local_generic.generic_database.fetchData(input)
+            # output=local_generic.generic_database.fetchData(input)
+            output = database_keywords.db_output
+            varible_name = input[-1].strip("{}").split('[')[0]
+            output = eval(input[-1].strip("{}").replace(f"{varible_name}", 'output').replace("]","-1]"))
+
         except Exception as e:
             local_generic.log.error(e)
         return output

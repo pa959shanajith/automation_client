@@ -35,7 +35,7 @@ except:
 
 from constants import *
 log = logging.getLogger('database_keywords.py')
-
+db_output = []
 
 class DatabaseOperation():
 
@@ -233,6 +233,7 @@ class DatabaseOperation():
         param : database type, IP, port number , database name, username , password , query
         return : data
         """
+        global db_output
         status=generic_constants.TEST_RESULT_FAIL
         result=generic_constants.TEST_RESULT_FALSE
         value = None
@@ -291,6 +292,7 @@ class DatabaseOperation():
                             cursor.execute(query)
                             status=generic_constants.TEST_RESULT_PASS
                             result=generic_constants.TEST_RESULT_TRUE
+                db_output = cursor.fetchall()
                 details=res
         except Exception as e:
             err_msg = self.processException(e)

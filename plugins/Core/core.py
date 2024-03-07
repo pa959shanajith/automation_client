@@ -1251,7 +1251,7 @@ class MainNamespace(BaseNamespace):
             sap_scraping_obj.clickandadd('STOPCLICKANDADD', socketIO, args[1])
             sap_launch_keywords_obj = sap_launch_keywords.Launch_Keywords()
             sap_launch_keywords_obj.close_window()
-            sapScrapeFlag=True
+            sapScrapeFlag=False
         except Exception as error:
             err_msg='Error while Scraping SAP application through Genius'
             log.error(err_msg)
@@ -1269,11 +1269,12 @@ class MainNamespace(BaseNamespace):
                 testrailObject = testrailController.testrailWindow()
             data = args[0]
             response = testrailObject.testrail_dict[data['testrailAction']](data)
-            
             if data['testrailAction'] == 'getTestCases':
                 socketIO.emit(f'qcresponse{response[0]["section_id"]}', response)
             elif data['testrailAction'] == 'getSections':
                 socketIO.emit(f'qcresponse{response[0]["suite_id"]}', response)
+            elif data['testrailAction'] == 'getTestPlanDetails':
+                socketIO.emit(f'qcresponse{response[0]["testplanid"]}', response)
             else:
                 socketIO.emit('qcresponse', response)
         except KeyError:
