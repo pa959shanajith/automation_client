@@ -406,7 +406,6 @@ class MainNamespace(BaseNamespace):
         try:
             move_to_next_step_data = args[0]
             controller.debugger_action = move_to_next_step_data['responseData']['action'] if 'action' in move_to_next_step_data['responseData'] else None
-            controller.debugger_points_list = move_to_next_step_data['responseData']['debuggerPoints'] if 'debuggerPoints' in move_to_next_step_data['responseData'] else None
             controller.pause_flag=False
             root.testthread.resume(False)
         except Exception as e:
@@ -1501,10 +1500,17 @@ class TestThread(threading.Thread):
                                 UserObjectScrape.update_data={}
                                 data['status']=status
                                 socketIO.emit('result_debugTestCase',data)
+                                socketIO.emit('result_playDebug_listener',data)
+                                socketIO.emit('result_moveToNextStep_listener',data)
                             else:
                                 socketIO.emit('result_debugTestCase',status)
+                                socketIO.emit('result_playDebug_listener',status)
+                                socketIO.emit('result_moveToNextStep_listener',status)
                         else:
                             socketIO.emit('result_debugTestCase',status)
+                            socketIO.emit('result_playDebug_listener',status)
+                            socketIO.emit('result_moveToNextStep_listener',status)
+                        controller.debugger_result_data = []    #on complete debuge empty result data
                     else:
                         socketIO.emit('result_debugTestCaseWS',status)
                 elif self.action==EXECUTE:

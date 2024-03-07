@@ -551,3 +551,28 @@ class UtilOperations:
         var = inp[1:len(str(inp))-1]
         path = handler.local_handler.paramData[var][0]
         return path
+
+    def custom_keyword(self, *args):
+        status=TEST_RESULT_FAIL
+        methodoutput=TEST_RESULT_FALSE
+        output=OUTPUT_CONSTANT
+        err_msg=None
+        custome_result = False
+        try:
+            if len(args)>1:
+                if args[-1].lower() == 'javascript':
+                    code = args[-2].replace("element", "arguments[0]")
+                    custom_result = browser_Keywords.local_bk.driver_obj.execute_script(code,webelement)
+                elif args[-1].lower() == 'python':
+                    code = args[-2]
+                    custom_result = exec(code)
+                if custom_result is not None:
+                    logger.print_on_console("Custom Keyword Result: ", custom_result)
+                output = custom_result              
+                status=TEST_RESULT_PASS
+                methodoutput=TEST_RESULT_TRUE
+        except Exception as e:
+            log.info("error in custom keywords: ", e)
+            logger.print_on_console("Custom Keyword Exception:")
+            logger.print_on_console(e)
+        return status,methodoutput,output,err_msg

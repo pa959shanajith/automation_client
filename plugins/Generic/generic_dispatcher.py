@@ -60,6 +60,7 @@ class GenericKeywordDispatcher:
         local_generic.const_var_obj=constant_variable.ConstantVariables()
         local_generic.log = logging.getLogger("generic_dispatcher.py")
         self.generic_dict={
+            'customkeyword':local_generic.util_operation_obj.custom_keyword,
             'tolowercase': local_generic.generic_string.toLowerCase,
             'touppercase' : local_generic.generic_string.toUpperCase,
             'trim'    : local_generic.generic_string.trim,
@@ -197,6 +198,8 @@ class GenericKeywordDispatcher:
          dataflag=False                  #flag for database operation keyword to resolve invalid input issue
          result=[constants.TEST_RESULT_FAIL,constants.TEST_RESULT_FALSE,constants.OUTPUT_CONSTANT,err_msg]
          try:
+            if tsp.code!='' and tsp.code!=None:
+                keyword = "customkeyword"
             if keyword in list(self.generic_dict.keys()):
                 if keyword in [generic_constants.DISPLAY_VARIABLE_VALUE,generic_constants.SENDFUNCTIONKEYS,generic_constants.PAUSE]:
                     actual_input=tsp.inputval[0].split(';')
@@ -276,6 +279,8 @@ class GenericKeywordDispatcher:
                 elif(dataflag):
                     err_msg=generic_constants.INVALID_INPUT
                     result[3]=err_msg
+                elif keyword == "customkeyword":
+                    result= self.generic_dict["customkeyword"](*message,tsp.code,tsp.language)
                 else:
                     result= self.generic_dict[keyword](*message)
             else:

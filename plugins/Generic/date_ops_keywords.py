@@ -182,7 +182,7 @@ class DateOperation:
             logger.print_on_console(err_msg)
         return status,result,output,err_msg
 
-    def dateDifference(self,input_date, date_or_count ,date_format):
+    def dateDifference(self,input_date, date_or_count ,date_format, *args):
         """
         def : dateDifference
         purpose : finds the differce between two dates or date and count
@@ -199,6 +199,40 @@ class DateOperation:
                     if not (date_format is None or date_format is ''):
                         ret_inp_format = self.validate(date_format)
                         if ret_inp_format != -1:
+                            if (date_or_count == '0') or (len(args) == 1 and args[0] == 'time'):
+                                date1 = datetime.datetime.strptime(input_date, ret_inp_format)
+                                if len(args) == 1 and args[0] == 'time':
+                                    current_date_time = date_or_count
+                                else:
+                                    current_date_time = (datetime.datetime.now()).strftime(ret_inp_format)
+                                date2 = datetime.datetime.strptime(current_date_time, ret_inp_format)
+                                seconds = abs((date2-date1).seconds)
+                                output = str(timedelta(seconds = seconds))
+                                logger.print_on_console('Output is :' ,str(output))
+                                log.info('output is')
+                                log.info(output)
+                                status=generic_constants.TEST_RESULT_PASS
+                                result=generic_constants.TEST_RESULT_TRUE
+                            else:
+                                if(len(input_date) == len(date_or_count)):
+                                    date1 = datetime.datetime.strptime(input_date, ret_inp_format)
+                                    date2 = datetime.datetime.strptime(date_or_count, ret_inp_format)
+                                    output = abs((date2 - date1).days)
+                                    logger.print_on_console('Output is :' ,str(output))
+                                    log.info('output is')
+                                    log.info(output)
+                                    status=generic_constants.TEST_RESULT_PASS
+                                    result=generic_constants.TEST_RESULT_TRUE
+                                else:
+                                    count = datetime.datetime.strptime(input_date, ret_inp_format)
+                                    days = int(date_or_count)
+                                    temp = count - timedelta(days = days)
+                                    output = temp.strftime(ret_inp_format)
+                                    logger.print_on_console('Output is :' ,output)
+                                    log.info('output is')
+                                    log.info(output)
+                                    status=generic_constants.TEST_RESULT_PASS
+                                    result=generic_constants.TEST_RESULT_TRUE
                             if(len(input_date) == len(date_or_count)):
                                 date1 = datetime.datetime.strptime(input_date, ret_inp_format)
                                 date2 = datetime.datetime.strptime(date_or_count, ret_inp_format)
