@@ -740,7 +740,41 @@ class Tree_View_Keywords():
                                             err_msg = 'Element not present on the page where operation is trying to be performed'
                                         else:
                                             tree_elm = element.item(tree_path, exact = True)
-                                            tree_elm.click_input(button = 'right', double = False, wheel_dist = 0, where = 'text', pressed = '')
+                                            if 'Batch' in input_val[0]:
+                                                Rect = str(tree_elm.client_rect())
+                                                Rect = Rect[1 : len(Rect) - 1]
+                                                Rect = Rect.split(",")
+                                                Left = Rect[0].strip()#left
+                                                if ( "L" in Left ):
+                                                    Left = int(Left[1:])
+                                                else:
+                                                    Left = int(Left)
+                                                Top = Rect[1].strip()#top
+                                                if ( "T" in Top ):
+                                                    Top = int(Top[1:])
+                                                else:
+                                                    Top = int(Top)
+                                                Right = Rect[2].strip()#right
+                                                if ( "R" in Right ):
+                                                    Right = int(Right[1:])
+                                                else:
+                                                    Right = int(Right)
+                                                Bottom = Rect[3].strip()#bottom
+                                                if ( "B" in Bottom ):
+                                                    Bottom = int(Bottom[1:])
+                                                else:
+                                                    Bottom = int(Bottom)
+                                                #---------------------Finding height and width
+                                                height = Bottom - Top
+                                                width = Right - Left
+                                                #--------------------Finding X and Y co-ordinates
+                                                x = Left + width / 2
+                                                y = Top + height / 2
+                                                x = x+1150
+                                                y = y+150
+                                                pywinauto.mouse.click(button = 'right', coords = (int(x), int(y)))
+                                            else:
+                                                tree_elm.click_input(button = 'right', double = False, wheel_dist = 0, where = 'text', pressed = '')
                                 elif ( element.backend.name == 'uia' ):
                                     root_element = element.roots()
                                     for list_item in root_element:
