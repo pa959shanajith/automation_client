@@ -656,6 +656,7 @@ class JSONOperations():
         err_msg=None
         import xmltodict
         input_json=xmltodict.parse(input_string)
+        input_json = json.loads(json.dumps(input_json))
         #logger.print_on_console(input_json)
         block=block_key_name.split('.')
         number=block_count.split(',')
@@ -699,11 +700,22 @@ class JSONOperations():
                     status = TEST_RESULT_PASS
                     methodoutput = TEST_RESULT_TRUE
             if len(args)>0:
-                attr='@'+args[0]
-                key_value=key_value[int(number[i])-1][attr]
-                logger.print_on_console('Tag Attribute : ',key_name, ' Attribute Value : ',key_value)
+                for value in args:
+                    if isinstance(key_value, list):
+                        key_value=key_value[int(number[i])-1]
+                        
+                    if value in key_value:
+                        key_name = value
+                        key_value = key_value[value]
+                    else:
+                        log.debug('Invalid key given')
+                        err_msg = ERR_XML
+                        break
+                
+                if err_msg != ERR_XML:
+                    logger.print_on_console('Tag : ',key_name, ', Value : ',key_value)
             else:
-                logger.print_on_console('Tag : ',key_name, ' Value : ',key_value)
+                logger.print_on_console('Tag : ',key_name, ', Value : ',key_value)
         except Exception as e:
             err_msg=ERR_XML
             logger.print_on_console(err_msg)
