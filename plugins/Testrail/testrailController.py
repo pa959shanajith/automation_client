@@ -55,7 +55,6 @@ class testrailWindow():
             if response.status_code == 200:
                 projects = response.json()
                 if isinstance(projects, list):
-                    log.info(projects)
                     return {'projects':projects}
                 else:
                     return projects
@@ -66,7 +65,8 @@ class testrailWindow():
             else:
                 return 'failed to fetch data from testrail'
         except Exception as e:
-            return e
+            log.error(e)
+            return 'error'
         
     def getSuites(self,data):
         res = "invalidcredentials"
@@ -84,7 +84,6 @@ class testrailWindow():
             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 suites = response.json()
-                log.info(suites)
                 if len(suites) == 0:
                     return []
                 else :
@@ -96,6 +95,7 @@ class testrailWindow():
             else:
                 return 'failed to fetch data from testrail'
         except Exception as e:
+            log.error(e)
             return 'error'
         
     
@@ -114,13 +114,11 @@ class testrailWindow():
             if response.status_code == 200:
                 testcases = response.json()
                 if isinstance(testcases, list):
-                    log.info(testcases)
                     if len(testcases) == 0:
                         return [{'section_id':data['sectionId'],'message': []}]
                     else:
                         return [{'section_id':data['sectionId'],'message': testcases}]
                 else:
-                    log.info(testcases['cases'])
                     if len(testcases['cases']) == 0:
                         return [{'section_id':data['sectionId'],'message': []}]
                     else:
@@ -133,6 +131,7 @@ class testrailWindow():
                 return [{'section_id':data['sectionId'],'message':'failed to fetch data from testrail'}]
                 
         except Exception as e:
+            log.error(e)
             return [{'section_id':data['sectionId'],'message':'error'}]
         
     
@@ -144,25 +143,23 @@ class testrailWindow():
             
             # Construct the API endpoint for getting testcases on the basis of request
             endpoint = f"/index.php?/api/v2/get_plans/{data['projectId']}"
-            testPlansUrl = f"{self.baseUrl}{endpoint}"
+            testPlansUrl = f"{data['baseUrl']}{endpoint}"
             headers = {"Content-Type": "application/json"}
-            testRunsUrl = f"{self.baseUrl}/index.php?/api/v2/get_runs/{data['projectId']}"
-            auth = (self.testrailUsername, self.testrailApiToken)
+            testRunsUrl = f"{data['baseUrl']}/index.php?/api/v2/get_runs/{data['projectId']}"
+            auth = (data['testrailUsername'], data['testrailApiToken'])
             # # requesting testrail for getting the testplans
             testPlans = requests.get(testPlansUrl, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
              # Check if the request was successful (HTTP status code 200)
             if testPlans.status_code == 200:
                 response = testPlans.json()
-                log.info(response)
                 if isinstance(response, list) and len(response) > 0:
                     plans = response
                 else:
                     plans = response['plans']
             
-            testRuns =  requests.get(testRunsUrl, headers=headers, auth=auth)
+            testRuns =  requests.get(testRunsUrl, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)
             if testRuns.status_code == 200:
                 response = testRuns.json()
-                log.info(response)
                 if isinstance(response, list) and len(response) > 0:
                     runs = response
                 else:
@@ -176,6 +173,7 @@ class testrailWindow():
             
             return {'testPlans':plans,'testRuns':runs}
         except Exception as e:
+            log.error(e)
             return 'error'
         
     def getTestPlanDetails(self,data):
@@ -183,14 +181,13 @@ class testrailWindow():
         try:
             # Construct the API endpoint for getting testcases on the basis of request
             endpoint = f"/index.php?/api/v2/get_plan/{data['testPlanId']}"
-            url = f"{self.baseUrl}{endpoint}"
+            url = f"{data['baseUrl']}{endpoint}"
             headers = {"Content-Type": "application/json"}
-            auth = (self.testrailUsername, self.testrailApiToken)
+            auth = (data['testrailUsername'], data['testrailApiToken'])
             # # requesting testrail for getting the testcases
             response = requests.get(url, headers=headers, auth=auth, verify = self.verify_flag, proxies = self.proxies)             # Check if the request was successful (HTTP status code 200)
             if response.status_code == 200:
                 testPlanDetails = response.json()
-                log.info(testPlanDetails)
                 return [{'testplanid':data['testPlanId'],'message':testPlanDetails['entries']}]
             elif response.status_code == 429:
                 return [{'testplanid':data['testPlanId'],'message':'API rate limit exceeded'}]
@@ -199,6 +196,7 @@ class testrailWindow():
             else:
                 return [{'testplanid':data['testPlanId'],'message':'failed to fetch data from testrail'}]
         except Exception as e:
+            log.error(e)
             return [{'testplanid':data['testPlanId'],'message':'error'}]
     
     def getSections(self,data):
@@ -215,13 +213,11 @@ class testrailWindow():
             if response.status_code == 200:
                 testSections = response.json()
                 if isinstance(testSections, list):
-                    log.info(testSections)
                     if len(testSections) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
                     else:
                         return [{'suite_id':data['suiteId'],'message':testSections}]
                 else:
-                    log.info(testSections['sections'])
                     if len(testSections['sections']) == 0:
                         return [{'suite_id':data['suiteId'],'message':[]}]
                     else:
@@ -233,6 +229,7 @@ class testrailWindow():
             else:
                 return [{'suite_id':data['suiteId'],'message':'failed to fetch data from testrail'}]
         except Exception as e:
+            log.error(e)
             return 'error'
 
 
@@ -305,4 +302,5 @@ class testrailWindow():
             
             return {'status':1,'successCount':successCount,'totalCount':totalCount}
         except Exception as e:
+            log.error(e)
             return {'status':0}
