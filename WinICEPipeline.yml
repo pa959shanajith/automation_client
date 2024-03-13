@@ -1,0 +1,78 @@
+name: WinICEPipeline 
+trigger: none
+
+pool:
+  name: Default
+  demands: Agent.Name -equals 136 Server 
+
+resources:
+  pipelines:
+  - pipeline: WinICEPipeline  
+    source: Build-AvoAssure
+    trigger: true
+
+
+steps:
+- task: DownloadBuildArtifacts@1
+  inputs:
+    buildType: 'specific'
+    project: '95f9a2e6-4c17-42c9-825f-524aff8a66fe'
+    pipeline: '180'
+    buildVersionToDownload: 'latest'
+    downloadType: 'single'
+    artifactName: 'dependencies'
+    downloadPath: '$(System.ArtifactsDirectory)'
+
+- script: |
+    #unzip -j $(Build.ArtifactStagingDirectory)/dependencies/dependencies.zip -d $(Build.ArtifactStagingDirectory)
+    expand -F:* "$(Build.ArtifactStagingDirectory)\dependencies\dependencies.zip" "$(Build.ArtifactStagingDirectory)"
+    #rm -rf dependencies
+    rmdir /s /q "$(Build.ArtifactStagingDirectory)\dependencies"
+    #ls $(System.ArtifactsDirectory)
+    dir $(System.ArtifactsDirectory)
+
+- checkout: git://$(System.TeamProject)/ICE  #####
+  persistCredentials: true
+  clean: true
+  path: s/avoassure
+- task: CmdLine@2
+  inputs:
+    script: |
+      copy "$(System.ArtifactsDirectory)/BranchName.txt" "s/avoassure/"
+      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName.txt)
+      echo "Branch Name is:%BranchName%"
+      echo $(Build.SourceBranch)
+      cd s/avoassure
+      git checkout $BranchName
+      dir
+
+- task: PythonScript@0
+  displayName: 'Running build python script'
+  inputs:
+    scriptPath: 'build/build_classic.py'
+
+- script: |
+   mkdir AvoAssure 
+  displayName: 'Creating AvoAssure directory/folder'
+ 
+- script: |
+   cd assets 
+   del update.py
+   cd..
+   move plugins AvoAssure
+   move  assets AvoAssure
+  displayName: 'Moving plugins and assets to AvoAssure folder'
+ 
+- task: ArchiveFiles@2
+  displayName: 'Archive AvoAssure'
+  inputs:
+    rootFolderOrFile: AvoAssure
+    includeRootFolder: false
+    archiveType: 7z
+    archiveFile: '$(Build.ArtifactStagingDirectory)/AvoAssure.7z'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: dist'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/AvoAssure.7z'
+    ArtifactName: dist
