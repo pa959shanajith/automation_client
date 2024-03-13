@@ -1628,6 +1628,8 @@ class Singleton_DriverUtil():
                         WINDOW_SIZE = "1350,650"
                         choptions.add_argument("--window-size=%s" % WINDOW_SIZE)
                         choptions.headless = True
+                        choptions.add_argument('--ignore-ssl-errors=yes')
+                        choptions.add_argument('--ignore-certificate-errors')
                     if configvalues['extn_enabled'].lower()=='yes' and os.path.exists(webconstants.AVO_EXTENSION_PATH):
                         choptions.add_extension(webconstants.AVO_EXTENSION_PATH)
                     if extension_path.lower() != 'default':
