@@ -212,7 +212,7 @@ class CustomKeyword:
         return custom_element
 
 
-    def get_object_count(self,reference_ele,ele_type):
+    def get_object_count(self,reference_ele,ele_type,webelement):
         status=TEST_RESULT_FAIL
         methodoutput=TEST_RESULT_FALSE
         count=None
