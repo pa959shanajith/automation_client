@@ -1,0 +1,103 @@
+name: WinICEPipeline3.11 
+trigger: none
+
+resources:
+  pipelines:
+  - pipeline: WinICEPipeline3.11  
+    source: Build-AvoAssure
+    trigger: true
+
+pool:
+  vmImage: windows-latest
+steps:
+
+- script: |
+    expand -F:* "$(Build.ArtifactStagingDirectory)\dependencies\dependencies.zip" "$(Build.ArtifactStagingDirectory)"
+    rmdir /s /q "$(Build.ArtifactStagingDirectory)\dependencies"
+    dir $(System.ArtifactsDirectory)
+
+- checkout: git://$(System.TeamProject)/ICE  #####
+  persistCredentials: true
+  clean: true
+  path: s/avoassure
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      copy "$(System.ArtifactsDirectory)/BranchName.txt" "s/avoassure/"
+      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName.txt)
+      echo "Branch Name is:%BranchName%"
+      echo $(Build.SourceBranch)
+      cd s/avoassure
+      git checkout $BranchName
+      dir
+
+- task: UsePythonVersion@0
+  displayName: Use Python 3.11
+  inputs:
+    versionSpec: 3.11
+
+- task: CmdLine@2
+  displayName: Running python pip install command
+  inputs:
+    script: >
+      python -m pip install --upgrade pip && pip install -r requirements.txt
+
+
+- task: CmdLine@2
+  displayName: Changing directory to build folder
+  inputs:
+    script: >
+      cd build
+  
+- task: PythonScript@0
+  displayName: Running build python script
+  inputs:
+    scriptPath: build/build_classic.py
+
+- task: PythonScript@0
+  displayName: Run a Python script copy
+  enabled: False
+  inputs:
+    scriptPath: build/update.py
+    arguments: 22.1.3
+
+- task: CmdLine@2
+  displayName: Creating AvoAssure directory/folder
+  inputs:
+    script: "mkdir AvoAssure \n\n"
+
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: AvoAssure '
+  enabled: False
+  inputs:
+    SourceFolder: plugins
+    TargetFolder: 'AvoAssure '
+
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: AvoAssure'
+  enabled: False
+  inputs:
+    SourceFolder: assets
+    TargetFolder: AvoAssure
+
+- task: CmdLine@2
+  displayName: Moving plugins and assets to AvoAssure folder
+  inputs:
+    script: "cd assets \ndel update.py\ncd..\nmove plugins AvoAssure\nmove  assets AvoAssure"
+
+- task: ArchiveFiles@2
+  displayName: Archive AvoAssure
+  inputs:
+    rootFolderOrFile: AvoAssure
+    includeRootFolder: false
+    archiveType: 7z
+    archiveFile: $(Build.ArtifactStagingDirectory)/AvoAssure.7z
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: dist'
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)/AvoAssure.7z
+    ArtifactName: dist
