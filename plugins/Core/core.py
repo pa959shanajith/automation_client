@@ -38,6 +38,7 @@ from bs4 import BeautifulSoup
 from socketiolib import SocketIO, BaseNamespace, prepare_http_session
 import ssl
 from urllib import request
+import socketio 
 
 
 try:
@@ -220,8 +221,9 @@ class MainNamespace(BaseNamespace):
                         msg='Execution only Mode enabled'
                         logger.print_on_console(msg)
                         log.info(msg)
-                    socketIO.timer.resume()
-                    socketIO.emit('getconstants', '', dnack=True)
+                    # socketIO.timer.resume()
+                    # socketIO.emit('getconstants', '', dnack=True)
+                    socketIO.emit('getconstants', '')
                     conn_time = float(configvalues['connection_timeout'])
                     if (not (connection_Timer != None and connection_Timer.isAlive())
                      and (conn_time >= 8)):
@@ -1358,7 +1360,8 @@ class ConnectionThread(threading.Thread):
                 'http_session': prepare_http_session(kw_args),
                 'ssl_verify': kw_args.get('verify', True)
             }
-            socketIO = SocketIO(**kw)
+            # socketIO = SocketIO(**kw)
+            socketIO = socketio.Client(**kw)
             socketIO.register_namespace(MainNamespace())
             socketIO.connect(server_url)
             root.socketIO = socketIO
