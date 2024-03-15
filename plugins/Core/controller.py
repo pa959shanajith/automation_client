@@ -1595,7 +1595,13 @@ class Controller():
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                             else:
                                 execute_result_data['execReq'] = core.execReq
-                                socketIO.emit('result_executeTestSuite', execute_result_data)
+                                # in case of socket disconnect waiting and checking for connection again
+                                for retry in range(int(configvalues['max_retries_socket_connection'])):
+                                    if socketIO.connected == True:
+                                        socketIO.emit('result_executeTestSuite', execute_result_data)
+                                        break
+                                    else:
+                                        time.sleep(1)
                             obj.clearList(con)
                             sc_idx += 1
                             #logic for condition check
@@ -1632,7 +1638,13 @@ class Controller():
                                 res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)                          
                             else:
                                 execute_result_data['execReq'] = core.execReq
-                                socketIO.emit('result_executeTestSuite', execute_result_data)
+                                # in case of socket disconnect waiting and checking for connection again
+                                for retry in range(int(configvalues['max_retries_socket_connection'])):
+                                    if socketIO.connected == True:
+                                        socketIO.emit('result_executeTestSuite', execute_result_data)
+                                        break
+                                    else:
+                                        time.sleep(1)
                             obj.clearList(con)
                             sc_idx += 1
                             exc_pass = False
@@ -1880,7 +1892,13 @@ class Controller():
                             res = Retryrequests.retry_cicd_apis(self, server_url, data_dict)
                         else:
                             execute_result_data['execReq'] = core.execReq
-                            socketIO.emit('result_executeTestSuite', execute_result_data)
+                            # in case of socket disconnect waiting and checking for connection again
+                            for retry in range(int(configvalues['max_retries_socket_connection'])):
+                                if socketIO.connected == True:
+                                    socketIO.emit('result_executeTestSuite', execute_result_data)
+                                    break
+                                else:
+                                    time.sleep(1)
                         obj.clearList(con)
                         sc_idx += 1
                         exc_pass = False
