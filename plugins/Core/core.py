@@ -719,22 +719,28 @@ class MainNamespace(BaseNamespace):
             log.error(e,exc_info=True)
 
     def on_WS_ImportDefinition(self, *args):
+        response = 'Fail'
         try:
-            if check_execution_lic("result_WS_ImportDefinition"): return None
-            wait_until_browsercheck()
-            core_utils.get_all_the_imports('WebServices')
-            import wsdlgenerator
-            wsdlurl = str(args[0])
-            wsdl_object = wsdlgenerator.WebservicesWSDL()
-            import_def=True
-            response = wsdl_object.listOfOperation(wsdlurl,import_def)
-            log.debug(response)
-            socketIO.emit('result_WS_ImportDefinition',response)
+            if(args[1] == 'Swagger'):
+                response = requests.get(args[0]).json()
+            else:
+                if check_execution_lic("result_WS_ImportDefinition"): return None
+                wait_until_browsercheck()
+                core_utils.get_all_the_imports('WebServices')
+                import wsdlgenerator
+                wsdlurl = str(args[0])
+                wsdl_object = wsdlgenerator.WebservicesWSDL()
+                import_def=True
+                response = wsdl_object.listOfOperation(wsdlurl,import_def)
+                log.debug(response)
+
         except Exception as e:
             err_msg='Error while Fetching WSDL Operations'
             log.error(err_msg)
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
+
+        socketIO.emit('result_WS_ImportDefinition',response)
 
     def on_ExecuteRequestTemplate(self, *args):
         try:
