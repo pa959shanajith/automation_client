@@ -1288,7 +1288,7 @@ class Config_window(wx.Frame):
         data['sample_application_urls']=readconfig.configvalues['sample_application_urls']
         data['isTrial']=readconfig.configvalues['isTrial']
         data['element_load_timeout']=readconfig.configvalues['element_load_timeout']
-        data['verify_wait_time']=readconfig.configvalues['verify_wait_time']
+        data['max_retries_socket_connection']=readconfig.configvalues['max_retries_socket_connection']
         data['ai_server']=readconfig.configvalues['ai_server']
         data['sap_object_indentification_order']=readconfig.configvalues['sap_object_indentification_order']
         data['licensetype']=readconfig.configvalues['licensetype']
