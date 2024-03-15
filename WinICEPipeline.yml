@@ -16,35 +16,46 @@ steps:
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
-    project: '95f9a2e6-4c17-42c9-825f-524aff8a66fe'
-    pipeline: '180'
+    project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
+    pipeline: '182'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
     artifactName: 'dependencies'
     downloadPath: '$(System.ArtifactsDirectory)'
 
+- task: CmdLine@2
+  displayName: 'List Contents of dependencies directory'
+  inputs:
+    script: 'dir "$(Build.ArtifactStagingDirectory)\dependencies"'
+
+- task: PowerShell@2
+  displayName: 'Unzipping dependencies'
+  inputs:
+    targetType: 'inline'
+    script: 'Expand-Archive -Path "$(Build.ArtifactStagingDirectory)\dependencies\dependencies.zip" -DestinationPath "$(Build.ArtifactStagingDirectory)"'
+
 - script: |
-    #unzip -j $(Build.ArtifactStagingDirectory)/dependencies/dependencies.zip -d $(Build.ArtifactStagingDirectory)
-    expand -F:* "$(Build.ArtifactStagingDirectory)\dependencies\dependencies.zip" "$(Build.ArtifactStagingDirectory)"
-    #rm -rf dependencies
     rmdir /s /q "$(Build.ArtifactStagingDirectory)\dependencies"
-    #ls $(System.ArtifactsDirectory)
     dir $(System.ArtifactsDirectory)
+  displayName: 'Listing directory'
 
 - checkout: git://$(System.TeamProject)/ICE  #####
   persistCredentials: true
   clean: true
-  path: s/avoassure
+  path: s\avoassure
+
 - task: CmdLine@2
   inputs:
     script: |
-      copy "$(System.ArtifactsDirectory)/BranchName.txt" "s/avoassure/"
-      set BranchName=$(cat $(System.ArtifactsDirectory)/BranchName.txt)
+      #copy "$(System.ArtifactsDirectory)\BranchName.txt" "s\avoassure\"
+      set /p BranchName=<"$(System.ArtifactsDirectory)\BranchName.txt"
+      #set BranchName=$(cat $(System.ArtifactsDirectory)\BranchName.txt)
       echo "Branch Name is:%BranchName%"
       echo $(Build.SourceBranch)
-      cd s/avoassure
-      git checkout $BranchName
+      cd s\avoassure
+      git checkout %BranchName%
       dir
+  displayName: 'Setting Branch Name'
 
 - task: PythonScript@0
   displayName: 'Running build python script'
