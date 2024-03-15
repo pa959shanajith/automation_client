@@ -753,6 +753,23 @@ class MainNamespace(BaseNamespace):
             logger.print_on_console(err_msg)
             log.error(e,exc_info=True)
 
+    def on_generateToken(self, *args):
+        try:
+            wait_until_browsercheck()
+            core_utils.get_all_the_imports('WebServices')
+            import  webservices
+            ws_object = webservices.WSkeywords()
+            response = 'Fail'
+            if(args[0]['type'] == 'setOAuth2.0'):
+                response = ws_object.setOAuth2(args[0]['token_url'],args[0]['client_id'],args[0]['client_secret'],args[0]['scope'],args[0]['grant_type'])
+            log.debug(response)
+            socketIO.emit('result_generateToken',response)
+        except Exception as e:
+            err_msg='Error while Fetching WSDL Operations'
+            log.error(err_msg)
+            logger.print_on_console(err_msg)
+            log.error(e,exc_info=True)
+
     def on_qclogin(self, *args):
         global qcObject
         err_msg = None
